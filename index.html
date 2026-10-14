@@ -5,7 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
 <title>B2C Project Flow Rework</title>
-<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js" onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.3/lib/msal-browser.min.js';document.head.appendChild(s)"></script>
+<script>
+window.msalReady=new Promise(function(res){
+ var urls=["https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js","https://cdn.jsdelivr.net/npm/@azure/msal-browser@2.38.3/lib/msal-browser.min.js","https://unpkg.com/@azure/msal-browser@2.38.3/lib/msal-browser.min.js"];
+ (function next(i){
+  if(window.msal)return res(true);
+  if(i>=urls.length)return res(false);
+  var s=document.createElement("script"),done=false;
+  var t=setTimeout(function(){if(!done){done=true;next(i+1)}},8000);
+  s.src=urls[i];
+  s.onload=function(){if(done)return;done=true;clearTimeout(t);window.msal?res(true):next(i+1)};
+  s.onerror=function(){if(done)return;done=true;clearTimeout(t);next(i+1)};
+  document.head.appendChild(s);
+ })(0);
+});
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -388,6 +402,10 @@ textarea.fld.title{font-size:15.5px;font-weight:600;min-height:56px}
 @media(max-width:1720px){.brand div{display:none}.search input{width:180px}}
 @media(max-width:1380px){.tab{padding:9px 11px}.search input{width:140px}}
 @media(max-width:1250px){.kpis{grid-template-columns:repeat(2,1fr)}.ov2{grid-template-columns:1fr!important}.tab .ct{display:none}.sync span{display:none}}
+.toast.hasundo{padding:10px 10px 10px 20px;overflow:hidden;border-color:rgba(245,196,0,.5)}
+.toast.hasundo #undo{background:#F5C400;color:#15161A;font-size:13px;padding:8px 16px}
+.toast .tbar{position:absolute;left:0;bottom:0;height:3px;width:100%;background:#F5C400;animation:tbar 8s linear forwards}
+@keyframes tbar{to{width:0}}
 </style>
 </head>
 <body>
@@ -879,7 +897,7 @@ function sectionModal(sec,cb){
  $("mName").onkeydown=e=>{if(e.key==="Enter")$("mOk").click()};
  $("modal").classList.add("on");$("scrim").classList.add("on");setTimeout(()=>$("mName").focus(),60);
 }
-let tt;function toast(m,undo){const el=$("toast");el.innerHTML=H(m)+(undo?'<button id="undo">Undo</button>':"");el.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>el.classList.remove("on"),undo?6000:2800);if(undo)$("undo").onclick=()=>{el.classList.remove("on");undo()}}
+let tt;function toast(m,undo){const el=$("toast");el.innerHTML=H(m)+(undo?'<button id="undo">↶ Undo</button><i class="tbar"></i>':"");el.classList.toggle("hasundo",!!undo);el.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>el.classList.remove("on"),undo?8000:2800);if(undo)$("undo").onclick=()=>{el.classList.remove("on");undo()}}
 
 /* =====================================================================
    XLSX engine – writes and reads the core workbook, no external libraries
@@ -1114,16 +1132,16 @@ const Live=(()=>{
   set("init");render();
   try{
    if(!MOCK){
-    if(!window.msal)throw new Error("Couldn't load the Microsoft sign-in library – check your internet connection.");
+    if(!window.msal){await Promise.race([window.msalReady,sleep(25000)]);for(let i=0;i<40&&!window.msal;i++)await sleep(250)}if(!window.msal)throw new Error("Couldn't load the Microsoft sign-in library – check your internet connection.");
     pca=new msal.PublicClientApplication({auth:{clientId:CONFIG.clientId,authority:"https://login.microsoftonline.com/"+CONFIG.tenantId,redirectUri:location.origin+location.pathname},cache:{cacheLocation:"localStorage"}});
-    const rr=await pca.handleRedirectPromise();if(rr&&rr.account)account=rr.account;
+    if(pca.initialize)await pca.initialize();const rr=await pca.handleRedirectPromise().catch(()=>null);if(rr&&rr.account)account=rr.account;
     if(!account)account=pca.getAllAccounts()[0]||null;
     if(!account){try{account=(await pca.ssoSilent({scopes:SCOPES})).account}catch(e){}}
     if(!account){set("signin");render();return}
     pca.setActiveAccount(account);me=account.name||account.username||"";
    }else me="Test User";
-   await connect()}
-  catch(e){set("error",e.message);render()}}
+   try{await connect()}catch(e1){if(e1&&(e1.status===401||e1.status===403))throw e1;await sleep(1500);await connect()}}
+  catch(e){const m=String((e&&(e.message||e.errorCode))||"");if(/interaction|consent|login_required|no_account|AADSTS50058|AADSTS65001|AADSTS160021/i.test(m))set("signin");else set("error",m);render()}}
  async function findLists(){
   const j=await api(`/sites/${siteId}/lists?$select=id,displayName,webUrl`);const L=j.value||[];
   const f=n=>L.find(l=>(l.displayName||"").toLowerCase()===n.toLowerCase());
