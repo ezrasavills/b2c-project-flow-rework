@@ -154,7 +154,7 @@ select option{background:#1b1d23;color:#F2F4F8}
 .hero h2{margin:0 0 10px;font-size:26px;letter-spacing:-.035em;font-weight:700}
 .hero p{margin:0;color:var(--ink2);font-size:14.5px;max-width:860px;line-height:1.7}
 .hero p b{color:#fff}.hero p b.r{color:var(--red)}.hero p b.y{color:var(--gold2)}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:18px}
 .kpi{padding:20px 22px;cursor:pointer;transition:transform .18s,box-shadow .18s}
 .kpi:hover{transform:translateY(-3px)}
 .kpi .ic{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;margin-bottom:16px;box-shadow:inset 0 1px 0 rgba(255,255,255,.15)}
@@ -244,7 +244,7 @@ svg text{font-family:var(--font)}
 .seg button.on em{color:var(--ink2)}
 .sel{height:38px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.25);border-radius:12px;padding:0 14px;outline:none;color:var(--ink)}
 .tl{overflow:hidden;padding:8px}
-.th,.tr{display:grid;grid-template-columns:52px minmax(280px,1fr) 190px 132px 132px 140px 104px 44px;align-items:center;gap:8px;padding:0 12px}
+.th,.tr{display:grid;grid-template-columns:52px minmax(260px,1fr) 112px 170px 128px 128px 136px 100px 40px;align-items:center;gap:8px;padding:0 12px}
 .th{height:40px;font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:var(--muted);font-weight:600}
 .th .s{cursor:pointer;user-select:none}.th .s:hover{color:var(--ink)}
 .tr{min-height:66px;border-radius:12px;transition:background .15s,opacity .3s}
@@ -402,6 +402,23 @@ textarea.fld.title{font-size:15.5px;font-weight:600;min-height:56px}
 @media(max-width:1720px){.brand div{display:none}.search input{width:180px}}
 @media(max-width:1380px){.tab{padding:9px 11px}.search input{width:140px}}
 @media(max-width:1250px){.kpis{grid-template-columns:repeat(2,1fr)}.ov2{grid-template-columns:1fr!important}.tab .ct{display:none}.sync span{display:none}}
+ .ppill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:10px;color:var(--pc);background:color-mix(in srgb,var(--pc) 16%,transparent)}
+.ppill i{width:7px;height:7px;border-radius:50%;background:var(--pc)}
+.psel{color:var(--pc);background-color:color-mix(in srgb,var(--pc) 15%,transparent)}
+.prseg{grid-template-columns:repeat(3,1fr)}
+.prseg button.on{background:color-mix(in srgb,var(--pc) 18%,transparent);border-color:var(--pc);color:var(--pc)}
+.prwarn{display:flex;align-items:center;gap:16px;border-color:rgba(242,176,74,.45)!important}.prwarn>div{flex:1}.prwarn b{display:block;color:var(--amber);margin-bottom:3px}.prwarn span{font-size:12.5px;color:var(--ink2)}
+.prlist{display:flex;flex-direction:column;gap:16px}
+.prrow{cursor:pointer;padding:8px 10px;border-radius:12px;transition:.15s}.prrow:hover{background:rgba(255,255,255,.05)}
+.prh{display:flex;align-items:center;gap:8px;margin-bottom:8px}.prh span{flex:1}.prh b{font-size:20px;letter-spacing:-.02em}.prh small{color:var(--muted)}
+.prm{display:flex;gap:14px;font-size:11.5px;color:var(--muted);margin-top:7px}.prm .r{color:var(--red);font-weight:600}
+.qsum{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.qs{cursor:pointer;border-radius:12px;padding:10px;border:1px solid color-mix(in srgb,var(--qc) 40%,transparent);background:color-mix(in srgb,var(--qc) 10%,transparent);text-align:center;transition:.15s}
+.qs:hover{background:color-mix(in srgb,var(--qc) 20%,transparent)}
+.qs b{display:block;font-size:20px;color:var(--qc)}.qs span{font-size:11px;color:var(--ink2);font-weight:600}
+.qz{cursor:pointer}.qz:hover rect{opacity:.18}
+.qdot{cursor:pointer;transition:r .1s}.qdot:hover{r:8}
+@media(max-width:1500px){.kpis{grid-template-columns:repeat(3,1fr)}}
 .toast.hasundo{padding:10px 10px 10px 20px;overflow:hidden;border-color:rgba(245,196,0,.5)}
 .toast.hasundo #undo{background:#F5C400;color:#15161A;font-size:13px;padding:8px 16px}
 .toast .tbar{position:absolute;left:0;bottom:0;height:3px;width:100%;background:#F5C400;animation:tbar 8s linear forwards}
@@ -455,6 +472,9 @@ const DEFAULT_SECTIONS=["Prime Index","Publications","Business Intelligence","Ma
 const PALETTE=["#F5C400","#6E9BFF","#3DDC97","#FF8A7A","#A78BFA","#38D3E6","#F2A93B","#F472B6","#94A3B8","#6EE7A8","#E08A5B","#7C9CFF"];
 const PCOL=["#4F7BEA","#22A877","#C49A2C","#8A6CEB","#E0685B","#1BA9BC","#D24B91","#64748B","#DD8A12","#3C9E50"];
 const STATUSES=["Not started","In progress","Complete","On hold"];
+const PRIS=["High","Medium","Low"];
+const PCH={"High":"#FF6B6B","Medium":"#F2B04A","Low":"#7FA3D9"};
+const PRANK={"High":0,"Medium":1,"Low":2};
 const SCH={"Complete":"#3DDC97","In progress":"#6E9BFF","Not started":"#9AA3B2","On hold":"#F2B04A"};
 const DAY=864e5;
 const T=new Date();T.setHours(0,0,0,0);
@@ -477,6 +497,7 @@ const ico={
  dl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>',
  ul:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V9M7 14l5-5 5 5M5 4h14"/></svg>',
  refresh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 11a8 8 0 10-2.3 5.7M20 4v7h-7"/></svg>',
+ flag:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>',
  sel:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="8" height="8" rx="2.5"/><rect x="13" y="13" width="8" height="8" rx="2.5"/><path d="M15 6l2 2 4-4"/></svg>'
 };
 const doneBtn=(t,sm)=>`<button class="done-btn ${sm?"sm":""} ${t.status==="Complete"?"on":""}" data-done="${t.id}" title="${t.status==="Complete"?"Completed – click to reopen":"Mark complete"}">${ico.check}</button>`;
@@ -491,8 +512,8 @@ function pColor(p){let h=0;for(const ch of p)h=(h*31+ch.charCodeAt(0))>>>0;retur
 const avatars=(t,max=4)=>{const pmset=new Set(t.pm),ps=people(t);return'<span class="av">'+ps.slice(0,max).map(p=>`<span class="${pmset.has(p)?"pm":""}" style="background:${pColor(p)};font-size:${p.length>2?8:9}px" title="${H(p)}${pmset.has(p)?" (project manager)":""}">${H(p.slice(0,3))}</span>`).join("")+(ps.length>max?`<em>+${ps.length-max}</em>`:"")+"</span>"};
 
 /* ---------- State ---------- */
-let DB,UI={view:"overview",section:null,filters:new Set(["open"]),statuses:new Set(),sections:new Set(),q:"",people:[],pmode:"any",limit:80,sort:"end",tlHold:false,selMode:false,sel:new Set()};
-function norm(t){t.pm=uniq(splitPeople(t.pm));t.an=uniq(splitPeople(t.an));t.prog=Math.max(0,Math.min(1,+t.prog||0));if(!STATUSES.includes(t.status))t.status=t.prog>=1?"Complete":t.prog>0?"In progress":"Not started";t.notes=t.notes||"";return t}
+let DB,UI={view:"overview",section:null,filters:new Set(["open"]),statuses:new Set(),sections:new Set(),pris:new Set(),q:"",people:[],pmode:"any",limit:80,sort:"end",tlHold:false,selMode:false,sel:new Set()};
+function norm(t){t.pm=uniq(splitPeople(t.pm));t.an=uniq(splitPeople(t.an));t.prog=Math.max(0,Math.min(1,+t.prog||0));if(!STATUSES.includes(t.status))t.status=t.prog>=1?"Complete":t.prog>0?"In progress":"Not started";t.notes=t.notes||"";{const p=String(t.pri||"").trim().toLowerCase();t.pri=PRIS.find(x=>x.toLowerCase()===p)||(p==="med"?"Medium":"Medium")}return t}
 const blank=()=>({tasks:[],sections:[],nextId:1});
 function recolor(d){const old=["#C9A227","#3567E0","#18976A","#E0685B","#7C5CF0","#0EA5B7","#E08A0B","#D9468F","#5B6B85","#2F9E44","#B4552D","#4C6EF5"];d.sections.forEach(s=>{const i=old.indexOf((s.color||"").toUpperCase());if(i>=0)s.color=PALETTE[i]})}
 const touch=t=>t.updated=new Date().toISOString();
@@ -502,6 +523,10 @@ const isOpen=t=>t.status!=="Complete";
 const daysLeft=t=>t.end?Math.round((D(t.end)-T)/DAY):null;
 const isOver=t=>isOpen(t)&&t.status!=="On hold"&&t.end&&D(t.end)<T;
 const isSoon=t=>isOpen(t)&&t.status!=="On hold"&&t.end&&daysLeft(t)>=0&&daysLeft(t)<=14;
+const URGENT_DAYS=14;
+const quadOf=t=>{if(!isOpen(t)||t.status==="On hold"||!t.end)return null;const u=daysLeft(t)<=URGENT_DAYS,i=t.pri==="High";return i&&u?"do":i?"plan":u?"fit":"later"};
+const QUADS={do:{n:"Do now",d:"High priority · due within 14 days or overdue",c:"#FF6B6B"},plan:{n:"Plan",d:"High priority · deadline further out",c:"#F5C400"},fit:{n:"Fit in",d:"Medium/low priority · due soon",c:"#6E9BFF"},later:{n:"Later",d:"Medium/low priority · deadline further out",c:"#8B93A3"}};
+const priPill=p=>`<span class="ppill" style="--pc:${PCH[p]}"><i></i>${p}</span>`;
 function dueChip(t){
  if(t.status==="Complete")return'<span class="due g">Done</span>';
  if(t.status==="On hold")return'<span class="due m">On hold</span>';
@@ -513,7 +538,7 @@ function dueChip(t){
 }
 const pillCls=s=>"p-"+s.split(" ")[0];
 function matchPeople(t){if(!UI.people.length)return true;const ps=people(t).map(x=>x.toLowerCase()),sel=UI.people.map(x=>x.toLowerCase());return UI.pmode==="all"?sel.every(p=>ps.includes(p)):sel.some(p=>ps.includes(p))}
-function matches(t){const q=UI.q.toLowerCase();return(!q||(t.task+" "+t.pm.join(" ")+" "+t.an.join(" ")+" "+t.ws+" "+t.notes).toLowerCase().includes(q))&&matchPeople(t)&&(!UI.statuses.size||UI.statuses.has(t.status))&&(!UI.sections.size||UI.sections.has(t.ws))}
+function matches(t){const q=UI.q.toLowerCase();return(!q||(t.task+" "+t.pm.join(" ")+" "+t.an.join(" ")+" "+t.ws+" "+t.notes).toLowerCase().includes(q))&&matchPeople(t)&&(!UI.statuses.size||UI.statuses.has(t.status))&&(!UI.sections.size||UI.sections.has(t.ws))&&(!UI.pris.size||UI.pris.has(t.pri))}
 const setOne=k=>{UI.filters=new Set([k])};
 const listPred=()=>{const fs=FILTERS.filter(f=>UI.filters.has(f[0])).map(f=>f[2]);return fs.length?t=>fs.some(fn=>fn(t)):()=>true};
 function ring(pct,size,stroke,color,track){const r=(size-stroke)/2,c=2*Math.PI*r;
@@ -544,10 +569,11 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-done]");if
 function renderBulk(){
  const n=UI.sel.size,b=$("bulk");
  if(!UI.selMode){b.classList.remove("on");$("toast").classList.remove("up");return}
- b.innerHTML=`<b>${n} selected</b><button class="btn green sm" id="bkDone" ${n?"":"disabled style='opacity:.5'"}>${ico.check.replace('<svg','<svg width="14" height="14"')} Mark complete</button><select class="sel" id="bkSt" style="height:34px"><option value="">Set status…</option>${STATUSES.map(s=>`<option>${s}</option>`).join("")}</select><button class="btn sm" id="bkAll">Select all shown</button><button class="btn sm" id="bkX">Done</button>`;
+ b.innerHTML=`<b>${n} selected</b><button class="btn green sm" id="bkDone" ${n?"":"disabled style='opacity:.5'"}>${ico.check.replace('<svg','<svg width="14" height="14"')} Mark complete</button><select class="sel" id="bkSt" style="height:34px"><option value="">Set status…</option>${STATUSES.map(s=>`<option>${s}</option>`).join("")}</select><select class="sel" id="bkPr" style="height:34px"><option value="">Set priority…</option>${PRIS.map(s=>`<option>${s}</option>`).join("")}</select><button class="btn sm" id="bkAll">Select all shown</button><button class="btn sm" id="bkX">Done</button>`;
  b.classList.add("on");$("toast").classList.add("up");
  $("bkDone").onclick=()=>n&&bulkComplete();
  $("bkSt").onchange=e=>{if(e.target.value&&n)bulkStatus(e.target.value)};
+ $("bkPr").onchange=e=>{const v=e.target.value;if(!v||!n)return;const ids=[...UI.sel];ids.forEach(id=>{const t=DB.tasks.find(x=>x.id===id);t.pri=v;touch(t)});UI.sel.clear();UI.selMode=false;save(`${ids.length} task(s) set to ${v} priority`);render()};
  $("bkAll").onclick=()=>{(window._shownIds||[]).forEach(id=>UI.sel.add(id));render()};
  $("bkX").onclick=()=>{UI.selMode=false;UI.sel.clear();render()};
 }
@@ -566,7 +592,7 @@ function renderNav(){
  document.querySelectorAll(".tab[data-v]").forEach(n=>n.classList.toggle("on",n.dataset.v===UI.view));
  $("secLbl").textContent=UI.view==="section"?short(UI.section):"Sections";
  $("allct").textContent=DB.tasks.filter(isOpen).length;
- const nf=UI.statuses.size+UI.sections.size;$("fltBtn").innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg>Filters${nf?`<span class="nb">${nf}</span>`:""}`;$("fltBtn").classList.toggle("act",!!nf);
+ const nf=UI.statuses.size+UI.sections.size+UI.pris.size;$("fltBtn").innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg>Filters${nf?`<span class="nb">${nf}</span>`:""}`;$("fltBtn").classList.toggle("act",!!nf);
  const sel=UI.people;
  $("pplBtn").innerHTML=sel.length?`<span class="pc">${sel.slice(0,3).map(p=>`<span style="background:${pColor(p)}">${H(p.slice(0,3))}</span>`).join("")}</span>${sel.length>3?"+"+(sel.length-3):""} <span style="color:var(--muted);font-weight:500">${sel.length>1?(UI.pmode==="all"?"all of":"any of"):""}</span>`:`${ico.users}Everyone`;
 }
@@ -590,20 +616,22 @@ function bindSecChips(){$("view").querySelectorAll("[data-sc]").forEach(b=>b.onc
 function renderFltPop(){
  const cnt=s=>DB.tasks.filter(t=>t.status===s).length;
  $("fltPop").innerHTML=`<h6>Statuses · pick as many as you like</h6><div class="pgrid" style="grid-template-columns:repeat(2,1fr)">${STATUSES.map(s=>`<div class="pchip ${UI.statuses.has(s)?"on":""}" data-fs="${s}"><span style="background:${SCH[s]}"></span>${s}<small>${cnt(s)}</small></div>`).join("")}</div>
+ <h6 style="margin-top:12px">Priority · pick as many as you like</h6><div class="pgrid" style="grid-template-columns:repeat(3,1fr)">${PRIS.map(p=>`<div class="pchip ${UI.pris.has(p)?"on":""}" data-fp="${p}"><span style="background:${PCH[p]}"></span>${p}<small>${DB.tasks.filter(t=>t.pri===p&&isOpen(t)).length}</small></div>`).join("")}</div>
  <h6 style="margin-top:12px">Sections · pick as many as you like</h6><div class="pgrid" style="grid-template-columns:1fr 1fr">${DB.sections.map(s=>`<div class="pchip ${UI.sections.has(s.name)?"on":""}" data-fsec="${H(s.name)}" title="${H(s.name)}"><span style="background:${s.color}"></span><b style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${H(s.name)}</b></div>`).join("")}</div>
  <div class="pfoot"><span style="font-size:12px;color:var(--muted)">Applies to every page</span><span class="sp"></span><button class="link" id="fClear">Clear all</button></div>`;
  $("fltPop").querySelectorAll("[data-fs]").forEach(c=>c.onclick=()=>{const s=c.dataset.fs;UI.statuses.has(s)?UI.statuses.delete(s):UI.statuses.add(s);UI.limit=80;render();renderFltPop()});
  $("fltPop").querySelectorAll("[data-fsec]").forEach(c=>c.onclick=()=>{const s=c.dataset.fsec;UI.sections.has(s)?UI.sections.delete(s):UI.sections.add(s);UI.limit=80;render();renderFltPop()});
- $("fClear").onclick=()=>{UI.statuses.clear();UI.sections.clear();render();renderFltPop()};
+ $("fltPop").querySelectorAll("[data-fp]").forEach(c=>c.onclick=()=>{const s=c.dataset.fp;UI.pris.has(s)?UI.pris.delete(s):UI.pris.add(s);UI.limit=80;render();renderFltPop()});
+ $("fClear").onclick=()=>{UI.statuses.clear();UI.sections.clear();UI.pris.clear();render();renderFltPop()};
 }
 function pageHead(title,sub){
- const chips=[...UI.statuses].map(s=>`<span class="fchip"><i style="width:8px;height:8px;border-radius:50%;background:${SCH[s]}"></i>${H(s)}<button data-rms="${H(s)}" title="Remove filter">×</button></span>`).join("")+[...UI.sections].map(s=>`<span class="fchip"><i style="width:8px;height:8px;border-radius:50%;background:${secColor(s)}"></i>${H(s)}<button data-rmsec="${H(s)}" title="Remove filter">×</button></span>`).join("")+UI.people.map(p=>`<span class="fchip">${H(p)}<button data-rm="${H(p)}" title="Remove filter">×</button></span>`).join("")+(UI.people.length>1?`<span class="fchip note">${UI.pmode==="all"?"Tasks with all of these":"Tasks with any of these"}</span>`:"");
+ const chips=[...UI.pris].map(p=>`<span class="fchip"><i style="width:8px;height:8px;border-radius:50%;background:${PCH[p]}"></i>${p} priority<button data-rmp="${p}" title="Remove filter">×</button></span>`).join("")+[...UI.statuses].map(s=>`<span class="fchip"><i style="width:8px;height:8px;border-radius:50%;background:${SCH[s]}"></i>${H(s)}<button data-rms="${H(s)}" title="Remove filter">×</button></span>`).join("")+[...UI.sections].map(s=>`<span class="fchip"><i style="width:8px;height:8px;border-radius:50%;background:${secColor(s)}"></i>${H(s)}<button data-rmsec="${H(s)}" title="Remove filter">×</button></span>`).join("")+UI.people.map(p=>`<span class="fchip">${H(p)}<button data-rm="${H(p)}" title="Remove filter">×</button></span>`).join("")+(UI.people.length>1?`<span class="fchip note">${UI.pmode==="all"?"Tasks with all of these":"Tasks with any of these"}</span>`:"");
  return`<div class="phead"><div><h1>${H(title)}</h1><div class="sub">${sub}</div></div><div class="fchips">${chips}</div></div>`;
 }
 
 /* ---------- Views ---------- */
 function render(){renderNav();if(Live.state!=="ready"&&Live.state!=="busy"&&Live.state!=="err")vGate();else({overview:vOverview,section:vSection,all:vAll,timeline:vTimeline})[UI.view]();
- $("view").querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{UI.people=UI.people.filter(x=>x!==b.dataset.rm);render()});$("view").querySelectorAll("[data-rms]").forEach(b=>b.onclick=()=>{UI.statuses.delete(b.dataset.rms);render()});$("view").querySelectorAll("[data-rmsec]").forEach(b=>b.onclick=()=>{UI.sections.delete(b.dataset.rmsec);render()});renderBulk()}
+ $("view").querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{UI.people=UI.people.filter(x=>x!==b.dataset.rm);render()});$("view").querySelectorAll("[data-rms]").forEach(b=>b.onclick=()=>{UI.statuses.delete(b.dataset.rms);render()});$("view").querySelectorAll("[data-rmsec]").forEach(b=>b.onclick=()=>{UI.sections.delete(b.dataset.rmsec);render()});$("view").querySelectorAll("[data-rmp]").forEach(b=>b.onclick=()=>{UI.pris.delete(b.dataset.rmp);render()});renderBulk()}
 function vGate(){
  const st=Live.state,cfg=`<pre style="text-align:left;background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:12px;overflow:auto">clientId: "${H(CONFIG.clientId)}"\ntenantId: "${H(CONFIG.tenantId)}"</pre>`;
  const V={
@@ -622,6 +650,8 @@ function vGate(){
 function vOverview(){
  const ts=DB.tasks.filter(matches);
  const open=ts.filter(isOpen),ip=ts.filter(t=>t.status==="In progress"),over=ts.filter(isOver),soon=ts.filter(isSoon);
+ const hiOpen=open.filter(t=>t.pri==="High"),hiOver=hiOpen.filter(isOver);
+ const qc={do:[],plan:[],fit:[],later:[]};let noDate=0;open.forEach(t=>{const q=quadOf(t);if(q)qc[q].push(t);else if(t.status!=="On hold"&&!t.end)noDate++});
  const mk=(y,m)=>ts.filter(t=>t.status==="Complete"&&t.end&&D(t.end).getFullYear()===y&&D(t.end).getMonth()===m).length;
  const thisM=mk(T.getFullYear(),T.getMonth()),pm=new Date(T.getFullYear(),T.getMonth()-1,1),lastM=mk(pm.getFullYear(),pm.getMonth());
  const hr=new Date().getHours(),greet=hr<12?"Good morning":hr<18?"Good afternoon":"Good evening";
@@ -639,23 +669,36 @@ function vOverview(){
  const tot=ts.length||1;let acc=0;const R=62,C=2*Math.PI*R;
  const donut=`<svg width="170" height="170" viewBox="0 0 170 170"><circle cx="85" cy="85" r="${R}" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="18"/>${STATUSES.map(s=>{const f=st[s]/tot;const seg=f?`<circle cx="85" cy="85" r="${R}" fill="none" stroke="${SCH[s]}" stroke-width="18" stroke-linecap="round" stroke-dasharray="${Math.max(0,C*f-6)} ${C}" stroke-dashoffset="${-C*acc-3}" transform="rotate(-90 85 85)" style="filter:drop-shadow(0 0 5px ${SCH[s]}66)"><title>${s}: ${st[s]}</title></circle>`:"";acc+=f;return seg}).join("")}
   <text x="85" y="81" text-anchor="middle" font-size="24" font-weight="700" fill="#F2F4F8">${ts.length.toLocaleString("en-GB")}</text><text x="85" y="102" text-anchor="middle" font-size="11.5" fill="#8B93A3">tasks</text></svg>`;
- const att=[...over,...soon].sort((a,b)=>D(a.end)-D(b.end));
- const mrow=t=>`<div class="mrow" data-id="${t.id}">${doneBtn(t)}<span class="bar" style="background:${secColor(t.ws)};box-shadow:0 0 8px ${secColor(t.ws)}88"></span><div class="b"><div class="t">${H(t.task)}</div><div class="m">${H(t.ws)} · ${Math.round(t.prog*100)}% done</div></div>${avatars(t)}<div style="width:96px;text-align:right">${dueChip(t)}</div></div>`;
+ const quadrant=quadChart(qc,noDate);
+ const priBars=PRIS.map(p=>{const o=open.filter(t=>t.pri===p),ov=o.filter(isOver).length,sn=o.filter(isSoon).length,dn=ts.filter(t=>t.pri===p&&t.status==="Complete").length;return{p,o:o.length,ov,sn,dn}});
+ const pmx=Math.max(1,...priBars.map(x=>x.o));
+ const att=[...over,...soon].sort((a,b)=>PRANK[a.pri]-PRANK[b.pri]||D(a.end)-D(b.end));
+ const mrow=t=>`<div class="mrow" data-id="${t.id}">${doneBtn(t)}<span class="bar" style="background:${secColor(t.ws)};box-shadow:0 0 8px ${secColor(t.ws)}88"></span><div class="b"><div class="t">${H(t.task)}</div><div class="m"><span style="color:${PCH[t.pri]};font-weight:700">● ${t.pri}</span> · ${H(t.ws)} · ${Math.round(t.prog*100)}% done</div></div>${avatars(t)}<div style="width:96px;text-align:right">${dueChip(t)}</div></div>`;
  const who=UI.people.length?` · ${UI.people.length===1?H(UI.people[0]):UI.people.length+" people selected"}`:"";
  $("view").innerHTML=pageHead("Overview",T.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"})+who)+`<div class="g fade">
- <div class="card hero"><h2>${greet}</h2><p>There ${open.length===1?"is":"are"} <b>${open.length} open tasks</b> across ${DB.sections.length} sections — <b>${ip.length} in progress</b>, <b class="r">${over.length} overdue</b> and <b class="y">${soon.length} due in the next two weeks</b>. ${thisM} task${thisM===1?"":"s"} completed so far this month.</p></div>
+ ${Live.hasPri||window.__B2C_MOCK__?"":`<div class="card pad prwarn"><div><b>One-off setup: add a Priority column</b><span>Priorities show here but won't be saved for everyone until the SharePoint list has a <b>Priority</b> column.</span></div><button class="btn gold sm" id="addPri">${ico.plus} Add Priority column</button></div>`}
+ <div class="card hero"><h2>${greet}</h2><p>There ${open.length===1?"is":"are"} <b>${open.length} open tasks</b> across ${DB.sections.length} sections — <b>${ip.length} in progress</b>, <b class="r">${over.length} overdue</b> and <b class="y">${soon.length} due in the next two weeks</b>. <b class="r">${qc.do.length} high-priority task${qc.do.length===1?" needs":"s need"} doing now</b>. ${thisM} task${thisM===1?"":"s"} completed so far this month.</p></div>
  <div class="kpis">
   ${kpi("Open tasks",open.length,`${ip.length} in progress · ${st["On hold"]} on hold`,ico.list,"var(--blue)","var(--bluebg)","open")}
   ${kpi("Overdue",over.length,"Open and past their end date",ico.alert,"var(--red)","var(--redbg)","over")}
   ${kpi("Due in next 14 days",soon.length,"Keep these on the radar",ico.cal,"var(--amber)","var(--amberbg)","soon")}
+  ${kpi("High priority",hiOpen.length,`${qc.do.length} to do now${hiOver.length?` · <span class="down">${hiOver.length} overdue</span>`:""}`,ico.flag,"#FF6B6B","rgba(255,107,107,.15)","high")}
   ${kpi("Completed this month",thisM,`<span class="${thisM>=lastM?"up":"down"}">${thisM>=lastM?"▲":"▼"} ${Math.abs(thisM-lastM)}</span> vs ${lastM} last month`,ico.done,"var(--green)","var(--greenbg)","done")}
  </div>
  <div class="g ov2" style="grid-template-columns:1.25fr 1fr">
-  <div class="card pad"><div class="ch"><div><h3>Needs attention</h3><div class="h">Tick the circle to mark a task complete · click the name to open</div></div><span class="pill p-On">${att.length}</span></div>
+  <div class="card pad"><div class="ch"><div><h3>Needs attention</h3><div class="h">High priority first, then soonest deadline · tick the circle to complete</div></div><span class="pill p-On">${att.length}</span></div>
    <div class="scroll">${att.map(mrow).join("")||'<div class="empty"><b>All clear</b>Nothing overdue or due soon</div>'}</div></div>
   <div class="card pad"><div class="ch"><div><h3>Status mix</h3><div class="h">All tasks in view · click to drill in</div></div></div>
    <div class="donutwrap">${donut}<div class="dl">${STATUSES.map(s=>`<div data-st="${s}"><i style="background:${SCH[s]};box-shadow:0 0 6px ${SCH[s]}"></i><span>${s}</span><b>${st[s].toLocaleString("en-GB")}</b><small style="color:var(--muted);width:38px;text-align:right">${Math.round(st[s]/tot*100)}%</small></div>`).join("")}</div></div>
    <div style="margin-top:18px;border-top:1px solid var(--line);padding-top:16px"><div class="ch" style="margin-bottom:4px"><div><h3>Completions per month</h3><div class="h">Last 12 months, by end date</div></div></div>${trend}</div></div>
+ </div>
+ <div class="g ov2" style="grid-template-columns:1.45fr 1fr">
+  <div class="card pad"><div class="ch"><div><h3>Priority × deadline</h3><div class="h">Open tasks with an end date · click a dot to open it, or a quadrant to list its tasks</div></div></div>${quadrant}</div>
+  <div class="card pad"><div class="ch"><div><h3>Priority mix</h3><div class="h">Open tasks by priority · click to filter</div></div></div>
+   <div class="prlist">${priBars.map(x=>`<div class="prrow" data-pf="${x.p}"><div class="prh"><span>${priPill(x.p)}</span><b>${x.o}</b><small>open</small></div>
+    <div class="track" style="height:12px"><div style="width:${x.o/pmx*100}%;background:linear-gradient(90deg,${PCH[x.p]},${PCH[x.p]}aa);border-radius:10px"></div></div>
+    <div class="prm"><span class="${x.ov?"r":""}">${x.ov} overdue</span><span>${x.sn} due ≤14d</span><span>${x.dn} completed</span></div></div>`).join("")}</div>
+   <div class="qsum">${Object.entries(QUADS).map(([k,q])=>`<div class="qs" data-q="${k}" style="--qc:${q.c}"><b>${qc[k].length}</b><span>${q.n}</span></div>`).join("")}</div></div>
  </div>
  <div class="card pad"><div class="ch"><div><h3>Sections</h3><div class="h">% complete, open work and overdue items · click to open</div></div><button class="link" id="ovAddSec">+ Add section</button></div>
   <div class="secgrid">${DB.sections.map(s=>{const x=ts.filter(t=>t.ws===s.name),c=x.filter(t=>t.status==="Complete").length,o=x.length-c,ov=x.filter(isOver).length;
@@ -666,23 +709,52 @@ function vOverview(){
  $("view").querySelectorAll(".dl div").forEach(e=>e.onclick=()=>{UI.view="all";setOne(e.dataset.st);render()});
  $("view").querySelectorAll(".kpi").forEach(e=>e.onclick=()=>{UI.view="all";setOne(e.dataset.f);UI.limit=80;render();window.scrollTo({top:0})});
  $("ovAddSec").onclick=()=>sectionModal();
+ const ap=$("addPri");if(ap)ap.onclick=async()=>{ap.disabled=true;ap.textContent="Adding…";try{await Live.addPriColumn();toast("Priority column added – priorities now save for everyone")}catch(e){ap.disabled=false;ap.textContent="Add Priority column";toast("Couldn't add it automatically ("+e.message+"). Add it in SharePoint instead – see the setup note.")}};
+ $("view").querySelectorAll("[data-q]").forEach(e=>e.onclick=()=>{UI.view="all";setOne("q_"+e.dataset.q);UI.sort="pri";UI.limit=80;render();window.scrollTo({top:0})});
+ $("view").querySelectorAll(".qdot").forEach(e=>e.onclick=ev=>{ev.stopPropagation();openTask(+e.dataset.id)});
+ $("view").querySelectorAll("[data-pf]").forEach(e=>e.onclick=()=>{UI.pris=new Set([e.dataset.pf]);UI.view="all";setOne("open");UI.limit=80;render();window.scrollTo({top:0})});
+}
+function quadChart(qc,noDate){
+ const W=640,Hh=360,L=58,Rr=16,Tp=16,B=40,iw=W-L-Rr,ih=Hh-Tp-B;
+ const xf=d=>{let f;if(d<0)f=.15*(1-Math.min(-d,30)/30);else if(d<=URGENT_DAYS)f=.15+.35*d/URGENT_DAYS;else f=.5+.5*Math.min(d-URGENT_DAYS,76)/76;return L+f*iw};
+ const band={High:[0,.5],Medium:[.5,.75],Low:[.75,1]};
+ const hash=s=>{let h=2166136261;for(const c of String(s)){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return(h>>>0)/4294967295};
+ let dots="";Object.values(qc).flat().forEach(t=>{const d=daysLeft(t),[a,b]=band[t.pri];const y=Tp+(a+(b-a)*(.12+.76*hash(t.id+"y")))*ih;const x=Math.min(L+iw-6,Math.max(L+6,xf(d)+(hash(t.id+"x")-.5)*10));
+  dots+=`<circle class="qdot" data-id="${t.id}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5.5" fill="${secColor(t.ws)}" stroke="rgba(10,11,14,.9)" stroke-width="1.5"><title>${H(t.task)}
+${t.pri} priority · ${d<0?(-d)+" days overdue":d===0?"due today":d+" days left"}
+${H(t.ws)}</title></circle>`});
+ const mx=L+iw*.5,my=Tp+ih*.5;
+ const q=(k,x,y,w,h,anchor)=>`<g class="qz" data-q="${k}"><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${QUADS[k].c}" opacity="${k==="do"?.11:.05}"/><text x="${anchor==="s"?x+12:x+w-12}" y="${y+22}" text-anchor="${anchor==="s"?"start":"end"}" font-size="13" font-weight="700" fill="${QUADS[k].c}">${QUADS[k].n} · ${qc[k].length}</text></g>`;
+ const ticks=[[-30,"30d late"],[0,"Today"],[7,"1 wk"],[14,"2 wks"],[30,"1 mth"],[60,"2 mths"],[90,"3 mths+"]];
+ return`<svg viewBox="0 0 ${W} ${Hh}" width="100%" style="display:block;overflow:visible">
+  ${q("do",L,Tp,iw*.5,ih*.5,"s")}${q("plan",mx,Tp,iw*.5,ih*.5,"e")}${q("fit",L,my,iw*.5,ih*.5,"s")}${q("later",mx,my,iw*.5,ih*.5,"e")}
+  <line x1="${mx}" x2="${mx}" y1="${Tp}" y2="${Tp+ih}" stroke="rgba(255,255,255,.28)" stroke-dasharray="4 4"/>
+  <line x1="${L}" x2="${L+iw}" y1="${my}" y2="${my}" stroke="rgba(255,255,255,.28)" stroke-dasharray="4 4"/>
+  <line x1="${L}" x2="${L+iw}" y1="${Tp+ih*.75}" y2="${Tp+ih*.75}" stroke="rgba(255,255,255,.07)"/>
+  <line x1="${xf(0)}" x2="${xf(0)}" y1="${Tp}" y2="${Tp+ih}" stroke="rgba(255,107,107,.45)"/>
+  <rect x="${L}" y="${Tp}" width="${iw}" height="${ih}" fill="none" stroke="rgba(255,255,255,.12)" rx="10"/>
+  ${[["High",.25],["Medium",.625],["Low",.875]].map(([p,f])=>`<text x="${L-10}" y="${Tp+ih*f+4}" text-anchor="end" font-size="11" font-weight="700" fill="${PCH[p]}">${p}</text>`).join("")}
+  ${ticks.map(([d,l])=>`<text x="${xf(d)}" y="${Tp+ih+17}" text-anchor="middle" font-size="10.5" fill="#8B93A3">${l}</text>`).join("")}
+  <text x="${L+iw/2}" y="${Hh-2}" text-anchor="middle" font-size="10.5" fill="#6F7787" letter-spacing=".12em">DEADLINE →  SOONER ON THE LEFT</text>
+  ${dots}</svg>${noDate?`<div class="h" style="margin-top:6px">${noDate} open task${noDate===1?"":"s"} without an end date aren't plotted.</div>`:""}`;
 }
 function kpi(l,v,s,ic,c,bg,f){return`<div class="card kpi" data-f="${f}"><div class="ic" style="background:${bg};color:${c}">${ic}</div><div class="l">${l}</div><div class="v">${v.toLocaleString("en-GB")}</div><div class="s">${s}</div></div>`}
 
-const FILTERS=[["open","Open",isOpen],["over","Overdue",isOver],["soon","Due soon",isSoon],["In progress","In progress",t=>t.status==="In progress"],["Not started","Not started",t=>t.status==="Not started"],["On hold","On hold",t=>t.status==="On hold"],["Complete","Complete",t=>t.status==="Complete"],["done","Done this month",t=>t.status==="Complete"&&t.end&&D(t.end).getMonth()===T.getMonth()&&D(t.end).getFullYear()===T.getFullYear()],["all","All",()=>true]];
+const FILTERS=[["open","Open",isOpen],["over","Overdue",isOver],["soon","Due soon",isSoon],["In progress","In progress",t=>t.status==="In progress"],["Not started","Not started",t=>t.status==="Not started"],["On hold","On hold",t=>t.status==="On hold"],["Complete","Complete",t=>t.status==="Complete"],["done","Done this month",t=>t.status==="Complete"&&t.end&&D(t.end).getMonth()===T.getMonth()&&D(t.end).getFullYear()===T.getFullYear()],["high","High priority",t=>isOpen(t)&&t.pri==="High"],["q_do","Do now",t=>quadOf(t)==="do"],["q_plan","Plan",t=>quadOf(t)==="plan"],["q_fit","Fit in",t=>quadOf(t)==="fit"],["q_later","Later",t=>quadOf(t)==="later"],["all","All",()=>true]];
 const filterBar=(base,keys)=>`<div class="seg" id="seg">${FILTERS.filter(f=>keys.includes(f[0])).map(([k,l,fn])=>`<button data-f="${k}" class="${UI.filters.has(k)?"on":""}">${l}<em>${base.filter(fn).length}</em></button>`).join("")}</div>`;
 function sortRows(a){
  const k=UI.sort,dir=k==="end-desc"?-1:1,kk=k.replace("-desc","");
  return a.sort((x,y)=>{
   if(kk==="task")return x.task.localeCompare(y.task);
   if(kk==="prog")return y.prog-x.prog;
+  if(kk==="pri")return PRANK[x.pri]-PRANK[y.pri]||((x.end||"9")<(y.end||"9")?-1:(x.end||"9")>(y.end||"9")?1:0);
   if(kk==="end"&&dir===1){const hx=!isOpen(x)||x.status==="On hold",hy=!isOpen(y)||y.status==="On hold";if(hx!==hy)return hx?1:-1}
   const ax=x[kk],ay=y[kk];if(!ax&&!ay)return 0;if(!ax)return 1;if(!ay)return -1;return(ax<ay?-1:ax>ay?1:0)*dir});
 }
-const toolbarRight=()=>`<span class="sp"></span><button class="btn sm" id="selBtn" style="${UI.selMode?"background:rgba(245,196,0,.2);border-color:rgba(245,196,0,.5);color:var(--gold2)":""}">${ico.sel.replace('<svg','<svg width="15" height="15"')} ${UI.selMode?"Selecting…":"Select multiple"}</button><select class="sel" id="sortSel">${[["end","Sort: End date (soonest)"],["end-desc","Sort: End date (latest)"],["start","Sort: Start date"],["prog","Sort: Progress"],["task","Sort: A–Z"]].map(([k,l])=>`<option value="${k}" ${UI.sort===k?"selected":""}>${l}</option>`).join("")}</select>`;
+const toolbarRight=()=>`<span class="sp"></span><button class="btn sm" id="selBtn" style="${UI.selMode?"background:rgba(245,196,0,.2);border-color:rgba(245,196,0,.5);color:var(--gold2)":""}">${ico.sel.replace('<svg','<svg width="15" height="15"')} ${UI.selMode?"Selecting…":"Select multiple"}</button><select class="sel" id="sortSel">${[["end","Sort: End date (soonest)"],["end-desc","Sort: End date (latest)"],["start","Sort: Start date"],["pri","Sort: Priority (high first)"],["prog","Sort: Progress"],["task","Sort: A–Z"]].map(([k,l])=>`<option value="${k}" ${UI.sort===k?"selected":""}>${l}</option>`).join("")}</select>`;
 function taskTable(rows,showSec){
  const vis=rows.slice(0,UI.limit);window._shownIds=vis.map(t=>t.id);
- const head=`<div class="th"><span>${UI.selMode?"":"Done"}</span><span class="s" data-k="task">Task</span><span class="s" data-k="prog">Progress</span><span class="s" data-k="start">Start</span><span class="s" data-k="end">End</span><span>Status</span><span>Due</span><span></span></div>`;
+ const head=`<div class="th"><span>${UI.selMode?"":"Done"}</span><span class="s" data-k="task">Task</span><span class="s" data-k="pri">Priority</span><span class="s" data-k="prog">Progress</span><span class="s" data-k="start">Start</span><span class="s" data-k="end">End</span><span>Status</span><span>Due</span><span></span></div>`;
  if(!rows.length)return`<div class="card tl">${head}<div class="empty"><b>No tasks here</b>Try a different filter, or add a new task.</div></div>`;
  return`<div class="card tl">${head}${vis.map(t=>row(t,showSec)).join("")}${rows.length>UI.limit?`<div class="showmore"><button class="btn sm" id="moreBtn">Show ${Math.min(80,rows.length-UI.limit)} more · ${rows.length-UI.limit} remaining</button></div>`:""}</div>`;
 }
@@ -693,6 +765,7 @@ function row(t,showSec){
  return`<div class="tr ${t.status==="Complete"?"done":""} ${sel?"sel":""}" data-id="${t.id}">
  <div style="display:grid;place-items:center">${first}</div>
  <div><div class="tt" data-a="edit">${H(t.task)}</div><div class="tm">${avatars(t)}${showSec?`<span class="tag" style="background:${secColor(t.ws)}26;color:${secColor(t.ws)}">${H(t.ws)}</span>`:""}<span>${meta}</span></div></div>
+ <select class="ssel psel" data-a="pri" style="--pc:${PCH[t.pri]}" title="Priority">${PRIS.map(x=>`<option ${x===t.pri?"selected":""}>${x}</option>`).join("")}</select>
  <div class="prog"><input type="range" min="0" max="100" step="5" value="${p}" data-a="prog" style="--p:${p}%;--c:${c}"><b>${p}%</b></div>
  <input type="date" class="dt ${t.start?"":"noval"}" value="${t.start||""}" data-a="start" title="Start date">
  <input type="date" class="dt ${t.end?"":"noval"}" value="${t.end||""}" data-a="end" title="End date">
@@ -714,6 +787,7 @@ function bindRows(){
      if(s&&e&&e<s){toast("End date can't be before the start date");el.value=t[a]||"";return}
      t[a]=val;touch(t);save((a==="start"?"Start":"End")+" date updated");render()};
    if(a==="status")el.onchange=()=>{setStatus(t,el.value);touch(t);save("Status set to "+el.value);render()};
+   if(a==="pri")el.onchange=()=>{t.pri=el.value;touch(t);save("Priority set to "+el.value);render()};
   })});
  const mb=$("moreBtn");if(mb)mb.onclick=()=>{UI.limit+=80;render()};
  v.querySelectorAll(".th .s").forEach(s=>s.onclick=()=>{const k=s.dataset.k;UI.sort=UI.sort===k&&k==="end"?"end-desc":k;render()});
@@ -732,7 +806,7 @@ function vSection(){
   <div class="card shead"><div class="tint" style="background:radial-gradient(120% 140% at 0% 50%,${s.color},transparent 60%)"></div>${ring(base.length?c/base.length:0,94,9,s.color,"rgba(255,255,255,.1)")}
   <div><h2>${H(s.name)}</h2><div class="sstats"><div><b>${base.length-c}</b>Open</div><div><b>${base.filter(t=>t.status==="In progress").length}</b>In progress</div><div><b class="${ov?"r":""}">${ov}</b>Overdue</div><div><b>${c}</b>Completed</div></div></div>
   <div class="acts"><button class="btn sm" id="renSec">Edit section</button><button class="btn sm" id="delSec">Delete</button><button class="btn gold sm" id="addHere">+ Add task</button></div></div>
-  <div class="tb">${filterBar(base,["open","over","soon","In progress","Not started","On hold","Complete","all"])}${toolbarRight()}</div>
+  <div class="tb">${filterBar(base,["open","over","soon","high","q_do","In progress","Not started","On hold","Complete","all"])}${toolbarRight()}</div>
   ${taskTable(rows,false)}</div>`;
  bindRows();
  $("view").querySelectorAll(".secstrip [data-s]").forEach(b=>b.onclick=()=>go("section",b.dataset.s));
@@ -745,7 +819,7 @@ function vAll(){
  const base=DB.tasks.filter(matches);
  const fn=listPred();
  const rows=sortRows(base.filter(fn));
- $("view").innerHTML=pageHead("All tasks","Tick the circle to complete · edit progress, dates and status inline · use “Select multiple” to complete several at once")+`<div class="fade"><div class="tb" style="margin-top:0">${filterBar(base,["open","over","soon","In progress","Not started","On hold","Complete","done","all"])}${toolbarRight()}</div><div class="tb" style="margin-top:-4px">${secChips()}</div>${taskTable(rows,true)}</div>`;
+ $("view").innerHTML=pageHead("All tasks","Tick the circle to complete · edit progress, dates and status inline · use “Select multiple” to complete several at once")+`<div class="fade"><div class="tb" style="margin-top:0">${filterBar(base,["open","over","soon","high","q_do","In progress","Not started","On hold","Complete","done","all"])}${toolbarRight()}</div><div class="tb" style="margin-top:-4px">${secChips()}</div>${taskTable(rows,true)}</div>`;
  bindRows();bindSecChips();
 }
 
@@ -826,7 +900,7 @@ function chipInput(host,initial,onChange){
 let editing=null;
 function openTask(id,sec){
  if(!DB.sections.length){toast("Add a section first");return}
- const t=id?DB.tasks.find(x=>x.id===id):{id:null,task:"",ws:sec||UI.section||DB.sections[0].name,pm:[],an:[],prog:0,status:"Not started",start:iso(T),end:"",notes:""};
+ const t=id?DB.tasks.find(x=>x.id===id):{id:null,task:"",ws:sec||UI.section||DB.sections[0].name,pm:[],an:[],prog:0,status:"Not started",pri:"Medium",start:iso(T),end:"",notes:""};
  editing={...t,pm:[...t.pm],an:[...t.an]};
  $("drawer").innerHTML=`<div class="dh"><div><div class="k">${id?"Edit task":"New task"}</div><h3>${id?H(short(t.task)):"Add a task"}</h3></div><button class="x" id="dx">×</button></div>
  ${id?`<button class="bigdone ${t.status==="Complete"?"on":""}" id="dDone"><span class="done-btn ${t.status==="Complete"?"on":""}">${ico.check}</span><span><b>${t.status==="Complete"?"Completed":"Mark as complete"}</b><small>${t.status==="Complete"?"Click to reopen this task":"One click – saves and closes"}</small></span></button>`:""}
@@ -836,6 +910,7 @@ function openTask(id,sec){
   <div class="f"><label>Project managers <small>· add as many as needed</small></label><div id="fPm"></div></div>
   <div class="f"><label>Analysts <small>· add as many as needed</small></label><div id="fAn"></div></div>
   <datalist id="plist">${allPeople().map(([p])=>`<option value="${H(p)}">`).join("")}</datalist>
+  <div class="f"><label>Priority</label><div class="stseg prseg" id="fPr">${PRIS.map(p=>`<button type="button" data-p="${p}" style="--pc:${PCH[p]}">${p}</button>`).join("")}</div></div>
   <div class="f"><label>Status</label><div class="stseg" id="fSt">${STATUSES.map(s=>`<button type="button" data-s="${s}" class="${s.split(" ")[0]}">${s}</button>`).join("")}</div></div>
   <div class="f"><label>Progress</label><div class="pbig"><input type="range" min="0" max="100" step="5" id="fProg"><b id="fProgL"></b></div>
    <div class="quick">${[0,25,50,75,90,100].map(v=>`<button type="button" data-v="${v}">${v}%</button>`).join("")}</div></div>
@@ -850,12 +925,14 @@ function openTask(id,sec){
  chipInput($("fAn"),editing.an,v=>editing.an=[...v]);
  const pr=$("fProg");
  const syncP=()=>{const v=Math.round(editing.prog*100);pr.value=v;pr.style.setProperty("--p",v+"%");pr.style.setProperty("--c",SCH[editing.status]);$("fProgL").textContent=v+"%";
-  $("fSt").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.s===editing.status))};
+  $("fSt").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.s===editing.status));
+  $("fPr").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.p===editing.pri))};
  const syncD=()=>{const s=$("fStart").value,e=$("fEnd").value;$("fDur").textContent=s&&e?(e<s?"⚠ End date is before start date":`Duration: ${Math.round((D(e)-D(s))/DAY)+1} day(s) · ${fmt(s,1)} → ${fmt(e,1)}`):"Tip: add both dates so the task appears on the timeline"};
  syncP();syncD();
  pr.oninput=()=>{setProg(editing,pr.value/100);syncP()};
  $("drawer").querySelectorAll(".quick button").forEach(b=>b.onclick=()=>{setProg(editing,b.dataset.v/100);syncP()});
  $("fSt").querySelectorAll("button").forEach(b=>b.onclick=()=>{setStatus(editing,b.dataset.s);syncP()});
+ $("fPr").querySelectorAll("button").forEach(b=>b.onclick=()=>{editing.pri=b.dataset.p;syncP()});
  $("fStart").onchange=$("fEnd").onchange=syncD;
  $("fWs").onchange=e=>{if(e.target.value==="__new"){e.target.value=editing.ws;sectionModal(null,name=>{const o=document.createElement("option");o.textContent=name;o.selected=true;e.target.insertBefore(o,e.target.lastElementChild)})}};
  $("dx").onclick=$("dCancel").onclick=closeDrawer;
@@ -948,18 +1025,18 @@ const XL=(()=>{
  function build(db){
   const order=new Map(db.sections.map((s,i)=>[s.name,i]));
   const tasks=[...db.tasks].sort((a,b)=>(order.get(a.ws)??999)-(order.get(b.ws)??999)||a.id-b.id);
-  const tRows=[["ID","Section","Task","Project Manager(s)","Analyst(s)","Progress","Status","Start","End","Days","Notes","Last Updated"]];
-  tasks.forEach(t=>tRows.push([t.id,t.ws,t.task,t.pm.join("/"),t.an.join("/"),{p:Math.round(t.prog*100)/100},t.status,t.start?{d:t.start}:null,t.end?{d:t.end}:null,t.start&&t.end?Math.round((D(t.end)-D(t.start))/DAY):null,t.notes||null,t.updated?new Date(t.updated).toLocaleString("en-GB",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}):null]));
+  const tRows=[["ID","Section","Task","Project Manager(s)","Analyst(s)","Progress","Status","Priority","Start","End","Days","Notes","Last Updated"]];
+  tasks.forEach(t=>tRows.push([t.id,t.ws,t.task,t.pm.join("/"),t.an.join("/"),{p:Math.round(t.prog*100)/100},t.status,t.pri,t.start?{d:t.start}:null,t.end?{d:t.end}:null,t.start&&t.end?Math.round((D(t.end)-D(t.start))/DAY):null,t.notes||null,t.updated?new Date(t.updated).toLocaleString("en-GB",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}):null]));
   const sRows=[["Order","Section","Colour","Open tasks","Overdue","Total tasks"]];
   db.sections.forEach((s,i)=>{const x=db.tasks.filter(t=>t.ws===s.name);sRows.push([i+1,s.name,s.color,x.filter(isOpen).length,x.filter(isOver).length,x.length])});
   const pc={};db.tasks.forEach(t=>{t.pm.forEach(p=>{pc[p]=pc[p]||[0,0,0];pc[p][0]++});t.an.forEach(p=>{pc[p]=pc[p]||[0,0,0];pc[p][1]++});people(t).forEach(p=>{if(isOpen(t)){pc[p]=pc[p]||[0,0,0];pc[p][2]++}})});
   const pRows=[["Initials","Tasks as project manager","Tasks as analyst","Open tasks"]];Object.entries(pc).sort((a,b)=>b[1][2]-a[1][2]).forEach(([p,c])=>pRows.push([p,...c]));
   const aRows=[["B2C Project Flow – core workbook",""],["Last synced",new Date().toLocaleString("en-GB")],["Tasks",db.tasks.length],["Sections",db.sections.length],["",""],["How this works","The HTML dashboard writes to this file every time a change is made. You can also edit the Tasks and Sections sheets here; the dashboard picks up changes when it is next focused or reconnected."],["Multiple people","Separate initials with a forward slash, e.g. FMM/NH"],["Status values","Not started, In progress, Complete, On hold"],["Progress","0% to 100%"],["Dates","Enter as real dates (dd/mm/yyyy)"],["Read-only columns","Days and Last Updated are recalculated by the dashboard"]];
-  const sheets=[["Tasks",sheetXml(tRows,[7,30,52,20,20,10,13,12,12,7,40,18],true)],["Sections",sheetXml(sRows,[8,34,11,12,10,12],true)],["People",sheetXml(pRows,[10,24,18,12],true)],["About",sheetXml(aRows,[22,110],false)]];
+  const sheets=[["Tasks",sheetXml(tRows,[7,30,52,20,20,10,13,10,12,12,7,40,18],true)],["Sections",sheetXml(sRows,[8,34,11,12,10,12],true)],["People",sheetXml(pRows,[10,24,18,12],true)],["About",sheetXml(aRows,[22,110],false)]];
   const files=[
    {name:"[Content_Types].xml",data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${sheets.map((s,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("")}</Types>`},
    {name:"_rels/.rels",data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`},
-   {name:"xl/workbook.xml",data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><bookViews><workbookView activeTab="0"/></bookViews><sheets>${sheets.map((s,i)=>`<sheet name="${s[0]}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join("")}</sheets><definedNames><definedName name="_xlnm._FilterDatabase" localSheetId="0" hidden="1">Tasks!$A$1:$L$${tRows.length}</definedName><definedName name="_xlnm._FilterDatabase" localSheetId="1" hidden="1">Sections!$A$1:$F$${sRows.length}</definedName><definedName name="_xlnm._FilterDatabase" localSheetId="2" hidden="1">People!$A$1:$D$${pRows.length}</definedName></definedNames></workbook>`},
+   {name:"xl/workbook.xml",data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><bookViews><workbookView activeTab="0"/></bookViews><sheets>${sheets.map((s,i)=>`<sheet name="${s[0]}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join("")}</sheets><definedNames><definedName name="_xlnm._FilterDatabase" localSheetId="0" hidden="1">Tasks!$A$1:$M$${tRows.length}</definedName><definedName name="_xlnm._FilterDatabase" localSheetId="1" hidden="1">Sections!$A$1:$F$${sRows.length}</definedName><definedName name="_xlnm._FilterDatabase" localSheetId="2" hidden="1">People!$A$1:$D$${pRows.length}</definedName></definedNames></workbook>`},
    {name:"xl/_rels/workbook.xml.rels",data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join("")}<Relationship Id="rId${sheets.length+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`},
    {name:"xl/styles.xml",data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="1"><numFmt numFmtId="164" formatCode="dd/mm/yyyy"/></numFmts><fonts count="2"><font><sz val="10"/><name val="Gotham Book"/><family val="2"/></font><font><b/><sz val="10"/><color rgb="FFFFFFFF"/><name val="Gotham Medium"/><family val="2"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF16171C"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="5"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment vertical="center"/></xf><xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="9" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="top"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`},
    ...sheets.map((s,i)=>({name:`xl/worksheets/sheet${i+1}.xml`,data:s[1]}))];
@@ -981,14 +1058,14 @@ const XL=(()=>{
     arr[ci]=val});rows[ri]=arr});return rows.filter(Boolean)}
   const tr=await read("tasks")||await read(Object.keys(sheets)[0]);if(!tr||!tr.length)throw new Error("No Tasks sheet found");
   const hdr=tr[0].map(h=>String(h||"").toLowerCase());const find=(...k)=>hdr.findIndex(h=>k.some(x=>h.includes(x)));
-  const ix={id:find("id"),ws:find("section","workstream"),task:find("task"),pm:find("manager","pm"),an:find("analyst"),prog:find("progress"),status:find("status"),start:find("start"),end:find("end"),notes:find("note"),upd:find("updated")};
+  const ix={id:find("id"),ws:find("section","workstream"),task:find("task"),pm:find("manager","pm"),an:find("analyst"),prog:find("progress"),status:find("status"),start:find("start"),end:find("end"),notes:find("note"),upd:find("updated"),pri:find("priority")};
   if(ix.task<0)throw new Error("No Task column found");
   const toIso=v=>{if(!v)return null;if(typeof v==="object"&&v.d)return v.d;if(typeof v==="number")return fromSerial(v);const s=String(v).trim();let m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);if(m)return`${m[3]}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`;m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);return m?m[0]:null};
   const toProg=v=>{if(v==null||v==="")return 0;let n=typeof v==="number"?v:parseFloat(String(v).replace("%",""));if(isNaN(n))return 0;if(n>1||String(v).includes("%"))n/=100;return Math.max(0,Math.min(1,n))};
   const tasks=[];let maxId=0;
   tr.slice(1).forEach(r=>{const g=i=>i>=0?r[i]:null;const task=g(ix.task);if(!task||!String(task).trim())return;
    const id=parseInt(g(ix.id));const st=String(g(ix.status)||"").trim();const status=STATUSES.find(s=>s.toLowerCase()===st.toLowerCase())||"";
-   const t=norm({id:isNaN(id)?null:id,ws:String(g(ix.ws)||"Unsorted").trim(),task:String(task).trim(),pm:g(ix.pm)||"",an:g(ix.an)||"",prog:toProg(g(ix.prog)),status,start:toIso(g(ix.start)),end:toIso(g(ix.end)),notes:g(ix.notes)?String(g(ix.notes)):""});
+   const t=norm({id:isNaN(id)?null:id,ws:String(g(ix.ws)||"Unsorted").trim(),task:String(task).trim(),pm:g(ix.pm)||"",an:g(ix.an)||"",prog:toProg(g(ix.prog)),status,start:toIso(g(ix.start)),end:toIso(g(ix.end)),notes:g(ix.notes)?String(g(ix.notes)):"",pri:g(ix.pri)||""});
    if(status==="Complete")t.prog=1;tasks.push(t);if(t.id)maxId=Math.max(maxId,t.id)});
   const used=new Set();tasks.forEach(t=>{if(!t.id||used.has(t.id))t.id=++maxId;used.add(t.id)});
   const sr=await read("sections");const sections=[];
@@ -1007,7 +1084,7 @@ const MOCK=!!window.__B2C_MOCK__;
 const Live=(()=>{
  const G="https://graph.microsoft.com/v1.0";
  const SCOPES=["User.Read","Sites.ReadWrite.All"];
- const TF="Title,Section,ProjectManagers,Analysts,Progress,Status,StartDate,EndDate,Notes";
+ let TF="Title,Section,ProjectManagers,Analysts,Progress,Status,StartDate,EndDate,Notes";let hasPri=false;
  let pca=null,account=null,siteId=null,taskListId=null,secListId=null,listUrl="";
  let state="init",msg="",me="",lastPull=0,timer=null,pushing=false,dirty=false,pollT=null,retryT=null,progress="";
  const snapT=new Map(),snapS=new Map();
@@ -1056,11 +1133,11 @@ const Live=(()=>{
  /* ---------- Mapping ---------- */
  const iso2sp=d=>d?d+"T00:00:00Z":null;
  const sp2iso=v=>v?new Date(new Date(v).getTime()+6*36e5).toISOString().slice(0,10):null;
- const ser=t=>JSON.stringify([t.ws,t.task,t.pm.join("/"),t.an.join("/"),Math.round(t.prog*100),t.status,t.start||"",t.end||"",t.notes||""]);
+ const ser=t=>JSON.stringify([t.ws,t.task,t.pm.join("/"),t.an.join("/"),Math.round(t.prog*100),t.status,t.start||"",t.end||"",t.notes||"",t.pri]);
  const sser=s=>JSON.stringify([s.name,s.color,s.order]);
- const toFields=t=>({Title:t.task,Section:t.ws,ProjectManagers:t.pm.join("/"),Analysts:t.an.join("/"),Progress:Math.round(t.prog*100)/100,Status:t.status,StartDate:iso2sp(t.start),EndDate:iso2sp(t.end),Notes:t.notes||""});
+ const toFields=t=>({...(hasPri?{Priority:t.pri}:{}),Title:t.task,Section:t.ws,ProjectManagers:t.pm.join("/"),Analysts:t.an.join("/"),Progress:Math.round(t.prog*100)/100,Status:t.status,StartDate:iso2sp(t.start),EndDate:iso2sp(t.end),Notes:t.notes||""});
  const toSFields=s=>({Title:s.name,Color:s.color,SortOrder:s.order});
- function toTask(it){const f=it.fields||{};const t=norm({id:+it.id,sp:String(it.id),ws:f.Section||"Unsorted",task:f.Title||"(untitled)",pm:f.ProjectManagers||"",an:f.Analysts||"",prog:+f.Progress||0,status:f.Status||"",start:sp2iso(f.StartDate),end:sp2iso(f.EndDate),notes:f.Notes||""});
+ function toTask(it){const f=it.fields||{};const t=norm({id:+it.id,sp:String(it.id),ws:f.Section||"Unsorted",task:f.Title||"(untitled)",pm:f.ProjectManagers||"",an:f.Analysts||"",prog:+f.Progress||0,status:f.Status||"",start:sp2iso(f.StartDate),end:sp2iso(f.EndDate),notes:f.Notes||"",pri:f.Priority||""});
   if(t.status==="Complete")t.prog=1;t.updated=it.lastModifiedDateTime;t.by=(it.lastModifiedBy&&it.lastModifiedBy.user&&it.lastModifiedBy.user.displayName)||"";return t}
  function toSec(it,i){const f=it.fields||{};return{sp:String(it.id),name:f.Title||"Section",color:/^#[0-9a-f]{6}$/i.test(f.Color||"")?f.Color:PALETTE[i%PALETTE.length],order:f.SortOrder!=null?+f.SortOrder:i+1}}
 
@@ -1150,17 +1227,26 @@ const Live=(()=>{
   const site=await api(`/sites/${CONFIG.siteHost}:${CONFIG.sitePath}`);siteId=site.id;
   await findLists();
   if(!taskListId||!secListId){set("setup");render();return}
+  await checkPri();
   const {tasks,secs}=await fetchAll();
   snapT.clear();snapS.clear();tasks.forEach(t=>snapT.set(t.sp,ser(t)));secs.forEach(s=>snapS.set(s.sp,sser(s)));
   DB.tasks=tasks;DB.sections=secs;lastPull=Date.now();
   set(tasks.length||secs.length?"ready":"empty");render();
   clearInterval(pollT);pollT=setInterval(()=>{if(document.visibilityState==="visible")pull()},CONFIG.pollSeconds*1000)}
+ async function checkPri(){
+  try{const j=await api(`/sites/${siteId}/lists/${taskListId}/columns?$select=name`);hasPri=(j.value||[]).some(c=>c.name==="Priority")}catch(e){hasPri=false}
+  TF="Title,Section,ProjectManagers,Analysts,Progress,Status,StartDate,EndDate,Notes"+(hasPri?",Priority":"")}
+ async function addPriColumn(){
+  await api(`/sites/${siteId}/lists/${taskListId}/columns`,{method:"POST",body:JSON.stringify({name:"Priority",displayName:"Priority",choice:{choices:PRIS,displayAs:"dropDownMenu"},defaultValue:{value:"Medium"}})},["Sites.Manage.All"]);
+  await checkPri();if(!hasPri)throw new Error("Column not found after creating it");
+  const keep=new Map(DB.tasks.filter(t=>t.sp).map(t=>[t.sp,t.pri]));await connect();
+  DB.tasks.forEach(t=>{const p=keep.get(t.sp);if(p&&p!==t.pri)t.pri=p});push()}
  async function createLists(){
   const sc=["Sites.Manage.All"];
   const mk=(name,cols)=>api(`/sites/${siteId}/lists`,{method:"POST",body:JSON.stringify({displayName:name,list:{template:"genericList"},columns:cols})},sc);
   if(!taskListId)await mk(CONFIG.tasksList,[{name:"Section",text:{}},{name:"ProjectManagers",text:{}},{name:"Analysts",text:{}},{name:"Progress",number:{}},
    {name:"Status",choice:{choices:STATUSES,displayAs:"dropDownMenu"}},{name:"StartDate",dateTime:{format:"dateOnly"}},{name:"EndDate",dateTime:{format:"dateOnly"}},
-   {name:"Notes",text:{allowMultipleLines:true,linesForEditing:6}}]);
+   {name:"Notes",text:{allowMultipleLines:true,linesForEditing:6}},{name:"Priority",choice:{choices:PRIS,displayAs:"dropDownMenu"},defaultValue:{value:"Medium"}}]);
   if(!secListId)await mk(CONFIG.sectionsList,[{name:"Color",text:{}},{name:"SortOrder",number:{}}]);
   await findLists();await connect()}
  async function startFresh(){DB.sections=DEFAULT_SECTIONS.map((n,i)=>({name:n,color:PALETTE[i%PALETTE.length],order:i+1}));set("ready");render();await push()}
@@ -1172,7 +1258,7 @@ const Live=(()=>{
   const base=-Date.now();d.tasks.forEach((t,i)=>{delete t.sp;t.id=base-i;DB.tasks.push(t)});
   set("ready");go("overview");toast("Uploading to SharePoint – keep this tab open until it finishes");await push();
   if(state==="ready")toast(`Imported ${d.tasks.length.toLocaleString("en-GB")} tasks – everyone can see them now`)}
- return{init,pull,push,signIn,signOut,createLists,startFresh,importWorkbook,configured,
+ return{get hasPri(){return hasPri},addPriColumn,init,pull,push,signIn,signOut,createLists,startFresh,importWorkbook,configured,
   schedule(){clearTimeout(timer);timer=setTimeout(push,400)},
    pending:()=>pushing||DB.tasks.some(t=>!t.sp||!snapT.has(t.sp)||ser(t)!==snapT.get(t.sp)),
   get state(){return state},get msg(){return msg},get me(){return me},get lastPull(){return lastPull},get listUrl(){return listUrl},get account(){return account}}
@@ -1199,8 +1285,8 @@ function renderSyncPop(){
 function dl(name,blob){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
 const ukd=s=>s?s.split("-").reverse().join("/"):"";
 function exportCsv(){const e=v=>`"${String(v??"").replace(/"/g,'""')}"`;
- const L=[["Section","Task","Project manager(s)","Analyst(s)","Progress","Status","Start","End","Notes"].join(",")];
- DB.sections.forEach(s=>DB.tasks.filter(t=>t.ws===s.name).forEach(t=>L.push([s.name,t.task,t.pm.join("/"),t.an.join("/"),Math.round(t.prog*100)+"%",t.status,ukd(t.start),ukd(t.end),t.notes].map(e).join(","))));
+ const L=[["Section","Task","Project manager(s)","Analyst(s)","Progress","Status","Priority","Start","End","Notes"].join(",")];
+ DB.sections.forEach(s=>DB.tasks.filter(t=>t.ws===s.name).forEach(t=>L.push([s.name,t.task,t.pm.join("/"),t.an.join("/"),Math.round(t.prog*100)+"%",t.status,t.pri,ukd(t.start),ukd(t.end),t.notes].map(e).join(","))));
  dl(`B2C_Project_Flow_${iso(T)}.csv`,new Blob(["\ufeff"+L.join("\r\n")],{type:"text/csv"}));toast("Exported "+DB.tasks.length+" tasks")}
 $("file").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;try{await Live.importWorkbook(f)}catch(x){toast("Couldn't import: "+x.message)}};
 addEventListener("beforeunload",e=>{if(Live.pending()){e.preventDefault();e.returnValue=""}});
