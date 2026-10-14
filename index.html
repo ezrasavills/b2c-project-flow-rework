@@ -118,11 +118,12 @@ select option{background:#1b1d23;color:#F2F4F8}
 .pi.add{color:var(--gold2);font-weight:600}
 .pi.danger{color:var(--red)}
 .psep{height:1px;background:var(--line);margin:6px 8px}
-.pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:4px 6px 6px}
-.pchip{display:flex;align-items:center;gap:6px;padding:7px 9px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.05);font-size:12px;font-weight:600;cursor:pointer;user-select:none}
+.pgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:4px 6px 6px}
+.pchip{min-width:0;display:flex;align-items:center;gap:6px;padding:7px 9px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.05);font-size:12px;font-weight:600;cursor:pointer;user-select:none}
 .pchip:hover{background:rgba(255,255,255,.1)}
 .pchip span{width:16px;height:16px;border-radius:50%;flex:none}
 .pchip.on{background:var(--gold);color:#15161A;border-color:var(--gold)}
+.pchip>b{min-width:0;flex:1}
 .pchip small{margin-left:auto;font-weight:500;opacity:.6;font-size:10.5px}
 .pfoot{display:flex;align-items:center;gap:8px;padding:10px 8px 4px;border-top:1px solid var(--line);margin-top:6px}
 
@@ -365,7 +366,7 @@ textarea.fld.title{font-size:15.5px;font-weight:600;min-height:56px}
 .dur{font-size:12px;color:var(--muted);margin-top:-8px}
 .df{padding:16px 26px 20px;border-top:1px solid var(--line);display:flex;gap:10px}
 .df .sp{flex:1}
-.modal{position:fixed;left:50%;top:20%;transform:translate(-50%,-10px) scale(.98);width:470px;max-width:94vw;border-radius:20px;z-index:110;opacity:0;pointer-events:none;transition:.2s;
+.modal{position:fixed;left:50%;top:20%;transform:translate(-50%,-10px) scale(.98);width:470px;max-width:94vw;border-radius:20px;z-index:110;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
  background:linear-gradient(155deg,rgba(44,47,56,.95),rgba(22,24,29,.96));-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px);border:1px solid rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 30px 80px rgba(0,0,0,.7)}
 .modal.on{opacity:1;pointer-events:auto;transform:translate(-50%,0) scale(1)}
 .modal .mb{padding:26px 28px}
@@ -419,6 +420,16 @@ textarea.fld.title{font-size:15.5px;font-weight:600;min-height:56px}
 .qz{cursor:pointer}.qz:hover rect{opacity:.18}
 .qdot{cursor:pointer;transition:r .1s}.qdot:hover{r:8}
 @media(max-width:1500px){.kpis{grid-template-columns:repeat(3,1fr)}}
+.mecard{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;border-radius:14px;border:1px solid rgba(245,196,0,.35);background:rgba(245,196,0,.07);margin-bottom:14px}
+.mecard small{display:block;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}.mecard b{display:block;font-size:14px}.mecard span{font-size:12px;color:var(--ink2)}
+.ptab{max-height:46vh;overflow:auto;border:1px solid var(--line);border-radius:14px}
+.ptab .ph,.ptab .pr{display:grid;grid-template-columns:38px 70px minmax(0,1fr) minmax(0,1.3fr) 44px;gap:8px;align-items:center;padding:6px 12px}
+.ptab .ph{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:600;position:sticky;top:0;background:rgba(30,32,38,.98);padding:9px 12px;grid-template-columns:116px minmax(0,1fr) minmax(0,1.3fr) 44px}
+.ptab .pr+.pr{border-top:1px solid var(--line2)}.ptab .pr .fld{padding:7px 10px;font-size:12.5px}.ptab small{color:var(--muted);text-align:right}
+.pini em{font-style:normal;font-size:10px;background:var(--gold);color:#15161A;border-radius:6px;padding:1px 6px;margin-left:4px}
+.secbars{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 34px}
+.sbr{display:grid;grid-template-columns:minmax(0,190px) 1fr 30px;align-items:center;gap:12px;cursor:pointer;padding:6px 8px;border-radius:10px}.sbr:hover{background:rgba(255,255,255,.05)}
+.sbr span{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sbr b{text-align:right}
 .toast.hasundo{padding:10px 10px 10px 20px;overflow:hidden;border-color:rgba(245,196,0,.5)}
 .toast.hasundo #undo{background:#F5C400;color:#15161A;font-size:13px;padding:8px 16px}
 .toast .tbar{position:absolute;left:0;bottom:0;height:3px;width:100%;background:#F5C400;animation:tbar 8s linear forwards}
@@ -432,14 +443,16 @@ textarea.fld.title{font-size:15.5px;font-weight:600;min-height:56px}
   <div class="tabs">
    <button class="tab" data-v="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="2.5"/><rect x="14" y="3" width="7" height="5" rx="2.5"/><rect x="14" y="12" width="7" height="9" rx="2.5"/><rect x="3" y="16" width="7" height="5" rx="2.5"/></svg>Overview</button>
    <button class="tab" data-v="timeline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M8 12h12M4 18h8"/></svg>Timeline</button>
+   <button class="tab" data-v="mine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.4 4.2-6.5 8-6.5s7 2.1 8 6.5"/></svg>My tasks<span class="ct" id="minect"></span></button>
    <button class="tab" data-v="all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>All tasks<span class="ct" id="allct"></span></button>
    <span style="position:relative"><button class="tab" id="secBtn" data-v="section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span id="secLbl">Sections</span><svg class="car" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg></button>
     <div class="pop" id="secPop" style="width:330px"></div></span>
   </div>
   <span class="sp"></span>
   <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input class="gin" id="q" placeholder="Search tasks…"></div>
-  <span style="position:relative"><button class="gbtn" id="fltBtn"></button><div class="pop r" id="fltPop" style="width:420px"></div></span>
+  <span style="position:relative"><button class="gbtn" id="fltBtn"></button><div class="pop r" id="fltPop" style="width:480px;max-width:calc(100vw - 40px);max-height:calc(100vh - 110px);overflow:auto"></div></span>
   <span style="position:relative"><button class="gbtn" id="pplBtn"></button><div class="pop r" id="pplPop" style="width:410px"></div></span>
+  <button class="gbtn" id="setBtn" title="Team &amp; initials" style="width:40px;padding:0;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></button>
   <span style="position:relative"><button class="sync off" id="syncBtn" title="Core workbook"><i></i><span id="syncTxt">No workbook</span></button><div class="pop r" id="syncPop" style="width:340px"></div></span>
   <button class="gbtn prim" id="newTask"><b>+</b> New task</button>
  </nav>
@@ -465,6 +478,7 @@ const CONFIG={
  sitePath:"/sites/UKResidentialResearchsharedadminfiles",
  tasksList:"B2C Project Flow Tasks",
  sectionsList:"B2C Project Flow Sections",
+ peopleList:"B2C Project Flow People",            // maps initials to Microsoft accounts
  pollSeconds:20                                   // how often everyone's screen refreshes
 };
 const KEY="b2c_project_flow_v3";
@@ -509,12 +523,12 @@ const people=t=>uniq([...t.pm,...t.an]).filter(x=>x!=="TBC");
 function allPeople(){const c={};DB.tasks.forEach(t=>people(t).forEach(p=>c[p]=(c[p]||0)+1));return Object.entries(c).sort((a,b)=>b[1]-a[1])}
 function canon(p){const hit=allPeople().find(([x])=>x.toLowerCase()===p.toLowerCase());return hit?hit[0]:p}
 function pColor(p){let h=0;for(const ch of p)h=(h*31+ch.charCodeAt(0))>>>0;return PCOL[h%PCOL.length]}
-const avatars=(t,max=4)=>{const pmset=new Set(t.pm),ps=people(t);return'<span class="av">'+ps.slice(0,max).map(p=>`<span class="${pmset.has(p)?"pm":""}" style="background:${pColor(p)};font-size:${p.length>2?8:9}px" title="${H(p)}${pmset.has(p)?" (project manager)":""}">${H(p.slice(0,3))}</span>`).join("")+(ps.length>max?`<em>+${ps.length-max}</em>`:"")+"</span>"};
+const avatars=(t,max=4)=>{const pmset=new Set(t.pm),ps=people(t);return'<span class="av">'+ps.slice(0,max).map(p=>`<span class="${pmset.has(p)?"pm":""}" style="background:${pColor(p)};font-size:${p.length>2?8:9}px" title="${H(p)}${(pInfo(p)||{}).name?" – "+H(pInfo(p).name):""}${pmset.has(p)?" (project manager)":""}">${H(p.slice(0,3))}</span>`).join("")+(ps.length>max?`<em>+${ps.length-max}</em>`:"")+"</span>"};
 
 /* ---------- State ---------- */
 let DB,UI={view:"overview",section:null,filters:new Set(["open"]),statuses:new Set(),sections:new Set(),pris:new Set(),q:"",people:[],pmode:"any",limit:80,sort:"end",tlHold:false,selMode:false,sel:new Set()};
 function norm(t){t.pm=uniq(splitPeople(t.pm));t.an=uniq(splitPeople(t.an));t.prog=Math.max(0,Math.min(1,+t.prog||0));if(!STATUSES.includes(t.status))t.status=t.prog>=1?"Complete":t.prog>0?"In progress":"Not started";t.notes=t.notes||"";{const p=String(t.pri||"").trim().toLowerCase();t.pri=PRIS.find(x=>x.toLowerCase()===p)||(p==="med"?"Medium":"Medium")}return t}
-const blank=()=>({tasks:[],sections:[],nextId:1});
+const blank=()=>({tasks:[],sections:[],people:[],nextId:1});
 function recolor(d){const old=["#C9A227","#3567E0","#18976A","#E0685B","#7C5CF0","#0EA5B7","#E08A0B","#D9468F","#5B6B85","#2F9E44","#B4552D","#4C6EF5"];d.sections.forEach(s=>{const i=old.indexOf((s.color||"").toUpperCase());if(i>=0)s.color=PALETTE[i]})}
 const touch=t=>t.updated=new Date().toISOString();
 function save(msg,undo){if(msg)toast(msg,undo);Live.schedule()}
@@ -592,6 +606,7 @@ function renderNav(){
  document.querySelectorAll(".tab[data-v]").forEach(n=>n.classList.toggle("on",n.dataset.v===UI.view));
  $("secLbl").textContent=UI.view==="section"?short(UI.section):"Sections";
  $("allct").textContent=DB.tasks.filter(isOpen).length;
+ {const m=myIni();$("minect").textContent=m?DB.tasks.filter(t=>isOpen(t)&&isMine(t,m,"any")).length:"";$("minect").style.display=m?"":"none"}
  const nf=UI.statuses.size+UI.sections.size+UI.pris.size;$("fltBtn").innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg>Filters${nf?`<span class="nb">${nf}</span>`:""}`;$("fltBtn").classList.toggle("act",!!nf);
  const sel=UI.people;
  $("pplBtn").innerHTML=sel.length?`<span class="pc">${sel.slice(0,3).map(p=>`<span style="background:${pColor(p)}">${H(p.slice(0,3))}</span>`).join("")}</span>${sel.length>3?"+"+(sel.length-3):""} <span style="color:var(--muted);font-weight:500">${sel.length>1?(UI.pmode==="all"?"all of":"any of"):""}</span>`:`${ico.users}Everyone`;
@@ -604,7 +619,7 @@ function renderSecPop(){
 }
 function renderPplPop(){
  const ps=allPeople(),sel=new Set(UI.people.map(x=>x.toLowerCase()));
- $("pplPop").innerHTML=`<h6>Filter by people · pick as many as you like</h6><div class="pgrid">${ps.map(([p,c])=>`<div class="pchip ${sel.has(p.toLowerCase())?"on":""}" data-p="${H(p)}"><span style="background:${pColor(p)}"></span>${H(p)}<small>${c}</small></div>`).join("")||'<div style="grid-column:1/-1;color:var(--muted);padding:8px">No people yet</div>'}</div>
+ $("pplPop").innerHTML=`<h6>Filter by people · pick as many as you like</h6><div class="pgrid">${ps.map(([p,c])=>`<div class="pchip ${sel.has(p.toLowerCase())?"on":""}" data-p="${H(p)}"><span style="background:${pColor(p)}"></span><b style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${H((pInfo(p)||{}).name||"")}">${H(p)}</b><small>${c}</small></div>`).join("")||'<div style="grid-column:1/-1;color:var(--muted);padding:8px">No people yet</div>'}</div>
  <div class="pfoot"><span style="font-size:12px;color:var(--muted)">Match</span><div class="seg"><button data-m="any" class="${UI.pmode==="any"?"on":""}">Any selected</button><button data-m="all" class="${UI.pmode==="all"?"on":""}">All selected</button></div><span class="sp"></span><button class="link" id="pClear">Clear</button></div>`;
  $("pplPop").querySelectorAll(".pchip").forEach(c=>c.onclick=()=>{const p=c.dataset.p;UI.people=UI.people.some(x=>x.toLowerCase()===p.toLowerCase())?UI.people.filter(x=>x.toLowerCase()!==p.toLowerCase()):[...UI.people,p];UI.limit=80;render();renderPplPop()});
  $("pplPop").querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{UI.pmode=b.dataset.m;render();renderPplPop()});
@@ -615,9 +630,9 @@ function secChips(){return`<div class="schips"><span class="lbl">Sections</span>
 function bindSecChips(){$("view").querySelectorAll("[data-sc]").forEach(b=>b.onclick=()=>{const n=b.dataset.sc;if(!n)UI.sections.clear();else UI.sections.has(n)?UI.sections.delete(n):UI.sections.add(n);UI.limit=80;render()})}
 function renderFltPop(){
  const cnt=s=>DB.tasks.filter(t=>t.status===s).length;
- $("fltPop").innerHTML=`<h6>Statuses · pick as many as you like</h6><div class="pgrid" style="grid-template-columns:repeat(2,1fr)">${STATUSES.map(s=>`<div class="pchip ${UI.statuses.has(s)?"on":""}" data-fs="${s}"><span style="background:${SCH[s]}"></span>${s}<small>${cnt(s)}</small></div>`).join("")}</div>
- <h6 style="margin-top:12px">Priority · pick as many as you like</h6><div class="pgrid" style="grid-template-columns:repeat(3,1fr)">${PRIS.map(p=>`<div class="pchip ${UI.pris.has(p)?"on":""}" data-fp="${p}"><span style="background:${PCH[p]}"></span>${p}<small>${DB.tasks.filter(t=>t.pri===p&&isOpen(t)).length}</small></div>`).join("")}</div>
- <h6 style="margin-top:12px">Sections · pick as many as you like</h6><div class="pgrid" style="grid-template-columns:1fr 1fr">${DB.sections.map(s=>`<div class="pchip ${UI.sections.has(s.name)?"on":""}" data-fsec="${H(s.name)}" title="${H(s.name)}"><span style="background:${s.color}"></span><b style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${H(s.name)}</b></div>`).join("")}</div>
+ $("fltPop").innerHTML=`<h6>Statuses · pick as many as you like</h6><div class="pgrid" style="grid-template-columns:repeat(2,minmax(0,1fr))">${STATUSES.map(s=>`<div class="pchip ${UI.statuses.has(s)?"on":""}" data-fs="${s}"><span style="background:${SCH[s]}"></span>${s}<small>${cnt(s)}</small></div>`).join("")}</div>
+ <h6 style="margin-top:12px">Priority · pick as many as you like</h6><div class="pgrid" style="grid-template-columns:repeat(3,minmax(0,1fr))">${PRIS.map(p=>`<div class="pchip ${UI.pris.has(p)?"on":""}" data-fp="${p}"><span style="background:${PCH[p]}"></span>${p}<small>${DB.tasks.filter(t=>t.pri===p&&isOpen(t)).length}</small></div>`).join("")}</div>
+ <h6 style="margin-top:12px">Sections · pick as many as you like</h6><div class="pgrid" style="grid-template-columns:repeat(2,minmax(0,1fr))">${DB.sections.map(s=>`<div class="pchip ${UI.sections.has(s.name)?"on":""}" data-fsec="${H(s.name)}" title="${H(s.name)}"><span style="background:${s.color}"></span><b style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${H(s.name)}</b></div>`).join("")}</div>
  <div class="pfoot"><span style="font-size:12px;color:var(--muted)">Applies to every page</span><span class="sp"></span><button class="link" id="fClear">Clear all</button></div>`;
  $("fltPop").querySelectorAll("[data-fs]").forEach(c=>c.onclick=()=>{const s=c.dataset.fs;UI.statuses.has(s)?UI.statuses.delete(s):UI.statuses.add(s);UI.limit=80;render();renderFltPop()});
  $("fltPop").querySelectorAll("[data-fsec]").forEach(c=>c.onclick=()=>{const s=c.dataset.fsec;UI.sections.has(s)?UI.sections.delete(s):UI.sections.add(s);UI.limit=80;render();renderFltPop()});
@@ -629,8 +644,106 @@ function pageHead(title,sub){
  return`<div class="phead"><div><h1>${H(title)}</h1><div class="sub">${sub}</div></div><div class="fchips">${chips}</div></div>`;
 }
 
+/* ---------- Team & initials ---------- */
+const PKEY="b2c_people_local";
+const peopleMap=()=>Live.hasPeople?(DB.people||[]):JSON.parse(localStorage.getItem(PKEY)||"[]");
+const pInfo=ini=>peopleMap().find(p=>p.ini.toLowerCase()===String(ini).toLowerCase());
+function myIni(){const e=(Live.email||"").toLowerCase();if(!e)return null;const p=peopleMap().find(x=>(x.email||"").toLowerCase()===e);return p?p.ini:null}
+const isMine=(t,ini,role)=>{const L=x=>x.toLowerCase(),m=L(ini);return(role!=="an"&&t.pm.some(p=>L(p)===m))||(role!=="pm"&&t.an.some(p=>L(p)===m))};
+async function savePeopleRows(rows){
+ // one person per account: if an email is being assigned, clear it from any other initials
+ const all=new Map(peopleMap().map(p=>[p.ini.toLowerCase(),{...p}]));
+ rows.forEach(r=>{const e=(r.email||"").toLowerCase();if(e)all.forEach((p,k)=>{if(k!==r.ini.toLowerCase()&&(p.email||"").toLowerCase()===e){p.email="";rows.push({ini:p.ini,email:"",name:p.name})}});all.set(r.ini.toLowerCase(),{...all.get(r.ini.toLowerCase()),...r})});
+ const uniqRows=[...new Map(rows.map(r=>[r.ini.toLowerCase(),r])).values()];
+ if(Live.hasPeople)await Live.savePeople(uniqRows);
+ else localStorage.setItem(PKEY,JSON.stringify([...all.values()].filter(p=>p.email||p.name)));
+}
+async function claimInitials(ini){
+ ini=canon(ini.trim());if(!ini)return;
+ try{await savePeopleRows([{ini,email:Live.email,name:Live.me}]);toast(`You're now linked to ${ini}`);render()}catch(e){toast("Couldn't save: "+e.message)}
+}
+function peopleModal(){
+ const rows=[...new Set([...allPeople().map(x=>x[0]),...peopleMap().map(p=>p.ini)])].sort((a,b)=>a.localeCompare(b));
+ const mine=myIni(),cnt=Object.fromEntries(allPeople());
+ $("modal").style.width="640px";
+ $("modal").innerHTML=`<div class="mb"><h3>Team &amp; initials</h3><p>Link each set of initials to a Microsoft account so <b>My tasks</b> works for everyone. ${Live.hasPeople?"Saved in SharePoint – shared with the whole team.":"<span style='color:var(--amber)'>Saved only in this browser.</span>"}</p>
+  ${Live.hasPeople?"":`<div class="prwarn card pad" style="margin-bottom:14px;padding:12px 14px"><div><b>Share these links with everyone</b><span>Create a small SharePoint list so everyone's initials are set once for the whole team.</span></div><button class="btn gold sm" id="mkPeople">${ico.plus} Create list</button></div>`}
+  <div class="mecard"><div><small>Signed in as</small><b>${H(Live.me||"Unknown")}</b><span>${H(Live.email||"")}</span></div>
+   <div style="display:flex;gap:8px;align-items:center"><span style="font-size:12px;color:var(--muted)">My initials</span><input class="fld" id="myIniIn" list="plistM" value="${H(mine||"")}" placeholder="e.g. EzA" style="width:110px;padding:8px 10px"><button class="btn gold sm" id="myIniSave">Save</button></div></div>
+  <datalist id="plistM">${rows.map(p=>`<option value="${H(p)}">`).join("")}</datalist>
+  <div class="ptab"><div class="ph"><span>Initials</span><span>Name</span><span>Microsoft email</span><span>Tasks</span></div>
+  ${rows.map(p=>{const i=pInfo(p)||{};return`<div class="pr" data-ini="${H(p)}"><span class="av"><span style="background:${pColor(p)};width:30px;height:30px;font-size:9.5px">${H(p.slice(0,3))}</span></span><b class="pini">${H(p)}${mine&&p.toLowerCase()===mine.toLowerCase()?' <em>you</em>':""}</b>
+   <input class="fld pn" value="${H(i.name||"")}" placeholder="Full name"><input class="fld pe" value="${H(i.email||"")}" placeholder="name@savills.com"><small>${cnt[p]||0}</small></div>`}).join("")}</div>
+  <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px"><button class="btn" id="mCancel">Close</button><button class="btn gold" id="mOk">Save changes</button></div></div>`;
+ const close=()=>{$("modal").classList.remove("on");$("modal").style.width="";if(!$("drawer").classList.contains("on"))$("scrim").classList.remove("on")};
+ $("mCancel").onclick=close;
+ $("myIniSave").onclick=async()=>{const v=$("myIniIn").value.trim();if(!v){toast("Type your initials");return}await claimInitials(v);peopleModal()};
+ $("mOk").onclick=async()=>{const ch=[];$("modal").querySelectorAll(".pr").forEach(r=>{const ini=r.dataset.ini,i=pInfo(ini)||{},n=r.querySelector(".pn").value.trim(),e=r.querySelector(".pe").value.trim();
+   if(e&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){toast(`Check the email for ${ini}`);throw 0}
+   if(n!==(i.name||"")||e!==(i.email||""))ch.push({ini,name:n,email:e})});
+  if(!ch.length){close();return}
+  try{$("mOk").textContent="Saving…";await savePeopleRows(ch);toast(`Saved ${ch.length} change${ch.length===1?"":"s"}`);close();render()}catch(e){$("mOk").textContent="Save changes";if(e)toast("Couldn't save: "+e.message)}};
+ const mk=$("mkPeople");if(mk)mk.onclick=async()=>{mk.disabled=true;mk.textContent="Creating…";try{const local=JSON.parse(localStorage.getItem(PKEY)||"[]");await Live.createPeopleList();if(local.length)await Live.savePeople(local);toast("People list created – links are now shared");peopleModal()}catch(e){mk.disabled=false;mk.textContent="Create list";toast("Couldn't create it ("+e.message+"). Ask IT to keep Sites.Manage.All, or create a list called '"+CONFIG.peopleList+"' with Email and DisplayName text columns.")}};
+ $("modal").classList.add("on");$("scrim").classList.add("on");
+}
+$("setBtn").onclick=()=>peopleModal();
+
+function vMine(){
+ const me=myIni();
+ if(!me){
+  const ps=allPeople();
+  $("view").innerHTML=pageHead("My tasks",H(Live.me||""))+`<div class="card onb fade" style="max-width:820px"><div class="mark">${ico.users.replace('<svg','<svg width="28" height="28"')}</div><h2>Which initials are you?</h2>
+   <p>Pick the initials used for you in the task list. This links them to <b>${H(Live.email||"your account")}</b> so My tasks shows your work every time you sign in.</p>
+   <div class="pgrid" style="grid-template-columns:repeat(6,minmax(0,1fr));text-align:left">${ps.map(([p,c])=>{const i=pInfo(p);return`<div class="pchip" data-claim="${H(p)}" title="${i&&i.name?H(i.name):""}"><span style="background:${pColor(p)}"></span>${H(p)}<small>${c}</small></div>`}).join("")}</div>
+   <div class="acts" style="margin-top:18px"><input class="fld" id="claimIn" placeholder="Or type new initials" style="width:200px"><button class="btn gold" id="claimGo">Use these</button></div>
+   <small>You can change this any time from the ⚙ Team &amp; initials button.</small></div>`;
+  $("view").querySelectorAll("[data-claim]").forEach(c=>c.onclick=()=>claimInitials(c.dataset.claim));
+  $("claimGo").onclick=()=>{const v=$("claimIn").value.trim();if(v)claimInitials(v)};
+  return}
+ const role=UI.mineRole||"any";
+ const savePpl=UI.people;UI.people=[];
+ const mineAll=DB.tasks.filter(t=>isMine(t,me,role)&&matches(t));UI.people=savePpl;
+ const open=mineAll.filter(isOpen),ip=open.filter(t=>t.status==="In progress"),over=mineAll.filter(isOver),soon=mineAll.filter(isSoon),hi=open.filter(t=>t.pri==="High");
+ const doneM=mineAll.filter(t=>t.status==="Complete"&&t.end&&D(t.end).getMonth()===T.getMonth()&&D(t.end).getFullYear()===T.getFullYear()).length;
+ const qc={do:[],plan:[],fit:[],later:[]};let noDate=0;open.forEach(t=>{const q=quadOf(t);if(q)qc[q].push(t);else if(t.status!=="On hold"&&!t.end)noDate++});
+ const att=[...over,...soon].sort((a,b)=>PRANK[a.pri]-PRANK[b.pri]||D(a.end)-D(b.end));
+ const mrow=t=>`<div class="mrow" data-id="${t.id}">${doneBtn(t)}<span class="bar" style="background:${secColor(t.ws)}"></span><div class="b"><div class="t">${H(t.task)}</div><div class="m"><span style="color:${PCH[t.pri]};font-weight:700">● ${t.pri}</span> · ${H(t.ws)} · ${Math.round(t.prog*100)}% done</div></div><div style="width:96px;text-align:right">${dueChip(t)}</div></div>`;
+ const pm=open.filter(t=>isMine(t,me,"pm")).length,an=open.filter(t=>isMine(t,me,"an")).length;
+ const bySec=DB.sections.map(s=>({s,n:open.filter(t=>t.ws===s.name).length})).filter(x=>x.n).sort((a,b)=>b.n-a.n);const smx=Math.max(1,...bySec.map(x=>x.n));
+ const fn=listPred(),rows=sortRows(mineAll.filter(fn));
+ const first=(Live.me||"").split(" ")[0];
+ $("view").innerHTML=pageHead("My tasks",`${H(Live.me||"")} · <b style="color:var(--gold2)">${H(me)}</b> · <a href="#" id="chgIni" style="color:var(--muted)">change</a>`)+`<div class="g fade">
+ <div class="card hero"><h2>${first?H(first)+", here's":"Here's"} your work</h2><p>You have <b>${open.length} open task${open.length===1?"":"s"}</b> — <b>${ip.length} in progress</b>, <b class="r">${over.length} overdue</b> and <b class="y">${soon.length} due in the next two weeks</b>. <b class="r">${qc.do.length} high-priority task${qc.do.length===1?" needs":"s need"} doing now</b>. You lead ${pm} as project manager and are analyst on ${an}.</p>
+  <div class="seg" id="roleSeg" style="margin-top:16px">${[["any","All my tasks"],["pm","As project manager"],["an","As analyst"]].map(([k,l])=>`<button data-r="${k}" class="${role===k?"on":""}">${l}</button>`).join("")}</div></div>
+ <div class="kpis">
+  ${kpi("My open tasks",open.length,`${ip.length} in progress`,ico.list,"var(--blue)","var(--bluebg)","open")}
+  ${kpi("Overdue",over.length,"Past their end date",ico.alert,"var(--red)","var(--redbg)","over")}
+  ${kpi("Due in next 14 days",soon.length,"Coming up",ico.cal,"var(--amber)","var(--amberbg)","soon")}
+  ${kpi("High priority",hi.length,`${qc.do.length} to do now`,ico.flag,"#FF6B6B","rgba(255,107,107,.15)","high")}
+  ${kpi("Completed this month",doneM,"Nice work",ico.done,"var(--green)","var(--greenbg)","done")}
+ </div>
+ <div class="g ov2" style="grid-template-columns:1.45fr 1fr">
+  <div class="card pad"><div class="ch"><div><h3>My priority × deadline</h3><div class="h">Your open tasks · click a dot to open, or a quadrant to filter the list below</div></div></div>${quadChart(qc,noDate)}</div>
+  <div class="card pad"><div class="ch"><div><h3>Needs attention</h3><div class="h">High priority first, then soonest deadline</div></div><span class="pill p-On">${att.length}</span></div>
+   <div class="scroll" style="max-height:330px">${att.map(mrow).join("")||'<div class="empty"><b>All clear</b>Nothing overdue or due soon</div>'}</div>
+   <div class="qsum">${Object.entries(QUADS).map(([k,q])=>`<div class="qs" data-q="${k}" style="--qc:${q.c}"><b>${qc[k].length}</b><span>${q.n}</span></div>`).join("")}</div></div>
+ </div>
+ ${bySec.length?`<div class="card pad"><div class="ch"><div><h3>My open work by section</h3><div class="h">Click a section to filter the list below</div></div></div><div class="secbars">${bySec.map(x=>`<div class="sbr" data-sb="${H(x.s.name)}"><span>${H(x.s.name)}</span><div class="track"><div style="width:${x.n/smx*100}%;background:${x.s.color}"></div></div><b>${x.n}</b></div>`).join("")}</div></div>`:""}
+ <div id="mineList"><div class="tb" style="margin-top:4px">${filterBar(mineAll,["open","over","soon","high","q_do","In progress","Not started","On hold","Complete","done","all"])}${toolbarRight()}</div>${taskTable(rows,true)}</div>
+ </div>`;
+ bindRows();
+ const toList=()=>$("mineList").scrollIntoView({behavior:"smooth",block:"start"});
+ $("view").querySelectorAll(".mrow").forEach(e=>e.onclick=()=>openTask(+e.dataset.id));
+ $("view").querySelectorAll(".qdot").forEach(e=>e.onclick=ev=>{ev.stopPropagation();openTask(+e.dataset.id)});
+ $("view").querySelectorAll("[data-q]").forEach(e=>e.onclick=()=>{setOne("q_"+e.dataset.q);UI.sort="pri";UI.limit=80;render();toList()});
+ $("view").querySelectorAll(".kpi").forEach(e=>e.onclick=()=>{setOne(e.dataset.f);UI.limit=80;render();toList()});
+ $("view").querySelectorAll("[data-sb]").forEach(e=>e.onclick=()=>{UI.sections=new Set([e.dataset.sb]);setOne("open");render();toList()});
+ $("roleSeg").querySelectorAll("button").forEach(b=>b.onclick=()=>{UI.mineRole=b.dataset.r;render()});
+ $("chgIni").onclick=e=>{e.preventDefault();peopleModal()};
+}
+
 /* ---------- Views ---------- */
-function render(){renderNav();if(Live.state!=="ready"&&Live.state!=="busy"&&Live.state!=="err")vGate();else({overview:vOverview,section:vSection,all:vAll,timeline:vTimeline})[UI.view]();
+function render(){renderNav();if(Live.state!=="ready"&&Live.state!=="busy"&&Live.state!=="err")vGate();else({mine:vMine,overview:vOverview,section:vSection,all:vAll,timeline:vTimeline})[UI.view]();
  $("view").querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{UI.people=UI.people.filter(x=>x!==b.dataset.rm);render()});$("view").querySelectorAll("[data-rms]").forEach(b=>b.onclick=()=>{UI.statuses.delete(b.dataset.rms);render()});$("view").querySelectorAll("[data-rmsec]").forEach(b=>b.onclick=()=>{UI.sections.delete(b.dataset.rmsec);render()});$("view").querySelectorAll("[data-rmp]").forEach(b=>b.onclick=()=>{UI.pris.delete(b.dataset.rmp);render()});renderBulk()}
 function vGate(){
  const st=Live.state,cfg=`<pre style="text-align:left;background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:12px;overflow:auto">clientId: "${H(CONFIG.clientId)}"\ntenantId: "${H(CONFIG.tenantId)}"</pre>`;
@@ -1085,7 +1198,7 @@ const Live=(()=>{
  const G="https://graph.microsoft.com/v1.0";
  const SCOPES=["User.Read","Sites.ReadWrite.All"];
  let TF="Title,Section,ProjectManagers,Analysts,Progress,Status,StartDate,EndDate,Notes";let hasPri=false;
- let pca=null,account=null,siteId=null,taskListId=null,secListId=null,listUrl="";
+ let pca=null,account=null,siteId=null,taskListId=null,secListId=null,peopleListId=null,listUrl="";
  let state="init",msg="",me="",lastPull=0,timer=null,pushing=false,dirty=false,pollT=null,retryT=null,progress="";
  const snapT=new Map(),snapS=new Map();
  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -1159,7 +1272,8 @@ const Live=(()=>{
   return{res,changed}}
 
  async function fetchAll(){
-  const [ti,si]=await Promise.all([getAll(taskListId,TF),getAll(secListId,"Title,Color,SortOrder")]);
+  const [ti,si,pi]=await Promise.all([getAll(taskListId,TF),getAll(secListId,"Title,Color,SortOrder"),peopleListId?getAll(peopleListId,"Title,Email,DisplayName").catch(()=>null):null]);
+  if(pi)DB.people=pi.map(it=>({sp:String(it.id),ini:(it.fields.Title||"").trim(),email:(it.fields.Email||"").trim(),name:(it.fields.DisplayName||"").trim()})).filter(p=>p.ini);
   return{tasks:ti.map(toTask),secs:si.map(toSec).sort((a,b)=>a.order-b.order)}}
 
  async function pull(){
@@ -1222,7 +1336,7 @@ const Live=(()=>{
  async function findLists(){
   const j=await api(`/sites/${siteId}/lists?$select=id,displayName,webUrl`);const L=j.value||[];
   const f=n=>L.find(l=>(l.displayName||"").toLowerCase()===n.toLowerCase());
-  const a=f(CONFIG.tasksList),b=f(CONFIG.sectionsList);taskListId=a&&a.id;secListId=b&&b.id;listUrl=a?a.webUrl:""}
+  const a=f(CONFIG.tasksList),b=f(CONFIG.sectionsList),c=f(CONFIG.peopleList);taskListId=a&&a.id;secListId=b&&b.id;peopleListId=c&&c.id;listUrl=a?a.webUrl:""}
  async function connect(){
   const site=await api(`/sites/${CONFIG.siteHost}:${CONFIG.sitePath}`);siteId=site.id;
   await findLists();
@@ -1241,6 +1355,17 @@ const Live=(()=>{
   await checkPri();if(!hasPri)throw new Error("Column not found after creating it");
   const keep=new Map(DB.tasks.filter(t=>t.sp).map(t=>[t.sp,t.pri]));await connect();
   DB.tasks.forEach(t=>{const p=keep.get(t.sp);if(p&&p!==t.pri)t.pri=p});push()}
+ async function createPeopleList(){
+  await api(`/sites/${siteId}/lists`,{method:"POST",body:JSON.stringify({displayName:CONFIG.peopleList,list:{template:"genericList"},columns:[{name:"Email",text:{}},{name:"DisplayName",text:{}}]})},["Sites.Manage.All"]);
+  await findLists();if(!peopleListId)throw new Error("List not found after creating it");DB.people=[];await pull()}
+ async function savePeople(rows){ // rows: [{ini,email,name}]
+  const PU=`/sites/${siteId}/lists/${peopleListId}/items`,reqs=[];
+  for(const r of rows){const ex=DB.people.find(p=>p.ini.toLowerCase()===r.ini.toLowerCase());const f={Title:r.ini,Email:r.email||"",DisplayName:r.name||""};
+   if(ex){if(ex.email!==f.Email||ex.name!==f.DisplayName)reqs.push({method:"PATCH",url:`${PU}/${ex.sp}/fields`,body:f})}
+   else if(f.Email||f.DisplayName)reqs.push({method:"POST",url:PU,body:{fields:f}})}
+  if(reqs.length)await batch(reqs);
+  const pi=await getAll(peopleListId,"Title,Email,DisplayName");
+  DB.people=pi.map(it=>({sp:String(it.id),ini:(it.fields.Title||"").trim(),email:(it.fields.Email||"").trim(),name:(it.fields.DisplayName||"").trim()})).filter(p=>p.ini)}
  async function createLists(){
   const sc=["Sites.Manage.All"];
   const mk=(name,cols)=>api(`/sites/${siteId}/lists`,{method:"POST",body:JSON.stringify({displayName:name,list:{template:"genericList"},columns:cols})},sc);
@@ -1248,6 +1373,7 @@ const Live=(()=>{
    {name:"Status",choice:{choices:STATUSES,displayAs:"dropDownMenu"}},{name:"StartDate",dateTime:{format:"dateOnly"}},{name:"EndDate",dateTime:{format:"dateOnly"}},
    {name:"Notes",text:{allowMultipleLines:true,linesForEditing:6}},{name:"Priority",choice:{choices:PRIS,displayAs:"dropDownMenu"},defaultValue:{value:"Medium"}}]);
   if(!secListId)await mk(CONFIG.sectionsList,[{name:"Color",text:{}},{name:"SortOrder",number:{}}]);
+  if(!peopleListId)await mk(CONFIG.peopleList,[{name:"Email",text:{}},{name:"DisplayName",text:{}}]).catch(()=>{});
   await findLists();await connect()}
  async function startFresh(){DB.sections=DEFAULT_SECTIONS.map((n,i)=>({name:n,color:PALETTE[i%PALETTE.length],order:i+1}));set("ready");render();await push()}
  async function importWorkbook(file){
@@ -1258,7 +1384,7 @@ const Live=(()=>{
   const base=-Date.now();d.tasks.forEach((t,i)=>{delete t.sp;t.id=base-i;DB.tasks.push(t)});
   set("ready");go("overview");toast("Uploading to SharePoint – keep this tab open until it finishes");await push();
   if(state==="ready")toast(`Imported ${d.tasks.length.toLocaleString("en-GB")} tasks – everyone can see them now`)}
- return{get hasPri(){return hasPri},addPriColumn,init,pull,push,signIn,signOut,createLists,startFresh,importWorkbook,configured,
+ return{get hasPeople(){return!!peopleListId},get email(){return MOCK?"test.user@savills.com":(account&&account.username)||""},createPeopleList,savePeople,get hasPri(){return hasPri},addPriColumn,init,pull,push,signIn,signOut,createLists,startFresh,importWorkbook,configured,
   schedule(){clearTimeout(timer);timer=setTimeout(push,400)},
    pending:()=>pushing||DB.tasks.some(t=>!t.sp||!snapT.has(t.sp)||ser(t)!==snapT.get(t.sp)),
   get state(){return state},get msg(){return msg},get me(){return me},get lastPull(){return lastPull},get listUrl(){return listUrl},get account(){return account}}
@@ -1276,11 +1402,12 @@ function renderSyncPop(){
   <button class="pi" id="sXlsx">${ico.dl}<span class="nm">Download backup (.xlsx)</span></button>
   <button class="pi" id="sCsv">${ico.dl}<span class="nm">Download as .csv</span></button>
   ${ok?`<button class="pi" id="sImp">${ico.ul}<span class="nm">Import tasks from a workbook…</span></button>`:""}
+  <button class="pi" id="sTeam">${ico.users}<span class="nm">Team &amp; initials…</span></button>
   ${Live.account?`<div class="psep"></div><button class="pi danger" id="sOut">${ico.xls}<span class="nm">Sign out</span></button>`:""}`;
  const on=(id,f)=>{const el=$(id);if(el)el.onclick=()=>{closePops();f()}};
  on("sRef",async()=>{await Live.pull();toast("Refreshed")});on("sOpen",()=>window.open(Live.listUrl,"_blank"));
  on("sXlsx",()=>{dl(`B2C_Project_Flow_Backup_${iso(T)}.xlsx`,XL.build(DB));toast("Backup downloaded")});
- on("sCsv",exportCsv);on("sImp",()=>$("file").click());on("sOut",()=>Live.signOut());
+ on("sCsv",exportCsv);on("sImp",()=>$("file").click());on("sOut",()=>Live.signOut());on("sTeam",()=>peopleModal());
 }
 function dl(name,blob){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
 const ukd=s=>s?s.split("-").reverse().join("/"):"";
