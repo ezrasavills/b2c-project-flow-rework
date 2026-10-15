@@ -401,8 +401,8 @@ textarea.fld.title{font-size:15.5px;font-weight:600;min-height:56px}
 .fade{animation:fade .3s ease}
 .nofade .fade{animation:none}
 @keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
-@media(max-width:1720px){.brand div{display:none}.search input{width:180px}}
-@media(max-width:1380px){.tab{padding:9px 11px}.search input{width:140px}}
+
+
 @media(max-width:1250px){.kpis{grid-template-columns:repeat(2,1fr)}.ov2{grid-template-columns:1fr!important}.tab .ct{display:none}.sync span{display:none}}
  .ppill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:10px;color:var(--pc);background:color-mix(in srgb,var(--pc) 16%,transparent)}
 .ppill i{width:7px;height:7px;border-radius:50%;background:var(--pc)}
@@ -424,8 +424,8 @@ textarea.fld.title{font-size:15.5px;font-weight:600;min-height:56px}
 .mecard{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;border-radius:14px;border:1px solid rgba(245,196,0,.35);background:rgba(245,196,0,.07);margin-bottom:14px}
 .mecard small{display:block;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}.mecard b{display:block;font-size:14px}.mecard span{font-size:12px;color:var(--ink2)}
 .ptab{max-height:46vh;overflow:auto;border:1px solid var(--line);border-radius:14px}
-.ptab .ph,.ptab .pr{display:grid;grid-template-columns:38px 70px minmax(0,1fr) minmax(0,1.3fr) 44px;gap:8px;align-items:center;padding:6px 12px}
-.ptab .ph{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:600;position:sticky;top:0;background:rgba(30,32,38,.98);padding:9px 12px;grid-template-columns:116px minmax(0,1fr) minmax(0,1.3fr) 44px}
+.ptab .ph,.ptab .pr{display:grid;grid-template-columns:38px 70px minmax(0,1fr) minmax(0,1.3fr) 40px 34px;gap:8px;align-items:center;padding:6px 12px}
+.ptab .ph{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:600;position:sticky;top:0;background:rgba(30,32,38,.98);padding:9px 12px;grid-template-columns:116px minmax(0,1fr) minmax(0,1.3fr) 40px 34px}
 .ptab .pr+.pr{border-top:1px solid var(--line2)}.ptab .pr .fld{padding:7px 10px;font-size:12.5px}.ptab small{color:var(--muted);text-align:right}
 .pini em{font-style:normal;font-size:10px;background:var(--gold);color:#15161A;border-radius:6px;padding:1px 6px;margin-left:4px}
 .secbars{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 34px}
@@ -465,6 +465,74 @@ textarea.fld.title{font-size:15.5px;font-weight:600;min-height:56px}
 .toast.hasundo #undo{background:#F5C400;color:#15161A;font-size:13px;padding:8px 16px}
 .toast .tbar{position:absolute;left:0;bottom:0;height:3px;width:100%;background:#F5C400;animation:tbar 8s linear forwards}
 @keyframes tbar{to{width:0}}
+
+/* ---------- Responsive layout ---------- */
+.navwrap{padding:clamp(8px,1.2vw,16px) clamp(10px,1.8vw,28px) 0}
+.topnav{flex-wrap:nowrap;min-width:0}
+.topnav>*{flex:none}
+.brand{flex:none}
+.tabs{flex:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs>span{flex:none;display:flex;align-items:stretch}
+.tab{flex:none}
+.topnav>.sp{flex:1 1 0;min-width:0}
+.search{flex:0 1 240px;min-width:130px}
+.search input{width:100%!important}
+.gbtn,.sync{flex:none}
+.gbtn.icon{width:40px;padding:0;justify-content:center}
+.gbtn.icon.on{background:rgba(245,196,0,.16);border-color:rgba(245,196,0,.55);color:var(--gold2)}
+.sync{cursor:pointer}
+.wrap{padding:clamp(14px,1.8vw,24px) clamp(10px,1.8vw,28px) 120px}
+.phead{flex-wrap:wrap}
+.phead>div:first-child{min-width:0}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr))!important}
+.tl{overflow-x:auto}
+.th,.tr{min-width:1060px}
+.shead{flex-wrap:wrap}
+.shead .acts{flex-wrap:wrap}
+.hero{padding:clamp(20px,2.4vw,30px) clamp(20px,2.6vw,34px)}
+.tb{row-gap:10px}
+.sync span{display:none}.sync{width:40px;justify-content:center;padding:0}
+/* nav compacts step by step (set by fitNav) so nothing is ever cut off */
+.topnav.c1 .brand>div:last-child{display:none}
+.topnav.c2 .tab .ct{display:none}.topnav.c2 .tab{padding:9px 11px}
+.topnav.c3 .brand{display:none}.topnav.c3 .search{flex-basis:170px}
+.topnav.c4 .tab:not(.on) .tl{display:none}.topnav.c4 .tab .car{display:none}
+.topnav.c5 .tab .tl{display:none}.topnav.c5 .tab{padding:9px 12px}
+.topnav.c6 .gbtn.prim .tl{display:none}.topnav.c6 .gbtn.prim{width:40px;padding:0;justify-content:center}
+.topnav.c7 #pplBtn,.topnav.c7 #fltBtn{padding:0 11px}
+@media(max-width:1100px){.ov2{grid-template-columns:minmax(0,1fr)!important}.secbars{grid-template-columns:minmax(0,1fr)}}
+.ov2 svg{max-height:420px}
+@media(max-width:780px){.topnav{flex-wrap:wrap}.tabs{order:9;flex:1 1 100%}.topnav>.sp{display:none}.search{flex:1 1 120px}}
+.td{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;max-width:620px}
+/* settings + activity */
+.setgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr));gap:20px;align-items:start}
+.setcard h3{display:flex;align-items:center;gap:10px}
+.setcard h3 .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(245,196,0,.14);color:var(--gold2)}
+.setcard h3 .ic svg{width:17px;height:17px}
+.setrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line2)}
+.setrow:first-of-type{border-top:0}
+.setrow .b{flex:1;min-width:0}
+.setrow b{display:block;font-size:13.5px}
+.setrow small{display:block;color:var(--muted);font-size:12px;margin-top:2px;line-height:1.45}
+.okdot,.nodot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.okdot{background:var(--green)}.nodot{background:var(--amber)}
+.actday{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:16px 10px 6px}
+.actrow{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:12px;align-items:start;padding:12px 10px;border-radius:12px}
+.actrow:hover{background:rgba(255,255,255,.04)}
+.actic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:15px;font-weight:700}
+.actrow .w{font-size:13.5px;line-height:1.45}
+.actrow .w b{font-weight:700}
+.actrow .w a{color:var(--gold2);text-decoration:none;font-weight:600;cursor:pointer}
+.actrow .w a:hover{text-decoration:underline}
+.actrow .w a.gone{color:var(--ink2);cursor:default;text-decoration:line-through}
+.actrow .d{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5}
+.actrow time{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.pdel{width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:none;color:var(--muted);display:grid;place-items:center}
+.pdel:hover{background:var(--redbg);border-color:var(--red);color:var(--red)}
+.pdel svg{width:14px;height:14px}
+.back{color:var(--muted);font-weight:600;font-size:12.5px;cursor:pointer;background:none;border:0;padding:0}
+.back:hover{color:var(--gold2)}
 </style>
 </head>
 <body>
@@ -472,20 +540,20 @@ textarea.fld.title{font-size:15.5px;font-weight:600;min-height:56px}
  <nav class="glass topnav" id="topnav">
   <div class="brand"><div class="mark">B2C</div><div><b>Project Flow</b><span>UK Residential Research</span></div></div>
   <div class="tabs">
-   <button class="tab" data-v="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="2.5"/><rect x="14" y="3" width="7" height="5" rx="2.5"/><rect x="14" y="12" width="7" height="9" rx="2.5"/><rect x="3" y="16" width="7" height="5" rx="2.5"/></svg>Overview</button>
-   <button class="tab" data-v="timeline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M8 12h12M4 18h8"/></svg>Timeline</button>
-   <button class="tab" data-v="mine"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.4 4.2-6.5 8-6.5s7 2.1 8 6.5"/></svg>My tasks<span class="ct" id="minect"></span></button>
-   <button class="tab" data-v="all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>All tasks<span class="ct" id="allct"></span></button>
-   <span style="position:relative"><button class="tab" id="secBtn" data-v="section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span id="secLbl">Sections</span><svg class="car" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg></button>
+   <button class="tab" data-v="overview" title="Overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="2.5"/><rect x="14" y="3" width="7" height="5" rx="2.5"/><rect x="14" y="12" width="7" height="9" rx="2.5"/><rect x="3" y="16" width="7" height="5" rx="2.5"/></svg><span class="tl">Overview</span></button>
+   <button class="tab" data-v="timeline" title="Timeline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M8 12h12M4 18h8"/></svg><span class="tl">Timeline</span></button>
+   <button class="tab" data-v="mine" title="My tasks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.4 4.2-6.5 8-6.5s7 2.1 8 6.5"/></svg><span class="tl">My tasks</span><span class="ct" id="minect"></span></button>
+   <button class="tab" data-v="all" title="All tasks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg><span class="tl">All tasks</span><span class="ct" id="allct"></span></button>
+   <span style="position:relative"><button class="tab" id="secBtn" data-v="section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span id="secLbl" class="tl">Sections</span><svg class="car" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg></button>
     <div class="pop" id="secPop" style="width:330px"></div></span>
   </div>
   <span class="sp"></span>
   <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input class="gin" id="q" placeholder="Search tasks…"></div>
   <span style="position:relative"><button class="gbtn" id="fltBtn"></button><div class="pop r" id="fltPop" style="width:480px;max-width:calc(100vw - 40px);max-height:calc(100vh - 110px);overflow:auto"></div></span>
   <span style="position:relative"><button class="gbtn" id="pplBtn"></button><div class="pop r" id="pplPop" style="width:410px"></div></span>
-  <button class="gbtn" id="setBtn" title="Team &amp; initials" style="width:40px;padding:0;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></button>
-  <span style="position:relative"><button class="sync off" id="syncBtn" title="Core workbook"><i></i><span id="syncTxt">No workbook</span></button><div class="pop r" id="syncPop" style="width:340px"></div></span>
-  <button class="gbtn prim" id="newTask"><b>+</b> New task</button>
+  <button id="setBtn" title="Settings" class="gbtn icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></button>
+  <span style="position:relative"><button class="sync off" id="syncBtn" title="Connection status – click for settings"><i></i><span id="syncTxt">Connecting…</span></button><div class="pop r" id="syncPop" style="display:none"></div></span>
+  <button class="gbtn prim" id="newTask"><b>+</b><span class="tl">New task</span></button>
  </nav>
 </div>
 
@@ -509,7 +577,8 @@ const CONFIG={
  sitePath:"/sites/UKResidentialResearchsharedadminfiles",
  tasksList:"B2C Project Flow Tasks",
  sectionsList:"B2C Project Flow Sections",
- peopleList:"B2C Project Flow People",            // maps initials to Microsoft accounts
+ peopleList:"B2C Project Flow People",
+ activityList:"B2C Project Flow Activity",        // recent-changes log            // maps initials to Microsoft accounts
  pollSeconds:20                                   // how often everyone's screen refreshes
 };
 const KEY="b2c_project_flow_v3";
@@ -543,6 +612,10 @@ const ico={
  ul:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V9M7 14l5-5 5 5M5 4h14"/></svg>',
  refresh:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 11a8 8 0 10-2.3 5.7M20 4v7h-7"/></svg>',
  flag:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>',
+ bin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',
+ gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>',
+ hist:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 103-6.7L3 8M3 3v5h5M12 7v5l3 2"/></svg>',
+ db:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>',
  sel:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="8" height="8" rx="2.5"/><rect x="13" y="13" width="8" height="8" rx="2.5"/><path d="M15 6l2 2 4-4"/></svg>'
 };
 const doneBtn=(t,sm)=>`<button class="done-btn ${sm?"sm":""} ${t.status==="Complete"?"on":""}" data-done="${t.id}" title="${t.status==="Complete"?"Completed – click to reopen":"Mark complete"}">${ico.check}</button>`;
@@ -558,7 +631,7 @@ const avatars=(t,max=4)=>{const pmset=new Set(t.pm),ps=people(t);return'<span cl
 
 /* ---------- State ---------- */
 let DB,UI={view:"overview",section:null,filters:new Set(["open"]),statuses:new Set(),sections:new Set(),pris:new Set(),tls:new Set(),quad:null,showDone:false,openDD:null,mineTab:"overview",q:"",people:[],pmode:"any",limit:80,sort:"end",tlHold:false,selMode:false,sel:new Set()};
-function norm(t){t.pm=uniq(splitPeople(t.pm));t.an=uniq(splitPeople(t.an));t.prog=Math.max(0,Math.min(1,+t.prog||0));if(!STATUSES.includes(t.status))t.status=t.prog>=1?"Complete":t.prog>0?"In progress":"Not started";t.notes=t.notes||"";{const p=String(t.pri||"").trim().toLowerCase();t.pri=PRIS.find(x=>x.toLowerCase()===p)||(p==="med"?"Medium":"Medium")}return t}
+function norm(t){t.pm=uniq(splitPeople(t.pm));t.an=uniq(splitPeople(t.an));t.prog=Math.max(0,Math.min(1,+t.prog||0));if(!STATUSES.includes(t.status))t.status=t.prog>=1?"Complete":t.prog>0?"In progress":"Not started";t.notes=t.notes||"";t.desc=t.desc||"";{const p=String(t.pri||"").trim().toLowerCase();t.pri=PRIS.find(x=>x.toLowerCase()===p)||(p==="med"?"Medium":"Medium")}return t}
 const blank=()=>({tasks:[],sections:[],people:[],nextId:1});
 function recolor(d){const old=["#C9A227","#3567E0","#18976A","#E0685B","#7C5CF0","#0EA5B7","#E08A0B","#D9468F","#5B6B85","#2F9E44","#B4552D","#4C6EF5"];d.sections.forEach(s=>{const i=old.indexOf((s.color||"").toUpperCase());if(i>=0)s.color=PALETTE[i]})}
 const touch=t=>t.updated=new Date().toISOString();
@@ -585,7 +658,7 @@ const pillCls=s=>"p-"+s.split(" ")[0];
 function matchPeople(t){if(!UI.people.length)return true;const ps=people(t).map(x=>x.toLowerCase()),sel=UI.people.map(x=>x.toLowerCase());return UI.pmode==="all"?sel.every(p=>ps.includes(p)):sel.some(p=>ps.includes(p))}
 const TLS=[["over","Overdue",isOver],["soon","Due in next 14 days",isSoon],["later","Due later",t=>isOpen(t)&&t.status!=="On hold"&&t.end&&daysLeft(t)>14],["nodate","No end date",t=>!t.end],["donem","Completed this month",t=>t.status==="Complete"&&t.end&&D(t.end).getMonth()===T.getMonth()&&D(t.end).getFullYear()===T.getFullYear()]];
 const TLF=Object.fromEntries(TLS.map(x=>[x[0],x[2]]));const TLN=Object.fromEntries(TLS.map(x=>[x[0],x[1]]));
-function matches(t,ex){const q=UI.q.toLowerCase();return(!q||(t.task+" "+t.pm.join(" ")+" "+t.an.join(" ")+" "+t.ws+" "+t.notes).toLowerCase().includes(q))&&matchPeople(t)&&(ex==="st"||!UI.statuses.size||UI.statuses.has(t.status))&&(ex==="sec"||!UI.sections.size||UI.sections.has(t.ws))&&(ex==="pri"||!UI.pris.size||UI.pris.has(t.pri))&&(ex==="tl"||!UI.tls.size||[...UI.tls].some(k=>TLF[k](t)))}
+function matches(t,ex){const q=UI.q.toLowerCase();return(!q||(t.task+" "+(t.desc||"")+" "+t.pm.join(" ")+" "+t.an.join(" ")+" "+t.ws+" "+t.notes).toLowerCase().includes(q))&&matchPeople(t)&&(ex==="st"||!UI.statuses.size||UI.statuses.has(t.status))&&(ex==="sec"||!UI.sections.size||UI.sections.has(t.ws))&&(ex==="pri"||!UI.pris.size||UI.pris.has(t.pri))&&(ex==="tl"||!UI.tls.size||[...UI.tls].some(k=>TLF[k](t)))}
 const setOne=k=>{UI.filters=new Set([k]);UI.statuses.clear();UI.tls.clear();UI.quad=null;UI.showDone=false;
  if(k==="all")UI.showDone=true;
  else if(STATUSES.includes(k)){UI.statuses.add(k);if(k==="Complete")UI.showDone=true}
@@ -639,10 +712,10 @@ document.addEventListener("click",e=>{if(!e.target.closest(".pop")&&!e.target.cl
 $("secBtn").onclick=e=>{e.stopPropagation();togglePop("secPop")};
 $("pplBtn").onclick=e=>{e.stopPropagation();togglePop("pplPop")};
 $("fltBtn").onclick=e=>{e.stopPropagation();togglePop("fltPop")};
-$("syncBtn").onclick=e=>{e.stopPropagation();togglePop("syncPop")};
+$("syncBtn").onclick=e=>{e.stopPropagation();go("settings")};
 document.querySelectorAll(".tab[data-v]:not(#secBtn)").forEach(n=>n.onclick=()=>{if(n.dataset.v==="mine")UI.mineTab="overview";go(n.dataset.v)});
-function renderNav(){
- document.querySelectorAll(".tab[data-v]").forEach(n=>n.classList.toggle("on",n.dataset.v===UI.view));
+function renderNav(){setTimeout(fitNav,0);
+ document.querySelectorAll(".tab[data-v]").forEach(n=>n.classList.toggle("on",n.dataset.v===UI.view));$("setBtn").classList.toggle("on",UI.view==="settings"||UI.view==="activity");
  $("secLbl").textContent=UI.view==="section"?short(UI.section):"Sections";
  $("allct").textContent=DB.tasks.filter(isOpen).length;
  {const m=myIni();$("minect").textContent=m?DB.tasks.filter(t=>isOpen(t)&&isMine(t,m,"any")).length:"";$("minect").style.display=m?"":"none"}
@@ -709,6 +782,31 @@ function pageHead(title,sub){
  return`<div class="phead"><div><h1>${H(title)}</h1><div class="sub">${sub}</div></div><div class="fchips">${chips}</div></div>`;
 }
 
+/* ---------- Change descriptions for the activity log ---------- */
+function diffTask(oldJ,newJ){
+ let o,n;try{o=JSON.parse(oldJ||"[]");n=JSON.parse(newJ||"[]")}catch(e){return null}
+ const g=(a,i)=>a[i]==null?"":String(a[i]);const ch=[],keys=[];const dd=s=>s?fmt(s,1):"none";
+ const L=["Section","Name","Project managers","Analysts","Progress","Status","Start","End","Notes","Priority","Description"];
+ for(let i=0;i<11;i++){if(g(o,i)===g(n,i))continue;keys.push(i);
+  if(i===0)ch.push(`Moved from ${g(o,0)} to ${g(n,0)}`);
+  else if(i===1)ch.push(`Renamed from “${g(o,1)}”`);
+  else if(i===2||i===3)ch.push(`${L[i]}: ${g(o,i).replace(/\//g,", ")||"none"} → ${g(n,i).replace(/\//g,", ")||"none"}`);
+  else if(i===4)ch.push(`Progress ${g(o,4)||0}% → ${g(n,4)}%`);
+  else if(i===5)ch.push(`Status ${g(o,5)} → ${g(n,5)}`);
+  else if(i===6||i===7)ch.push(`${L[i]} date ${dd(g(o,i))} → ${dd(g(n,i))}`);
+  else if(i===9)ch.push(`Priority ${g(o,9)||"Medium"} → ${g(n,9)}`);
+  else ch.push(`${L[i]} updated`)}
+ if(!keys.length)return null;
+ let a="Edited";const only=s=>keys.every(k=>s.includes(k));
+ if(keys.includes(5)&&g(n,5)==="Complete")a="Completed";
+ else if(keys.includes(5)&&g(o,5)==="Complete")a="Reopened";
+ else if(only([6,7]))a="Dates changed";
+ else if(only([9]))a="Priority changed";
+ else if(only([4,5]))a=keys.includes(5)?"Status changed":"Progress updated";
+ else if(only([0]))a="Moved";
+ const det=a==="Completed"?ch.filter(x=>!/^Progress|^Status/.test(x)).join(" · "):ch.join(" · ");
+ return{a,t:det}}
+
 /* ---------- Team & initials ---------- */
 const PKEY="b2c_people_local";
 const peopleMap=()=>Live.hasPeople?(DB.people||[]):JSON.parse(localStorage.getItem(PKEY)||"[]");
@@ -736,9 +834,9 @@ function peopleModal(){
   <div class="mecard"><div><small>Signed in as</small><b>${H(Live.me||"Unknown")}</b><span>${H(Live.email||"")}</span></div>
    <div style="display:flex;gap:8px;align-items:center"><span style="font-size:12px;color:var(--muted)">My initials</span><input class="fld" id="myIniIn" list="plistM" value="${H(mine||"")}" placeholder="e.g. EzA" style="width:110px;padding:8px 10px"><button class="btn gold sm" id="myIniSave">Save</button></div></div>
   <datalist id="plistM">${rows.map(p=>`<option value="${H(p)}">`).join("")}</datalist>
-  <div class="ptab"><div class="ph"><span>Initials</span><span>Name</span><span>Microsoft email</span><span>Tasks</span></div>
+  <div class="ptab"><div class="ph"><span>Initials</span><span>Name</span><span>Microsoft email</span><span>Tasks</span><span></span></div>
   ${rows.map(p=>{const i=pInfo(p)||{};return`<div class="pr" data-ini="${H(p)}"><span class="av"><span style="background:${pColor(p)};width:30px;height:30px;font-size:9.5px">${H(p.slice(0,3))}</span></span><b class="pini">${H(p)}${mine&&p.toLowerCase()===mine.toLowerCase()?' <em>you</em>':""}</b>
-   <input class="fld pn" value="${H(i.name||"")}" placeholder="Full name"><input class="fld pe" value="${H(i.email||"")}" placeholder="name@savills.com"><small>${cnt[p]||0}</small></div>`}).join("")}</div>
+   <input class="fld pn" value="${H(i.name||"")}" placeholder="Full name"><input class="fld pe" value="${H(i.email||"")}" placeholder="name@savills.com"><small>${cnt[p]||0}</small><button class="pdel" data-del="${H(p)}" title="Remove ${H(p)}">${ico.bin}</button></div>`}).join("")}</div>
   <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px"><button class="btn" id="mCancel">Close</button><button class="btn gold" id="mOk">Save changes</button></div></div>`;
  const close=()=>{$("modal").classList.remove("on");$("modal").style.width="";if(!$("drawer").classList.contains("on"))$("scrim").classList.remove("on")};
  $("mCancel").onclick=close;
@@ -748,10 +846,17 @@ function peopleModal(){
    if(n!==(i.name||"")||e!==(i.email||""))ch.push({ini,name:n,email:e})});
   if(!ch.length){close();return}
   try{$("mOk").textContent="Saving…";await savePeopleRows(ch);toast(`Saved ${ch.length} change${ch.length===1?"":"s"}`);close();render()}catch(e){$("mOk").textContent="Save changes";if(e)toast("Couldn't save: "+e.message)}};
+ $("modal").querySelectorAll("[data-del]").forEach(b=>b.onclick=async()=>{const ini=b.dataset.del,L=x=>x.toLowerCase(),m=L(ini);
+   const hit=DB.tasks.filter(t=>t.pm.some(x=>L(x)===m)||t.an.some(x=>L(x)===m));
+   if(!confirm(`Remove ${ini}?\n\nThis takes ${ini} off ${hit.length} task${hit.length===1?"":"s"} (as project manager or analyst) and removes their account link. Tasks themselves are kept.`))return;
+   hit.forEach(t=>{t.pm=t.pm.filter(x=>L(x)!==m);t.an=t.an.filter(x=>L(x)!==m);touch(t)});
+   UI.people=UI.people.filter(x=>L(x)!==m);
+   try{const pi=pInfo(ini);if(pi&&pi.sp&&Live.hasPeople)await Live.deletePerson(pi.sp);else if(!Live.hasPeople)localStorage.setItem(PKEY,JSON.stringify(peopleMap().filter(x=>L(x.ini)!==m)))}catch(e){toast("Couldn't remove the account link: "+e.message)}
+   save(`Removed ${ini} from ${hit.length} task${hit.length===1?"":"s"}`);render();peopleModal()});
  const mk=$("mkPeople");if(mk)mk.onclick=async()=>{mk.disabled=true;mk.textContent="Creating…";try{const local=JSON.parse(localStorage.getItem(PKEY)||"[]");await Live.createPeopleList();if(local.length)await Live.savePeople(local);toast("People list created – links are now shared");peopleModal()}catch(e){mk.disabled=false;mk.textContent="Create list";toast("Couldn't create it ("+e.message+"). Ask IT to keep Sites.Manage.All, or create a list called '"+CONFIG.peopleList+"' with Email and DisplayName text columns.")}};
  $("modal").classList.add("on");$("scrim").classList.add("on");
 }
-$("setBtn").onclick=()=>peopleModal();
+$("setBtn").onclick=()=>go("settings");
 
 function vMine(){
  const me=myIni();
@@ -761,7 +866,7 @@ function vMine(){
    <p>Pick the initials used for you in the task list. This links them to <b>${H(Live.email||"your account")}</b> so My tasks shows your work every time you sign in.</p>
    <div class="pgrid" style="grid-template-columns:repeat(6,minmax(0,1fr));text-align:left">${ps.map(([p,c])=>{const i=pInfo(p);return`<div class="pchip" data-claim="${H(p)}" title="${i&&i.name?H(i.name):""}"><span style="background:${pColor(p)}"></span>${H(p)}<small>${c}</small></div>`}).join("")}</div>
    <div class="acts" style="margin-top:18px"><input class="fld" id="claimIn" placeholder="Or type new initials" style="width:200px"><button class="btn gold" id="claimGo">Use these</button></div>
-   <small>You can change this any time from the ⚙ Team &amp; initials button.</small></div>`;
+   <small>You can change this any time in ⚙ Settings → Team &amp; initials.</small></div>`;
   $("view").querySelectorAll("[data-claim]").forEach(c=>c.onclick=()=>claimInitials(c.dataset.claim));
   $("claimGo").onclick=()=>{const v=$("claimIn").value.trim();if(v)claimInitials(v)};
   return}
@@ -809,8 +914,86 @@ function vMine(){
  $("chgIni").onclick=e=>{e.preventDefault();peopleModal()};
 }
 
+/* ---------- Settings ---------- */
+function vSettings(){
+ const mine=myIni(),st=Live.state,ok=st==="ready";
+ const row=(title,sub,btn)=>`<div class="setrow"><div class="b"><b>${title}</b>${sub?`<small>${sub}</small>`:""}</div>${btn||""}</div>`;
+ const setup=[["Priority column",Live.hasPri],["Description column",Live.hasDesc],["Team & initials list",Live.hasPeople],["Recent changes log",Live.hasAct]];
+ $("view").innerHTML=pageHead("Settings","Account, shared data, team, exports and change history")+`<div class="setgrid fade">
+ <div class="card pad setcard"><div class="ch"><h3><span class="ic">${ico.users}</span>Account</h3></div>
+  ${row(H(Live.me||"Not signed in"),H(Live.email||""),Live.account?`<button class="btn sm danger" id="sOut">Sign out</button>`:"")}
+  ${row("My initials",mine?`Linked to <b style="display:inline;color:var(--gold2)">${H(mine)}</b>`:"Not linked yet – My tasks needs this",`<button class="btn sm" id="sMine">${mine?"Change":"Set initials"}</button>`)}
+ </div>
+ <div class="card pad setcard"><div class="ch"><h3><span class="ic">${ico.db}</span>Shared data</h3></div>
+  ${row(`<span class="${ok?"okdot":"nodot"}"></span>${ok?"Live – changes save instantly":st==="busy"?"Saving…":H(Live.msg||"Not connected")}`,Live.lastPull?`Last refreshed ${new Date(Live.lastPull).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})} · refreshes every ${CONFIG.pollSeconds} seconds`:"",`<button class="btn sm" id="sRef">${ico.refresh} Refresh now</button>`)}
+  ${row("SharePoint list","Open the underlying task list in SharePoint",Live.listUrl?`<button class="btn sm" id="sOpen">${ico.link} Open</button>`:"")}
+ </div>
+ <div class="card pad setcard"><div class="ch"><h3><span class="ic">${ico.hist}</span>Recent changes</h3></div>
+  ${row("Change history","Every task added, edited, completed, re-dated or removed – and who did it",`<button class="btn gold sm" id="sAct">View recent changes</button>`)}
+ </div>
+ <div class="card pad setcard"><div class="ch"><h3><span class="ic">${ico.users}</span>Team &amp; initials</h3></div>
+  ${row("Manage team",`${allPeople().length} sets of initials · link them to Microsoft accounts, rename details or remove initials`,`<button class="btn sm" id="sTeam">Manage</button>`)}
+ </div>
+ <div class="card pad setcard"><div class="ch"><h3><span class="ic">${ico.dl}</span>Export &amp; import</h3></div>
+  ${row("Download backup","Excel workbook of every task (.xlsx)",`<button class="btn sm" id="sXlsx">${ico.dl} .xlsx</button>`)}
+  ${row("Download CSV","Plain table that opens in Excel or Power BI",`<button class="btn sm" id="sCsv">${ico.dl} .csv</button>`)}
+  ${row("Import tasks","Add tasks from a workbook – they're added on top, nothing is replaced",ok?`<button class="btn sm" id="sImp">${ico.ul} Import</button>`:"")}
+ </div>
+ <div class="card pad setcard"><div class="ch"><h3><span class="ic">${ico.gear}</span>SharePoint setup</h3></div>
+  ${setup.map(([n,v])=>row(`<span class="${v?"okdot":"nodot"}"></span>${n}`,v?"Ready":"Not set up yet","")).join("")}
+  ${setup.some(x=>!x[1])&&!MOCK?`<div style="margin-top:12px"><button class="btn gold sm" id="sFix">${ico.plus} Set up missing items</button></div><small style="display:block;color:var(--muted);font-size:12px;margin-top:8px">Needs the Sites.Manage.All permission. If it fails, create them by hand in SharePoint (see the setup notes).</small>`:""}
+ </div></div>`;
+ const on=(id,f)=>{const el=$(id);if(el)el.onclick=f};
+ on("sOut",()=>Live.signOut());on("sMine",()=>peopleModal());on("sTeam",()=>peopleModal());
+ on("sRef",async()=>{await Live.pull();toast("Refreshed");render()});on("sOpen",()=>window.open(Live.listUrl,"_blank"));
+ on("sAct",()=>{UI.act=null;go("activity")});
+ on("sXlsx",()=>{dl(`B2C_Project_Flow_Backup_${iso(T)}.xlsx`,XL.build(DB));toast("Backup downloaded")});
+ on("sCsv",exportCsv);on("sImp",()=>$("file").click());
+ on("sFix",async()=>{const b=$("sFix");b.disabled=true;b.textContent="Setting up…";const errs=[];
+  if(!Live.hasPri||!Live.hasDesc){try{await Live.addPriColumn()}catch(e){errs.push("columns: "+e.message)}}
+  if(!Live.hasPeople){try{await Live.createPeopleList()}catch(e){errs.push("team list: "+e.message)}}
+  if(!Live.hasAct){try{await Live.createActivityList()}catch(e){errs.push("change log: "+e.message)}}
+  toast(errs.length?"Some items couldn't be created ("+errs.join("; ")+")":"All set up");render()});
+}
+
+/* ---------- Recent changes ---------- */
+const ACTC={"Added":["+","#3DDC97"],"Completed":["✓","#3DDC97"],"Reopened":["↺","#F2B04A"],"Deleted":["×","#FF6B6B"],"Dates changed":["◷","#6E9BFF"],"Priority changed":["!","#FF8A7A"],"Progress updated":["%","#6E9BFF"],"Status changed":["●","#A78BFA"],"Moved":["→","#38D3E6"],"Edited":["✎","#9AA3B2"],"Imported":["⤒","#F5C400"],"Section added":["+","#A78BFA"],"Section edited":["✎","#A78BFA"],"Section deleted":["×","#A78BFA"]};
+const ACTGROUPS=[["all","All"],["Added","Added"],["Completed","Completed"],["Dates changed","Dates"],["Edited","Edited"],["Deleted","Removed"],["sec","Sections"]];
+function ago(d){const s=(Date.now()-new Date(d))/1000;if(s<60)return"just now";if(s<3600)return Math.floor(s/60)+"m ago";if(s<86400)return Math.floor(s/3600)+"h ago";return new Date(d).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})}
+async function loadActivity(){UI.act={...(UI.act||{}),loading:true};try{UI.act.items=await Live.getActivity()}catch(e){UI.act.err=e.message}UI.act.loading=false;render()}
+function vActivity(){
+ const A=UI.act||(UI.act={f:"all",who:"",limit:150});A.f=A.f||"all";A.limit=A.limit||150;
+ const head=pageHead("Recent changes",`<button class="back" id="aBack">← Settings</button> · who changed what, newest first`);
+ if(!Live.hasAct){$("view").innerHTML=head+`<div class="card onb fade"><div class="mark">${ico.hist.replace('<svg','<svg width="28" height="28"')}</div><h2>Turn on the change log</h2><p>This creates a SharePoint list called <b>${H(CONFIG.activityList)}</b>. From then on, every change anyone makes is recorded here. Changes made before it's switched on can't be shown.</p><div class="acts">${MOCK?"":`<button class="btn gold" id="aMk">${ico.plus} Create the change log</button>`}</div><small>If it fails, create a list with that exact name and four single-line text columns: Action, TaskRef, Details, UserName.</small></div>`;
+  $("aBack").onclick=()=>go("settings");const mk=$("aMk");if(mk)mk.onclick=async()=>{mk.disabled=true;try{await Live.createActivityList();toast("Change log switched on");loadActivity()}catch(e){mk.disabled=false;toast("Couldn't create it: "+e.message)}};return}
+ if(!A.items&&!A.loading){loadActivity();}
+ if(!A.items){$("view").innerHTML=head+`<div class="card onb fade"><h2>Loading changes…</h2><div class="spin"></div>${A.err?`<p>${H(A.err)}</p>`:""}</div>`;$("aBack").onclick=()=>go("settings");return}
+ const whoList=[...new Set(A.items.map(x=>x.who))].sort();
+ const q=(A.q||"").toLowerCase();
+ const inG=x=>A.f==="all"||(A.f==="sec"?x.act.startsWith("Section"):A.f==="Dates changed"?x.act==="Dates changed":A.f==="Edited"?["Edited","Priority changed","Progress updated","Status changed","Moved","Reopened"].includes(x.act):A.f==="Added"?["Added","Imported"].includes(x.act):x.act===A.f);
+ const items=A.items.filter(x=>inG(x)&&(!A.who||x.who===A.who)&&(!q||(x.title+" "+x.det+" "+x.who).toLowerCase().includes(q)));
+ const vis=items.slice(0,A.limit);let html="",lastDay="";
+ const live=new Set(DB.tasks.map(t=>String(t.sp||t.id)));
+ vis.forEach(x=>{const d=new Date(x.when),day=d.toDateString()===new Date().toDateString()?"Today":d.toDateString()===new Date(Date.now()-DAY).toDateString()?"Yesterday":d.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  if(day!==lastDay){html+=`<div class="actday">${day}</div>`;lastDay=day}
+  const [ic,c]=ACTC[x.act]||["•","#9AA3B2"];const linked=x.ref&&live.has(x.ref)&&!x.act.startsWith("Section");
+  html+=`<div class="actrow"><span class="actic" style="background:${c}22;color:${c}">${ic}</span><div><div class="w"><b>${H(x.who)}</b> ${H(x.act.toLowerCase())} ${linked?`<a data-open="${H(x.ref)}">${H(x.title)}</a>`:`<a class="${x.act==="Deleted"?"gone":""}">${H(x.title)}</a>`}</div>${x.det?`<div class="d">${H(x.det)}</div>`:""}</div><time title="${d.toLocaleString("en-GB")}">${ago(x.when)}</time></div>`});
+ $("view").innerHTML=head+`<div class="fade"><div class="tb" style="margin-top:0"><div class="seg" id="aSeg">${ACTGROUPS.map(([k,l])=>`<button data-af="${k}" class="${A.f===k?"on":""}">${l}</button>`).join("")}</div>
+  <select class="sel" id="aWho"><option value="">Everyone</option>${whoList.map(w=>`<option ${A.who===w?"selected":""}>${H(w)}</option>`).join("")}</select>
+  <input class="sel" id="aQ" placeholder="Search changes…" value="${H(A.q||"")}" style="min-width:180px"><span class="sp"></span><button class="btn sm" id="aRef">${ico.refresh} Refresh</button></div>
+  <div class="card pad">${html||'<div class="empty"><b>No changes yet</b>Changes appear here as soon as anyone edits a task.</div>'}
+  ${items.length>A.limit?`<div class="showmore"><button class="btn sm" id="aMore">Show more · ${items.length-A.limit} older</button></div>`:""}</div></div>`;
+ $("aBack").onclick=()=>go("settings");
+ $("aSeg").querySelectorAll("button").forEach(b=>b.onclick=()=>{A.f=b.dataset.af;A.limit=150;render()});
+ $("aWho").onchange=e=>{A.who=e.target.value;render()};
+ $("aQ").oninput=e=>{A.q=e.target.value;render();const i=$("aQ");i.focus();i.setSelectionRange(i.value.length,i.value.length)};
+ $("aRef").onclick=()=>{A.items=null;loadActivity();render()};
+ const m=$("aMore");if(m)m.onclick=()=>{A.limit+=150;render()};
+ $("view").querySelectorAll("[data-open]").forEach(a=>a.onclick=()=>{const t=DB.tasks.find(x=>String(x.sp||x.id)===a.dataset.open);if(t)openTask(t.id)});
+}
+
 /* ---------- Views ---------- */
-function render(){{const k=UI.view+"|"+UI.mineTab+"|"+UI.section;document.body.classList.toggle("nofade",UI._lv===k);UI._lv=k}renderNav();if(Live.state!=="ready"&&Live.state!=="busy"&&Live.state!=="err")vGate();else({mine:vMine,overview:vOverview,section:vSection,all:vAll,timeline:vTimeline})[UI.view]();
+function render(){{const k=UI.view+"|"+UI.mineTab+"|"+UI.section;document.body.classList.toggle("nofade",UI._lv===k);UI._lv=k}renderNav();if(Live.state!=="ready"&&Live.state!=="busy"&&Live.state!=="err")vGate();else({settings:vSettings,activity:vActivity,mine:vMine,overview:vOverview,section:vSection,all:vAll,timeline:vTimeline})[UI.view]();
  $("view").querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{UI.people=UI.people.filter(x=>x!==b.dataset.rm);render()});$("view").querySelectorAll("[data-rms]").forEach(b=>b.onclick=()=>{UI.statuses.delete(b.dataset.rms);render()});$("view").querySelectorAll("[data-rmsec]").forEach(b=>b.onclick=()=>{UI.sections.delete(b.dataset.rmsec);render()});$("view").querySelectorAll("[data-rmp]").forEach(b=>b.onclick=()=>{UI.pris.delete(b.dataset.rmp);render()});$("view").querySelectorAll("[data-rmtl]").forEach(b=>b.onclick=()=>{UI.tls.delete(b.dataset.rmtl);render()});$("view").querySelectorAll("[data-rmq]").forEach(b=>b.onclick=()=>{UI.quad=null;render()});renderBulk()}
 function vGate(){
  const st=Live.state,cfg=`<pre style="text-align:left;background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:12px;overflow:auto">clientId: "${H(CONFIG.clientId)}"\ntenantId: "${H(CONFIG.tenantId)}"</pre>`;
@@ -856,7 +1039,7 @@ function vOverview(){
  const mrow=t=>`<div class="mrow" data-id="${t.id}">${doneBtn(t)}<span class="bar" style="background:${secColor(t.ws)};box-shadow:0 0 8px ${secColor(t.ws)}88"></span><div class="b"><div class="t">${H(t.task)}</div><div class="m"><span style="color:${PCH[t.pri]};font-weight:700">● ${t.pri}</span> · ${H(t.ws)} · ${Math.round(t.prog*100)}% done</div></div>${avatars(t)}<div style="width:96px;text-align:right">${dueChip(t)}</div></div>`;
  const who=UI.people.length?` · ${UI.people.length===1?H(UI.people[0]):UI.people.length+" people selected"}`:"";
  $("view").innerHTML=pageHead("Overview",T.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"})+who)+`<div class="g fade">
- ${Live.hasPri||window.__B2C_MOCK__?"":`<div class="card pad prwarn"><div><b>One-off setup: add a Priority column</b><span>Priorities show here but won't be saved for everyone until the SharePoint list has a <b>Priority</b> column.</span></div><button class="btn gold sm" id="addPri">${ico.plus} Add Priority column</button></div>`}
+ ${(Live.hasPri&&Live.hasDesc)||window.__B2C_MOCK__?"":`<div class="card pad prwarn"><div><b>One-off setup: add new columns</b><span>Priority and Description won't be saved for everyone until the SharePoint list has a <b>${Live.hasPri?"":"Priority"}${!Live.hasPri&&!Live.hasDesc?" and ":""}${Live.hasDesc?"":"Description"}</b> column.</span></div><button class="btn gold sm" id="addPri">${ico.plus} Add column${!Live.hasPri&&!Live.hasDesc?"s":""}</button></div>`}
  <div class="card hero"><h2>${greet}</h2><p>There ${open.length===1?"is":"are"} <b>${open.length} open tasks</b> across ${DB.sections.length} sections — <b>${ip.length} in progress</b>, <b class="r">${over.length} overdue</b> and <b class="y">${soon.length} due in the next two weeks</b>. <b class="r">${qc.do.length} high-priority task${qc.do.length===1?" needs":"s need"} doing now</b>. ${thisM} task${thisM===1?"":"s"} completed so far this month.</p></div>
  <div class="kpis">
   ${kpi("Open tasks",open.length,`${ip.length} in progress · ${st["On hold"]} on hold`,ico.list,"var(--blue)","var(--bluebg)","open")}
@@ -889,7 +1072,7 @@ function vOverview(){
  $("view").querySelectorAll(".dl div").forEach(e=>e.onclick=()=>{UI.view="all";setOne(e.dataset.st);render()});
  $("view").querySelectorAll(".kpi").forEach(e=>e.onclick=()=>{UI.view="all";setOne(e.dataset.f);UI.limit=80;render();window.scrollTo({top:0})});
  $("ovAddSec").onclick=()=>sectionModal();
- const ap=$("addPri");if(ap)ap.onclick=async()=>{ap.disabled=true;ap.textContent="Adding…";try{await Live.addPriColumn();toast("Priority column added – priorities now save for everyone")}catch(e){ap.disabled=false;ap.textContent="Add Priority column";toast("Couldn't add it automatically ("+e.message+"). Add it in SharePoint instead – see the setup note.")}};
+ const ap=$("addPri");if(ap)ap.onclick=async()=>{ap.disabled=true;ap.textContent="Adding…";try{await Live.addPriColumn();toast("Columns added – priorities and descriptions now save for everyone")}catch(e){ap.disabled=false;ap.textContent="Add Priority column";toast("Couldn't add it automatically ("+e.message+"). Add it in SharePoint instead – see the setup note.")}};
  $("view").querySelectorAll("[data-q]").forEach(e=>e.onclick=()=>{UI.view="all";setOne("q_"+e.dataset.q);UI.sort="pri";UI.limit=80;render();window.scrollTo({top:0})});
  $("view").querySelectorAll(".qdot").forEach(e=>e.onclick=ev=>{ev.stopPropagation();openTask(+e.dataset.id)});
  $("view").querySelectorAll("[data-pf]").forEach(e=>e.onclick=()=>{UI.view="all";setOne("open");UI.pris=new Set([e.dataset.pf]);UI.limit=80;render();window.scrollTo({top:0})});
@@ -944,7 +1127,7 @@ function row(t,showSec){
  const first=UI.selMode?`<button class="pick ${sel?"on":""}" data-a="pick" title="Select">${ico.check}</button>`:doneBtn(t);
  return`<div class="tr ${t.status==="Complete"?"done":""} ${sel?"sel":""}" data-id="${t.id}">
  <div style="display:grid;place-items:center">${first}</div>
- <div><div class="tt" data-a="edit">${H(t.task)}</div><div class="tm">${avatars(t)}${showSec?`<span class="tag" style="background:${secColor(t.ws)}26;color:${secColor(t.ws)}">${H(t.ws)}</span>`:""}<span>${meta}</span></div></div>
+ <div><div class="tt" data-a="edit">${H(t.task)}</div>${t.desc?`<div class="td" title="${H(t.desc)}">${H(t.desc)}</div>`:""}<div class="tm">${avatars(t)}${showSec?`<span class="tag" style="background:${secColor(t.ws)}26;color:${secColor(t.ws)}">${H(t.ws)}</span>`:""}<span>${meta}</span></div></div>
  <select class="ssel psel" data-a="pri" style="--pc:${PCH[t.pri]}" title="Priority">${PRIS.map(x=>`<option ${x===t.pri?"selected":""}>${x}</option>`).join("")}</select>
  <div class="prog"><input type="range" min="0" max="100" step="5" value="${p}" data-a="prog" style="--p:${p}%;--c:${c}"><b>${p}%</b></div>
  <input type="date" class="dt ${t.start?"":"noval"}" value="${t.start||""}" data-a="start" title="Start date">
@@ -1017,24 +1200,32 @@ function vTimeline(){
   if(d.getDay()===0||d.getDay()===6)bg+=`<div class="gwe" style="left:${i*PX}px;width:${PX}px"></div>`}
  const tdy=`<div class="gtoday" style="left:${x(T)+PX/2}px"></div>`;
  let rowsH="";
- DB.sections.forEach(s=>{const g=base.filter(t=>t.ws===s.name).sort((a,b)=>(a.start||a.end||"9")<(b.start||b.end||"9")?-1:1);if(!g.length)return;
+ const srt=(a,b)=>tlCmp(a,b);(UI.tlGroup==="none"?[{name:"All open tasks",color:"#F5C400",_all:1}]:DB.sections).forEach(s=>{const g=base.filter(t=>s._all||t.ws===s.name).sort(srt);if(!g.length)return;
   rowsH+=`<div class="ggrp"><div class="nm"><i style="background:${s.color};box-shadow:0 0 6px ${s.color}"></i>${H(s.name)} · ${g.length}</div><div class="garea" style="width:${W}px">${bg}${tdy}</div></div>`;
   g.forEach(t=>{let bar;
    if(!t.start&&!t.end)bar=`<span class="gset" data-id="${t.id}" style="left:${x(T)+20}px">+ Set dates</span>`;
-   else{const s0=D(t.start||t.end),e0=D(t.end||t.start),l=x(s0),w=x(e0)-l+PX,col=t.status==="On hold"?SCH["On hold"]:s.color;
+   else{const s0=D(t.start||t.end),e0=D(t.end||t.start),l=x(s0),w=x(e0)-l+PX,col=t.status==="On hold"?SCH["On hold"]:secColor(t.ws);
     bar=`<div class="gbar ${isOver(t)?"over":""}" data-id="${t.id}" style="left:${l}px;width:${w}px;background:${col}40;border:1px solid ${col}88"><div class="f" style="width:${t.prog*100}%;background:linear-gradient(180deg,${col},${col}cc)"></div><span class="lb">${Math.round(t.prog*100)}%</span><span class="h l"></span><span class="h r"></span></div>`}
    rowsH+=`<div class="grow2"><div class="nm">${doneBtn(t,true)}${avatars(t,3)}<span class="tn" data-id="${t.id}" title="${H(t.task)}">${H(t.task)}</span>${dueChip(t)}</div><div class="garea" style="width:${W}px">${bg}${tdy}${bar}</div></div>`})});
- $("view").innerHTML=pageHead("Timeline","Tick to complete · drag a bar to move it · drag either end to change the start or end date")+`<div class="fade"><div class="tb" style="margin-top:0">${ddBar(()=>true,{openOnly:true})}
+ $("view").innerHTML=pageHead("Timeline","Tick to complete · drag a bar to move it · drag either end to change the start or end date")+`<div class="fade"><div class="tb" style="margin-top:0">${ddBar(()=>true,{openOnly:true})}<select class="sel" id="tlSort" title="Sort tasks">${[["start","Sort: Start date"],["end","Sort: End date (soonest)"],["end-desc","Sort: End date (latest)"],["pri","Sort: Priority (high first)"],["prog","Sort: Progress"],["task","Sort: A–Z"]].map(([k,l])=>`<option value="${k}" ${(UI.tlSort||"start")===k?"selected":""}>${l}</option>`).join("")}</select><select class="sel" id="tlGroup" title="Grouping"><option value="sec" ${UI.tlGroup!=="none"?"selected":""}>Group by section</option><option value="none" ${UI.tlGroup==="none"?"selected":""}>No grouping</option></select>
   <label style="display:flex;gap:7px;align-items:center;font-size:13px;color:var(--ink2)"><input type="checkbox" id="tlHold" ${UI.tlHold?"checked":""}> Include on-hold</label><span class="sp"></span>
   <span class="legend"><span><i style="background:var(--red)"></i>Today / overdue outline</span><span><i style="background:var(--gold)"></i>Yellow ring = project manager</span><span>Brighter fill = progress</span></span></div>
   <div class="card gw"><div style="width:${W+340}px"><div class="gh"><div class="corner">Open task</div><div class="gscale" style="width:${W}px">${scale}<div class="gtoday" style="left:${x(T)+PX/2}px"><b>Today</b></div></div></div>
   ${rowsH||'<div class="empty"><b>No open tasks in this window</b></div>'}</div></div></div>`;
  bindDD();
  $("tlHold").onchange=e=>{UI.tlHold=e.target.checked;render()};
+ $("tlSort").onchange=e=>{UI.tlSort=e.target.value;render()};$("tlGroup").onchange=e=>{UI.tlGroup=e.target.value;render()};
  $("view").querySelectorAll(".grow2 .tn,.gset").forEach(e=>e.onclick=()=>openTask(+e.dataset.id));
  const gw=$("view").querySelector(".gw");if(gw)gw.scrollLeft=Math.max(0,x(T)-14*PX);
  $("view").querySelectorAll(".gbar").forEach(b=>dragBar(b,PX));
 }
+function tlCmp(a,b){const k=UI.tlSort||"start",z="9999";
+ if(k==="task")return a.task.localeCompare(b.task);
+ if(k==="prog")return b.prog-a.prog;
+ if(k==="pri")return PRANK[a.pri]-PRANK[b.pri]||((a.end||z)<(b.end||z)?-1:(a.end||z)>(b.end||z)?1:0);
+ if(k==="end")return(a.end||z)<(b.end||z)?-1:(a.end||z)>(b.end||z)?1:0;
+ if(k==="end-desc")return(a.end||"")>(b.end||"")?-1:(a.end||"")<(b.end||"")?1:0;
+ const x=a.start||a.end||z,y=b.start||b.end||z;return x<y?-1:x>y?1:0}
 function dragBar(b,PX){
  const t=DB.tasks.find(x=>x.id===+b.dataset.id),tip=$("tip");
  b.addEventListener("pointerdown",ev=>{
@@ -1080,12 +1271,13 @@ function chipInput(host,initial,onChange){
 let editing=null;
 function openTask(id,sec){
  if(!DB.sections.length){toast("Add a section first");return}
- const t=id?DB.tasks.find(x=>x.id===id):{id:null,task:"",ws:sec||UI.section||DB.sections[0].name,pm:[],an:[],prog:0,status:"Not started",pri:"Medium",start:iso(T),end:"",notes:""};
+ const t=id?DB.tasks.find(x=>x.id===id):{id:null,task:"",ws:sec||UI.section||DB.sections[0].name,pm:[],an:[],prog:0,status:"Not started",pri:"Medium",start:iso(T),end:"",notes:"",desc:""};
  editing={...t,pm:[...t.pm],an:[...t.an]};
  $("drawer").innerHTML=`<div class="dh"><div><div class="k">${id?"Edit task":"New task"}</div><h3>${id?H(short(t.task)):"Add a task"}</h3></div><button class="x" id="dx">×</button></div>
  ${id?`<button class="bigdone ${t.status==="Complete"?"on":""}" id="dDone"><span class="done-btn ${t.status==="Complete"?"on":""}">${ico.check}</span><span><b>${t.status==="Complete"?"Completed":"Mark as complete"}</b><small>${t.status==="Complete"?"Click to reopen this task":"One click – saves and closes"}</small></span></button>`:""}
  <div class="db">
   <div class="f"><label>Task name</label><textarea class="fld title" id="fTask" rows="2" placeholder="e.g. Q4 2026 lettings index slides">${H(t.task)}</textarea></div>
+  <div class="f"><label>Description <small>(optional)</small></label><textarea class="fld" id="fDesc" rows="3" placeholder="What does this task involve? Scope, deliverables, who it's for…">${H(t.desc||"")}</textarea></div>
   <div class="f"><label>Section</label><select class="fld" id="fWs">${DB.sections.map(s=>`<option ${s.name===t.ws?"selected":""}>${H(s.name)}</option>`).join("")}<option value="__new">+ Create new section…</option></select></div>
   <div class="f"><label>Project managers <small>· add as many as needed</small></label><div id="fPm"></div></div>
   <div class="f"><label>Analysts <small>· add as many as needed</small></label><div id="fAn"></div></div>
@@ -1120,7 +1312,7 @@ function openTask(id,sec){
   const ae=document.activeElement;if(ae&&ae.closest&&ae.closest(".chipin"))ae.blur();
   const name=$("fTask").value.trim();if(!name){$("fTask").focus();toast("Give the task a name");return false}
   const s=$("fStart").value||null,e=$("fEnd").value||null;if(s&&e&&e<s){toast("End date can't be before the start date");return false}
-  Object.assign(editing,{task:name,ws:$("fWs").value,start:s,end:e,notes:$("fNotes").value.trim()});touch(editing);return true};
+  Object.assign(editing,{task:name,ws:$("fWs").value,start:s,end:e,notes:$("fNotes").value.trim(),desc:$("fDesc").value.trim()});touch(editing);return true};
  $("dSave").onclick=()=>{if(!commit())return;
   if(id){Object.assign(DB.tasks.find(x=>x.id===id),editing);save("Changes saved")}
   else{editing.id=-Date.now();DB.tasks.push(editing);save("Task added to "+editing.ws)}
@@ -1205,18 +1397,18 @@ const XL=(()=>{
  function build(db){
   const order=new Map(db.sections.map((s,i)=>[s.name,i]));
   const tasks=[...db.tasks].sort((a,b)=>(order.get(a.ws)??999)-(order.get(b.ws)??999)||a.id-b.id);
-  const tRows=[["ID","Section","Task","Project Manager(s)","Analyst(s)","Progress","Status","Priority","Start","End","Days","Notes","Last Updated"]];
-  tasks.forEach(t=>tRows.push([t.id,t.ws,t.task,t.pm.join("/"),t.an.join("/"),{p:Math.round(t.prog*100)/100},t.status,t.pri,t.start?{d:t.start}:null,t.end?{d:t.end}:null,t.start&&t.end?Math.round((D(t.end)-D(t.start))/DAY):null,t.notes||null,t.updated?new Date(t.updated).toLocaleString("en-GB",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}):null]));
+  const tRows=[["ID","Section","Task","Description","Project Manager(s)","Analyst(s)","Progress","Status","Priority","Start","End","Days","Notes","Last Updated"]];
+  tasks.forEach(t=>tRows.push([t.id,t.ws,t.task,t.desc||null,t.pm.join("/"),t.an.join("/"),{p:Math.round(t.prog*100)/100},t.status,t.pri,t.start?{d:t.start}:null,t.end?{d:t.end}:null,t.start&&t.end?Math.round((D(t.end)-D(t.start))/DAY):null,t.notes||null,t.updated?new Date(t.updated).toLocaleString("en-GB",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}):null]));
   const sRows=[["Order","Section","Colour","Open tasks","Overdue","Total tasks"]];
   db.sections.forEach((s,i)=>{const x=db.tasks.filter(t=>t.ws===s.name);sRows.push([i+1,s.name,s.color,x.filter(isOpen).length,x.filter(isOver).length,x.length])});
   const pc={};db.tasks.forEach(t=>{t.pm.forEach(p=>{pc[p]=pc[p]||[0,0,0];pc[p][0]++});t.an.forEach(p=>{pc[p]=pc[p]||[0,0,0];pc[p][1]++});people(t).forEach(p=>{if(isOpen(t)){pc[p]=pc[p]||[0,0,0];pc[p][2]++}})});
   const pRows=[["Initials","Tasks as project manager","Tasks as analyst","Open tasks"]];Object.entries(pc).sort((a,b)=>b[1][2]-a[1][2]).forEach(([p,c])=>pRows.push([p,...c]));
   const aRows=[["B2C Project Flow – core workbook",""],["Last synced",new Date().toLocaleString("en-GB")],["Tasks",db.tasks.length],["Sections",db.sections.length],["",""],["How this works","The HTML dashboard writes to this file every time a change is made. You can also edit the Tasks and Sections sheets here; the dashboard picks up changes when it is next focused or reconnected."],["Multiple people","Separate initials with a forward slash, e.g. FMM/NH"],["Status values","Not started, In progress, Complete, On hold"],["Progress","0% to 100%"],["Dates","Enter as real dates (dd/mm/yyyy)"],["Read-only columns","Days and Last Updated are recalculated by the dashboard"]];
-  const sheets=[["Tasks",sheetXml(tRows,[7,30,52,20,20,10,13,10,12,12,7,40,18],true)],["Sections",sheetXml(sRows,[8,34,11,12,10,12],true)],["People",sheetXml(pRows,[10,24,18,12],true)],["About",sheetXml(aRows,[22,110],false)]];
+  const sheets=[["Tasks",sheetXml(tRows,[7,30,52,50,20,20,10,13,10,12,12,7,40,18],true)],["Sections",sheetXml(sRows,[8,34,11,12,10,12],true)],["People",sheetXml(pRows,[10,24,18,12],true)],["About",sheetXml(aRows,[22,110],false)]];
   const files=[
    {name:"[Content_Types].xml",data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${sheets.map((s,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("")}</Types>`},
    {name:"_rels/.rels",data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`},
-   {name:"xl/workbook.xml",data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><bookViews><workbookView activeTab="0"/></bookViews><sheets>${sheets.map((s,i)=>`<sheet name="${s[0]}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join("")}</sheets><definedNames><definedName name="_xlnm._FilterDatabase" localSheetId="0" hidden="1">Tasks!$A$1:$M$${tRows.length}</definedName><definedName name="_xlnm._FilterDatabase" localSheetId="1" hidden="1">Sections!$A$1:$F$${sRows.length}</definedName><definedName name="_xlnm._FilterDatabase" localSheetId="2" hidden="1">People!$A$1:$D$${pRows.length}</definedName></definedNames></workbook>`},
+   {name:"xl/workbook.xml",data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><bookViews><workbookView activeTab="0"/></bookViews><sheets>${sheets.map((s,i)=>`<sheet name="${s[0]}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join("")}</sheets><definedNames><definedName name="_xlnm._FilterDatabase" localSheetId="0" hidden="1">Tasks!$A$1:$N$${tRows.length}</definedName><definedName name="_xlnm._FilterDatabase" localSheetId="1" hidden="1">Sections!$A$1:$F$${sRows.length}</definedName><definedName name="_xlnm._FilterDatabase" localSheetId="2" hidden="1">People!$A$1:$D$${pRows.length}</definedName></definedNames></workbook>`},
    {name:"xl/_rels/workbook.xml.rels",data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join("")}<Relationship Id="rId${sheets.length+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`},
    {name:"xl/styles.xml",data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="1"><numFmt numFmtId="164" formatCode="dd/mm/yyyy"/></numFmts><fonts count="2"><font><sz val="10"/><name val="Gotham Book"/><family val="2"/></font><font><b/><sz val="10"/><color rgb="FFFFFFFF"/><name val="Gotham Medium"/><family val="2"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF16171C"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="5"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment vertical="center"/></xf><xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="9" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="top"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`},
    ...sheets.map((s,i)=>({name:`xl/worksheets/sheet${i+1}.xml`,data:s[1]}))];
@@ -1238,14 +1430,14 @@ const XL=(()=>{
     arr[ci]=val});rows[ri]=arr});return rows.filter(Boolean)}
   const tr=await read("tasks")||await read(Object.keys(sheets)[0]);if(!tr||!tr.length)throw new Error("No Tasks sheet found");
   const hdr=tr[0].map(h=>String(h||"").toLowerCase());const find=(...k)=>hdr.findIndex(h=>k.some(x=>h.includes(x)));
-  const ix={id:find("id"),ws:find("section","workstream"),task:find("task"),pm:find("manager","pm"),an:find("analyst"),prog:find("progress"),status:find("status"),start:find("start"),end:find("end"),notes:find("note"),upd:find("updated"),pri:find("priority")};
+  const ix={id:find("id"),ws:find("section","workstream"),task:find("task"),pm:find("manager","pm"),an:find("analyst"),prog:find("progress"),status:find("status"),start:find("start"),end:find("end"),notes:find("note"),upd:find("updated"),pri:find("priority"),desc:find("description")};
   if(ix.task<0)throw new Error("No Task column found");
   const toIso=v=>{if(!v)return null;if(typeof v==="object"&&v.d)return v.d;if(typeof v==="number")return fromSerial(v);const s=String(v).trim();let m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);if(m)return`${m[3]}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`;m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);return m?m[0]:null};
   const toProg=v=>{if(v==null||v==="")return 0;let n=typeof v==="number"?v:parseFloat(String(v).replace("%",""));if(isNaN(n))return 0;if(n>1||String(v).includes("%"))n/=100;return Math.max(0,Math.min(1,n))};
   const tasks=[];let maxId=0;
   tr.slice(1).forEach(r=>{const g=i=>i>=0?r[i]:null;const task=g(ix.task);if(!task||!String(task).trim())return;
    const id=parseInt(g(ix.id));const st=String(g(ix.status)||"").trim();const status=STATUSES.find(s=>s.toLowerCase()===st.toLowerCase())||"";
-   const t=norm({id:isNaN(id)?null:id,ws:String(g(ix.ws)||"Unsorted").trim(),task:String(task).trim(),pm:g(ix.pm)||"",an:g(ix.an)||"",prog:toProg(g(ix.prog)),status,start:toIso(g(ix.start)),end:toIso(g(ix.end)),notes:g(ix.notes)?String(g(ix.notes)):"",pri:g(ix.pri)||""});
+   const t=norm({id:isNaN(id)?null:id,ws:String(g(ix.ws)||"Unsorted").trim(),task:String(task).trim(),pm:g(ix.pm)||"",an:g(ix.an)||"",prog:toProg(g(ix.prog)),status,start:toIso(g(ix.start)),end:toIso(g(ix.end)),notes:g(ix.notes)?String(g(ix.notes)):"",pri:g(ix.pri)||"",desc:g(ix.desc)?String(g(ix.desc)):""});
    if(status==="Complete")t.prog=1;tasks.push(t);if(t.id)maxId=Math.max(maxId,t.id)});
   const used=new Set();tasks.forEach(t=>{if(!t.id||used.has(t.id))t.id=++maxId;used.add(t.id)});
   const sr=await read("sections");const sections=[];
@@ -1264,7 +1456,7 @@ const MOCK=!!window.__B2C_MOCK__;
 const Live=(()=>{
  const G="https://graph.microsoft.com/v1.0";
  const SCOPES=["User.Read","Sites.ReadWrite.All"];
- let TF="Title,Section,ProjectManagers,Analysts,Progress,Status,StartDate,EndDate,Notes";let hasPri=false;
+ let TF="Title,Section,ProjectManagers,Analysts,Progress,Status,StartDate,EndDate,Notes";let hasPri=false,hasDesc=false,actListId=null;
  let pca=null,account=null,siteId=null,taskListId=null,secListId=null,peopleListId=null,listUrl="";
  let state="init",msg="",me="",lastPull=0,timer=null,pushing=false,dirty=false,pollT=null,retryT=null,progress="";
  const snapT=new Map(),snapS=new Map();
@@ -1307,17 +1499,17 @@ const Live=(()=>{
    queue=retry;tries++;if(queue.length)await sleep(wait*1000)}
   return out}
  async function getAll(listId,select){
-  let url=`/sites/${siteId}/lists/${listId}/items?$expand=fields($select=${select})&$select=id,lastModifiedDateTime,lastModifiedBy&$top=999`;const all=[];
+  let url=`/sites/${siteId}/lists/${listId}/items?$expand=fields($select=${select})&$select=id,lastModifiedDateTime,lastModifiedBy,createdDateTime,createdBy&$top=999`;const all=[];
   while(url){const j=await api(url);all.push(...j.value);url=j["@odata.nextLink"]}return all}
 
  /* ---------- Mapping ---------- */
  const iso2sp=d=>d?d+"T00:00:00Z":null;
  const sp2iso=v=>v?new Date(new Date(v).getTime()+6*36e5).toISOString().slice(0,10):null;
- const ser=t=>JSON.stringify([t.ws,t.task,t.pm.join("/"),t.an.join("/"),Math.round(t.prog*100),t.status,t.start||"",t.end||"",t.notes||"",t.pri]);
+ const ser=t=>JSON.stringify([t.ws,t.task,t.pm.join("/"),t.an.join("/"),Math.round(t.prog*100),t.status,t.start||"",t.end||"",t.notes||"",t.pri,t.desc||""]);
  const sser=s=>JSON.stringify([s.name,s.color,s.order]);
- const toFields=t=>({...(hasPri?{Priority:t.pri}:{}),Title:t.task,Section:t.ws,ProjectManagers:t.pm.join("/"),Analysts:t.an.join("/"),Progress:Math.round(t.prog*100)/100,Status:t.status,StartDate:iso2sp(t.start),EndDate:iso2sp(t.end),Notes:t.notes||""});
+ const toFields=t=>({...(hasPri?{Priority:t.pri}:{}),...(hasDesc?{Description:t.desc||""}:{}),Title:t.task,Section:t.ws,ProjectManagers:t.pm.join("/"),Analysts:t.an.join("/"),Progress:Math.round(t.prog*100)/100,Status:t.status,StartDate:iso2sp(t.start),EndDate:iso2sp(t.end),Notes:t.notes||""});
  const toSFields=s=>({Title:s.name,Color:s.color,SortOrder:s.order});
- function toTask(it){const f=it.fields||{};const t=norm({id:+it.id,sp:String(it.id),ws:f.Section||"Unsorted",task:f.Title||"(untitled)",pm:f.ProjectManagers||"",an:f.Analysts||"",prog:+f.Progress||0,status:f.Status||"",start:sp2iso(f.StartDate),end:sp2iso(f.EndDate),notes:f.Notes||"",pri:f.Priority||""});
+ function toTask(it){const f=it.fields||{};const t=norm({id:+it.id,sp:String(it.id),ws:f.Section||"Unsorted",task:f.Title||"(untitled)",pm:f.ProjectManagers||"",an:f.Analysts||"",prog:+f.Progress||0,status:f.Status||"",start:sp2iso(f.StartDate),end:sp2iso(f.EndDate),notes:f.Notes||"",pri:f.Priority||"",desc:f.Description||""});
   if(t.status==="Complete")t.prog=1;t.updated=it.lastModifiedDateTime;t.by=(it.lastModifiedBy&&it.lastModifiedBy.user&&it.lastModifiedBy.user.displayName)||"";return t}
  function toSec(it,i){const f=it.fields||{};return{sp:String(it.id),name:f.Title||"Section",color:/^#[0-9a-f]{6}$/i.test(f.Color||"")?f.Color:PALETTE[i%PALETTE.length],order:f.SortOrder!=null?+f.SortOrder:i+1}}
 
@@ -1360,14 +1552,14 @@ const Live=(()=>{
   let mx=Math.max(0,...DB.sections.map(s=>s.order||0));
   for(const s of DB.sections){if(s.order==null)s.order=++mx;
    if(!s.sp||!snapS.has(s.sp)){reqs.push({method:"POST",url:SU,body:{fields:toSFields(s)}});meta.push({k:"sc",o:s,v:sser(s)})}
-   else if(sser(s)!==snapS.get(s.sp)){reqs.push({method:"PATCH",url:`${SU}/${s.sp}/fields`,body:toSFields(s)});meta.push({k:"su",o:s,v:sser(s)})}}
+   else if(sser(s)!==snapS.get(s.sp)){reqs.push({method:"PATCH",url:`${SU}/${s.sp}/fields`,body:toSFields(s)});meta.push({k:"su",o:s,v:sser(s),old:snapS.get(s.sp)})}}
   const ls=new Set(DB.sections.filter(s=>s.sp).map(s=>s.sp));
-  for(const sp of snapS.keys())if(!ls.has(sp)){reqs.push({method:"DELETE",url:`${SU}/${sp}`});meta.push({k:"sd",sp})}
+  for(const sp of snapS.keys())if(!ls.has(sp)){reqs.push({method:"DELETE",url:`${SU}/${sp}`});meta.push({k:"sd",sp,old:snapS.get(sp)})}
   for(const t of DB.tasks){
    if(!t.sp||!snapT.has(t.sp)){reqs.push({method:"POST",url:TU,body:{fields:toFields(t)}});meta.push({k:"tc",o:t,v:ser(t)})}
-   else{const v=ser(t);if(v!==snapT.get(t.sp)){reqs.push({method:"PATCH",url:`${TU}/${t.sp}/fields`,body:toFields(t)});meta.push({k:"tu",o:t,v})}}}
+   else{const v=ser(t);if(v!==snapT.get(t.sp)){reqs.push({method:"PATCH",url:`${TU}/${t.sp}/fields`,body:toFields(t)});meta.push({k:"tu",o:t,v,old:snapT.get(t.sp)})}}}
   const lt=new Set(DB.tasks.filter(t=>t.sp).map(t=>t.sp));
-  for(const sp of snapT.keys())if(!lt.has(sp)){reqs.push({method:"DELETE",url:`${TU}/${sp}`});meta.push({k:"td",sp})}
+  for(const sp of snapT.keys())if(!lt.has(sp)){reqs.push({method:"DELETE",url:`${TU}/${sp}`});meta.push({k:"td",sp,old:snapT.get(sp)})}
   if(!reqs.length){pushing=false;if(state!=="ready")set("ready");return}
   progress="";set("busy");let created=false,fail=0;
   try{
@@ -1377,7 +1569,7 @@ const Live=(()=>{
     if(m.k==="tc"||m.k==="sc"){if(ok){const id=String(r.body.id);m.o.sp=id;if(m.k==="tc"){m.o.id=+id;m.o.by=me;m.o.updated=r.body.lastModifiedDateTime||m.o.updated}snap.set(id,m.v);created=true}else fail++}
     else if(m.k==="tu"||m.k==="su"){if(ok){snap.set(m.o.sp,m.v);if(m.k==="tu")m.o.by=me}else if(gone){snap.delete(m.o.sp);dirty=true}else fail++}
     else{if(ok||gone)snap.delete(m.sp);else fail++}});
-   progress="";
+   progress="";logChanges(meta,out);
    if(fail){set("err",fail+" change(s) didn't save – retrying");retryT=setTimeout(push,15000)}else set("ready")
   }catch(e){progress="";set("err",e.message);retryT=setTimeout(push,15000)}
   finally{pushing=false;if(created)safeRender();if(dirty)setTimeout(push,300)}}
@@ -1403,7 +1595,7 @@ const Live=(()=>{
  async function findLists(){
   const j=await api(`/sites/${siteId}/lists?$select=id,displayName,webUrl`);const L=j.value||[];
   const f=n=>L.find(l=>(l.displayName||"").toLowerCase()===n.toLowerCase());
-  const a=f(CONFIG.tasksList),b=f(CONFIG.sectionsList),c=f(CONFIG.peopleList);taskListId=a&&a.id;secListId=b&&b.id;peopleListId=c&&c.id;listUrl=a?a.webUrl:""}
+  const a=f(CONFIG.tasksList),b=f(CONFIG.sectionsList),c=f(CONFIG.peopleList),d=f(CONFIG.activityList);taskListId=a&&a.id;secListId=b&&b.id;peopleListId=c&&c.id;actListId=d&&d.id;listUrl=a?a.webUrl:""}
  async function connect(){
   const site=await api(`/sites/${CONFIG.siteHost}:${CONFIG.sitePath}`);siteId=site.id;
   await findLists();
@@ -1415,13 +1607,40 @@ const Live=(()=>{
   set(tasks.length||secs.length?"ready":"empty");render();
   clearInterval(pollT);pollT=setInterval(()=>{if(document.visibilityState==="visible")pull()},CONFIG.pollSeconds*1000)}
  async function checkPri(){
-  try{const j=await api(`/sites/${siteId}/lists/${taskListId}/columns?$select=name`);hasPri=(j.value||[]).some(c=>c.name==="Priority")}catch(e){hasPri=false}
-  TF="Title,Section,ProjectManagers,Analysts,Progress,Status,StartDate,EndDate,Notes"+(hasPri?",Priority":"")}
+  try{const j=await api(`/sites/${siteId}/lists/${taskListId}/columns?$select=name`);const cn=(j.value||[]).map(c=>c.name);hasPri=cn.includes("Priority");hasDesc=cn.includes("Description")}catch(e){hasPri=false;hasDesc=false}
+  TF="Title,Section,ProjectManagers,Analysts,Progress,Status,StartDate,EndDate,Notes"+(hasPri?",Priority":"")+(hasDesc?",Description":"")}
  async function addPriColumn(){
-  await api(`/sites/${siteId}/lists/${taskListId}/columns`,{method:"POST",body:JSON.stringify({name:"Priority",displayName:"Priority",choice:{choices:PRIS,displayAs:"dropDownMenu"},defaultValue:{value:"Medium"}})},["Sites.Manage.All"]);
-  await checkPri();if(!hasPri)throw new Error("Column not found after creating it");
-  const keep=new Map(DB.tasks.filter(t=>t.sp).map(t=>[t.sp,t.pri]));await connect();
-  DB.tasks.forEach(t=>{const p=keep.get(t.sp);if(p&&p!==t.pri)t.pri=p});push()}
+  const C=`/sites/${siteId}/lists/${taskListId}/columns`,sc=["Sites.Manage.All"];
+  if(!hasPri)await api(C,{method:"POST",body:JSON.stringify({name:"Priority",displayName:"Priority",choice:{choices:PRIS,displayAs:"dropDownMenu"},defaultValue:{value:"Medium"}})},sc);
+  if(!hasDesc)await api(C,{method:"POST",body:JSON.stringify({name:"Description",displayName:"Description",text:{allowMultipleLines:true,linesForEditing:6}})},sc);
+  await checkPri();if(!hasPri||!hasDesc)throw new Error("Column not found after creating it");
+  const keep=new Map(DB.tasks.filter(t=>t.sp).map(t=>[t.sp,[t.pri,t.desc]]));await connect();
+  DB.tasks.forEach(t=>{const p=keep.get(t.sp);if(p){t.pri=p[0];t.desc=p[1]}});push()}
+ async function createActivityList(){
+  await api(`/sites/${siteId}/lists`,{method:"POST",body:JSON.stringify({displayName:CONFIG.activityList,list:{template:"genericList"},columns:[{name:"Action",text:{}},{name:"TaskRef",text:{}},{name:"Details",text:{allowMultipleLines:true}},{name:"UserName",text:{}}]})},["Sites.Manage.All"]);
+  await findLists();if(!actListId)throw new Error("List not found after creating it")}
+ async function getActivity(){
+  if(!actListId)return null;
+  const it=await getAll(actListId,"Title,Action,TaskRef,Details,UserName");
+  return it.map(x=>({id:x.id,when:x.createdDateTime,who:(x.fields.UserName||(x.createdBy&&x.createdBy.user&&x.createdBy.user.displayName)||"Someone"),act:x.fields.Action||"Edited",title:x.fields.Title||"",ref:x.fields.TaskRef||"",det:x.fields.Details||""})).sort((a,b)=>a.when<b.when?1:-1)}
+ async function deletePerson(sp){await api(`/sites/${siteId}/lists/${peopleListId}/items/${sp}`,{method:"DELETE"});DB.people=(DB.people||[]).filter(p=>p.sp!==sp)}
+ function logChanges(meta,out){
+  if(!actListId)return;const logs=[];
+  meta.forEach((m,i)=>{const r=out[i];if(!(r&&r.status<300))return;
+   if(m.k==="tc")logs.push({Title:m.o.task,Action:"Added",TaskRef:String(m.o.sp),Details:`Added to ${m.o.ws}`+(m.o.end?` · due ${fmt(m.o.end,1)}`:"")});
+   else if(m.k==="tu"){const d=diffTask(m.old,m.v);if(d)logs.push({Title:m.o.task,Action:d.a,TaskRef:String(m.o.sp),Details:d.t})}
+   else if(m.k==="td"){const o=m.old?JSON.parse(m.old):[];logs.push({Title:o[1]||"(task)",Action:"Deleted",TaskRef:String(m.sp),Details:o[0]?`Removed from ${o[0]}`:""})}
+   else if(m.k==="sc")logs.push({Title:m.o.name,Action:"Section added",Details:""});
+   else if(m.k==="su"){const o=JSON.parse(m.old||"[]");if(o[0]!==m.o.name||o[1]!==m.o.color)logs.push({Title:m.o.name,Action:"Section edited",Details:o[0]&&o[0]!==m.o.name?`Renamed from ${o[0]}`:"Colour changed"})}
+   else if(m.k==="sd"){const o=JSON.parse(m.old||"[]");logs.push({Title:o[0]||"Section",Action:"Section deleted",Details:""})}});
+  let fin=logs;const adds=logs.filter(l=>l.Action==="Added");
+  if(adds.length>25){fin=logs.filter(l=>l.Action!=="Added");fin.push({Title:`${adds.length.toLocaleString("en-GB")} tasks`,Action:"Imported",Details:`Imported ${adds.length.toLocaleString("en-GB")} tasks from a workbook`})}
+  const cOk=logs.filter(l=>l.Action==="Completed");
+  if(cOk.length>10){fin=fin.filter(l=>l.Action!=="Completed");fin.push({Title:`${cOk.length} tasks`,Action:"Completed",Details:cOk.slice(0,8).map(l=>l.Title).join(", ")+"…"})}
+  const ed=fin.filter(l=>l.TaskRef&&!["Added","Deleted","Completed","Imported"].includes(l.Action));
+  if(ed.length>25){const dets=[...new Set(ed.map(l=>l.Details))];fin=fin.filter(l=>!ed.includes(l));fin.push({Title:`${ed.length} tasks`,Action:"Edited",Details:(dets.length===1?dets[0]+" – ":"")+ed.slice(0,8).map(l=>l.Title).join(", ")+"…"})}
+  fin.forEach(l=>{l.UserName=me;l.Details=String(l.Details||"").slice(0,4000)});
+  if(fin.length)batch(fin.map(f=>({method:"POST",url:`/sites/${siteId}/lists/${actListId}/items`,body:{fields:f}}))).catch(()=>{})}
  async function createPeopleList(){
   await api(`/sites/${siteId}/lists`,{method:"POST",body:JSON.stringify({displayName:CONFIG.peopleList,list:{template:"genericList"},columns:[{name:"Email",text:{}},{name:"DisplayName",text:{}}]})},["Sites.Manage.All"]);
   await findLists();if(!peopleListId)throw new Error("List not found after creating it");DB.people=[];await pull()}
@@ -1438,8 +1657,9 @@ const Live=(()=>{
   const mk=(name,cols)=>api(`/sites/${siteId}/lists`,{method:"POST",body:JSON.stringify({displayName:name,list:{template:"genericList"},columns:cols})},sc);
   if(!taskListId)await mk(CONFIG.tasksList,[{name:"Section",text:{}},{name:"ProjectManagers",text:{}},{name:"Analysts",text:{}},{name:"Progress",number:{}},
    {name:"Status",choice:{choices:STATUSES,displayAs:"dropDownMenu"}},{name:"StartDate",dateTime:{format:"dateOnly"}},{name:"EndDate",dateTime:{format:"dateOnly"}},
-   {name:"Notes",text:{allowMultipleLines:true,linesForEditing:6}},{name:"Priority",choice:{choices:PRIS,displayAs:"dropDownMenu"},defaultValue:{value:"Medium"}}]);
+   {name:"Notes",text:{allowMultipleLines:true,linesForEditing:6}},{name:"Description",text:{allowMultipleLines:true,linesForEditing:6}},{name:"Priority",choice:{choices:PRIS,displayAs:"dropDownMenu"},defaultValue:{value:"Medium"}}]);
   if(!secListId)await mk(CONFIG.sectionsList,[{name:"Color",text:{}},{name:"SortOrder",number:{}}]);
+  if(!actListId)await mk(CONFIG.activityList,[{name:"Action",text:{}},{name:"TaskRef",text:{}},{name:"Details",text:{allowMultipleLines:true}},{name:"UserName",text:{}}]).catch(()=>{});
   if(!peopleListId)await mk(CONFIG.peopleList,[{name:"Email",text:{}},{name:"DisplayName",text:{}}]).catch(()=>{});
   await findLists();await connect()}
  async function startFresh(){DB.sections=DEFAULT_SECTIONS.map((n,i)=>({name:n,color:PALETTE[i%PALETTE.length],order:i+1}));set("ready");render();await push()}
@@ -1451,7 +1671,7 @@ const Live=(()=>{
   const base=-Date.now();d.tasks.forEach((t,i)=>{delete t.sp;t.id=base-i;DB.tasks.push(t)});
   set("ready");go("overview");toast("Uploading to SharePoint – keep this tab open until it finishes");await push();
   if(state==="ready")toast(`Imported ${d.tasks.length.toLocaleString("en-GB")} tasks – everyone can see them now`)}
- return{get hasPeople(){return!!peopleListId},get email(){return MOCK?"test.user@savills.com":(account&&account.username)||""},createPeopleList,savePeople,get hasPri(){return hasPri},addPriColumn,init,pull,push,signIn,signOut,createLists,startFresh,importWorkbook,configured,
+ return{get hasDesc(){return hasDesc},get hasAct(){return!!actListId},createActivityList,getActivity,deletePerson,get hasPeople(){return!!peopleListId},get email(){return MOCK?"test.user@savills.com":(account&&account.username)||""},createPeopleList,savePeople,get hasPri(){return hasPri},addPriColumn,init,pull,push,signIn,signOut,createLists,startFresh,importWorkbook,configured,
   schedule(){clearTimeout(timer);timer=setTimeout(push,400)},
    pending:()=>pushing||DB.tasks.some(t=>!t.sp||!snapT.has(t.sp)||ser(t)!==snapT.get(t.sp)),
   get state(){return state},get msg(){return msg},get me(){return me},get lastPull(){return lastPull},get listUrl(){return listUrl},get account(){return account}}
@@ -1479,8 +1699,8 @@ function renderSyncPop(){
 function dl(name,blob){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
 const ukd=s=>s?s.split("-").reverse().join("/"):"";
 function exportCsv(){const e=v=>`"${String(v??"").replace(/"/g,'""')}"`;
- const L=[["Section","Task","Project manager(s)","Analyst(s)","Progress","Status","Priority","Start","End","Notes"].join(",")];
- DB.sections.forEach(s=>DB.tasks.filter(t=>t.ws===s.name).forEach(t=>L.push([s.name,t.task,t.pm.join("/"),t.an.join("/"),Math.round(t.prog*100)+"%",t.status,t.pri,ukd(t.start),ukd(t.end),t.notes].map(e).join(","))));
+ const L=[["Section","Task","Description","Project manager(s)","Analyst(s)","Progress","Status","Priority","Start","End","Notes"].join(",")];
+ DB.sections.forEach(s=>DB.tasks.filter(t=>t.ws===s.name).forEach(t=>L.push([s.name,t.task,t.desc,t.pm.join("/"),t.an.join("/"),Math.round(t.prog*100)+"%",t.status,t.pri,ukd(t.start),ukd(t.end),t.notes].map(e).join(","))));
  dl(`B2C_Project_Flow_${iso(T)}.csv`,new Blob(["\ufeff"+L.join("\r\n")],{type:"text/csv"}));toast("Exported "+DB.tasks.length+" tasks")}
 $("file").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;try{await Live.importWorkbook(f)}catch(x){toast("Couldn't import: "+x.message)}};
 addEventListener("beforeunload",e=>{if(Live.pending()){e.preventDefault();e.returnValue=""}});
@@ -1495,6 +1715,12 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"){closePops();$("scri
  if(e.key==="/"&&!typing){e.preventDefault();$("q").focus()}});
 window.addEventListener("focus",()=>Live.pull());
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)Live.pull()});
+function fitNav(){const n=$("topnav"),tb=n.querySelector(".tabs"),cls=["c1","c2","c3","c4","c5","c6","c7"];n.classList.remove(...cls);
+ const over=()=>{const cs=getComputedStyle(n),kids=[...n.children].filter(k=>k.offsetParent&&!k.classList.contains("sp"));
+  const w=kids.reduce((a,k)=>a+k.getBoundingClientRect().width,0)+parseFloat(cs.columnGap||10)*(kids.length)+parseFloat(cs.paddingLeft)+parseFloat(cs.paddingRight);
+  return w>n.clientWidth+1||n.scrollWidth>n.clientWidth+1||n.querySelector(".search").getBoundingClientRect().width<=136};
+ for(const c of cls){if(!over())break;n.classList.add(c)}}
+new ResizeObserver(()=>fitNav()).observe(document.body);
 DB=blank();Live.init();
 </script>
 </body>
