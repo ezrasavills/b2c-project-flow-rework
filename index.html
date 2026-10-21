@@ -461,6 +461,7 @@ textarea.fld.title{font-size:15.5px;font-weight:600;min-height:56px}
 .subtabs button:hover{color:#fff}
 .subtabs button.on{background:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,.09));color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 3px 10px rgba(0,0,0,.3)}
 .subtabs em{font-style:normal;font-size:11px;background:rgba(255,255,255,.1);padding:1px 8px;border-radius:20px;color:var(--ink2)}
+.rcbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.rcbar .seg button{padding:6px 11px;font-size:12px}.rcbar .sel{height:34px;font-size:12.5px;max-width:190px}
 .toast.hasundo{padding:10px 10px 10px 20px;overflow:hidden;border-color:rgba(245,196,0,.5)}
 .toast.hasundo #undo{background:#F5C400;color:#15161A;font-size:13px;padding:8px 16px}
 .toast .tbar{position:absolute;left:0;bottom:0;height:3px;width:100%;background:#F5C400;animation:tbar 8s linear forwards}
@@ -631,7 +632,7 @@ const avatars=(t,max=4)=>{const pmset=new Set(t.pm),ps=people(t);return'<span cl
 
 /* ---------- State ---------- */
 let DB,UI={view:"overview",section:null,filters:new Set(["open"]),statuses:new Set(),sections:new Set(),pris:new Set(),tls:new Set(),quad:null,showDone:false,openDD:null,mineTab:"overview",q:"",people:[],pmode:"any",limit:80,sort:"end",tlHold:false,selMode:false,sel:new Set()};
-function norm(t){t.pm=uniq(splitPeople(t.pm));t.an=uniq(splitPeople(t.an));t.prog=Math.max(0,Math.min(1,+t.prog||0));if(!STATUSES.includes(t.status))t.status=t.prog>=1?"Complete":t.prog>0?"In progress":"Not started";t.notes=t.notes||"";t.desc=t.desc||"";{const p=String(t.pri||"").trim().toLowerCase();t.pri=PRIS.find(x=>x.toLowerCase()===p)||(p==="med"?"Medium":"Medium")}return t}
+function norm(t){t.pm=uniq(splitPeople(t.pm));t.an=uniq(splitPeople(t.an));t.prog=Math.max(0,Math.min(1,+t.prog||0));if(!STATUSES.includes(t.status))t.status=t.prog>=1?"Complete":t.prog>0?"In progress":"Not started";t.notes=t.notes||"";t.desc=t.desc||"";t.done=t.done||null;t.doneBy=t.doneBy||"";{const p=String(t.pri||"").trim().toLowerCase();t.pri=PRIS.find(x=>x.toLowerCase()===p)||(p==="med"?"Medium":"Medium")}return t}
 const blank=()=>({tasks:[],sections:[],people:[],nextId:1});
 function recolor(d){const old=["#C9A227","#3567E0","#18976A","#E0685B","#7C5CF0","#0EA5B7","#E08A0B","#D9468F","#5B6B85","#2F9E44","#B4552D","#4C6EF5"];d.sections.forEach(s=>{const i=old.indexOf((s.color||"").toUpperCase());if(i>=0)s.color=PALETTE[i]})}
 const touch=t=>t.updated=new Date().toISOString();
@@ -672,8 +673,13 @@ function ring(pct,size,stroke,color,track){const r=(size-stroke)/2,c=2*Math.PI*r
 const short=s=>s.length>40?s.slice(0,38)+"…":s;
 
 /* ---------- Completing tasks ---------- */
-function setProg(t,p){t.prog=Math.max(0,Math.min(1,p));if(t.prog>=1)t.status="Complete";else if(t.status==="Complete")t.status=t.prog>0?"In progress":"Not started";else if(t.prog>0&&t.status==="Not started")t.status="In progress"}
-function setStatus(t,s){t.status=s;if(s==="Complete")t.prog=1;else if(t.prog>=1)t.prog=.9;if(s==="Not started")t.prog=0}
+// Progress never completes a task on its own – only the Done tick (or choosing "Complete") does.
+function setProg(t,p){t.prog=Math.max(0,Math.min(1,p));
+ if(t.status==="Complete"&&t.prog<1)setStatus(t,t.prog>0?"In progress":"Not started",true);
+ else if(t.prog>0&&t.status==="Not started")t.status="In progress"}
+function setStatus(t,s,keepProg){const was=t.status;t.status=s;
+ if(s==="Complete"){t.prog=1;if(was!=="Complete"){t.done=new Date().toISOString();t.doneBy=(typeof Live!=="undefined"&&Live.me)||""}}
+ else{if(was==="Complete"){t.done=null;t.doneBy="";if(!keepProg&&t.prog>=1)t.prog=.9}if(s==="Not started"&&!keepProg)t.prog=0}}
 function toggleDone(id,el){
  const t=DB.tasks.find(x=>x.id===id);if(!t)return;
  const bak={status:t.status,prog:t.prog,updated:t.updated};
@@ -918,7 +924,7 @@ function vMine(){
 function vSettings(){
  const mine=myIni(),st=Live.state,ok=st==="ready";
  const row=(title,sub,btn)=>`<div class="setrow"><div class="b"><b>${title}</b>${sub?`<small>${sub}</small>`:""}</div>${btn||""}</div>`;
- const setup=[["Priority column",Live.hasPri],["Description column",Live.hasDesc],["Team & initials list",Live.hasPeople],["Recent changes log",Live.hasAct]];
+ const setup=[["Priority column",Live.hasPri],["Description column",Live.hasDesc],["Completion date columns",Live.hasDone],["Team & initials list",Live.hasPeople],["Recent changes log",Live.hasAct]];
  $("view").innerHTML=pageHead("Settings","Account, shared data, team, exports and change history")+`<div class="setgrid fade">
  <div class="card pad setcard"><div class="ch"><h3><span class="ic">${ico.users}</span>Account</h3></div>
   ${row(H(Live.me||"Not signed in"),H(Live.email||""),Live.account?`<button class="btn sm danger" id="sOut">Sign out</button>`:"")}
@@ -950,7 +956,7 @@ function vSettings(){
  on("sXlsx",()=>{dl(`B2C_Project_Flow_Backup_${iso(T)}.xlsx`,XL.build(DB));toast("Backup downloaded")});
  on("sCsv",exportCsv);on("sImp",()=>$("file").click());
  on("sFix",async()=>{const b=$("sFix");b.disabled=true;b.textContent="Setting up…";const errs=[];
-  if(!Live.hasPri||!Live.hasDesc){try{await Live.addPriColumn()}catch(e){errs.push("columns: "+e.message)}}
+  if(!Live.hasPri||!Live.hasDesc||!Live.hasDone){try{await Live.addPriColumn()}catch(e){errs.push("columns: "+e.message)}}
   if(!Live.hasPeople){try{await Live.createPeopleList()}catch(e){errs.push("team list: "+e.message)}}
   if(!Live.hasAct){try{await Live.createActivityList()}catch(e){errs.push("change log: "+e.message)}}
   toast(errs.length?"Some items couldn't be created ("+errs.join("; ")+")":"All set up");render()});
@@ -1019,6 +1025,7 @@ function vOverview(){
  const thisM=mk(T.getFullYear(),T.getMonth()),pm=new Date(T.getFullYear(),T.getMonth()-1,1),lastM=mk(pm.getFullYear(),pm.getMonth());
  const hr=new Date().getHours(),greet=hr<12?"Good morning":hr<18?"Good afternoon":"Good evening";
  const st={};STATUSES.forEach(s=>st[s]=ts.filter(t=>t.status===s).length);
+ const recent=recentDone(ts);
  const months=[];for(let i=11;i>=0;i--)months.push(new Date(T.getFullYear(),T.getMonth()-i,1));
  const mc=months.map(m=>mk(m.getFullYear(),m.getMonth()));
  const W=560,Hh=170,mx=Math.max(...mc,1),bw=W/12;
@@ -1039,7 +1046,7 @@ function vOverview(){
  const mrow=t=>`<div class="mrow" data-id="${t.id}">${doneBtn(t)}<span class="bar" style="background:${secColor(t.ws)};box-shadow:0 0 8px ${secColor(t.ws)}88"></span><div class="b"><div class="t">${H(t.task)}</div><div class="m"><span style="color:${PCH[t.pri]};font-weight:700">● ${t.pri}</span> · ${H(t.ws)} · ${Math.round(t.prog*100)}% done</div></div>${avatars(t)}<div style="width:96px;text-align:right">${dueChip(t)}</div></div>`;
  const who=UI.people.length?` · ${UI.people.length===1?H(UI.people[0]):UI.people.length+" people selected"}`:"";
  $("view").innerHTML=pageHead("Overview",T.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"})+who)+`<div class="g fade">
- ${(Live.hasPri&&Live.hasDesc)||window.__B2C_MOCK__?"":`<div class="card pad prwarn"><div><b>One-off setup: add new columns</b><span>Priority and Description won't be saved for everyone until the SharePoint list has a <b>${Live.hasPri?"":"Priority"}${!Live.hasPri&&!Live.hasDesc?" and ":""}${Live.hasDesc?"":"Description"}</b> column.</span></div><button class="btn gold sm" id="addPri">${ico.plus} Add column${!Live.hasPri&&!Live.hasDesc?"s":""}</button></div>`}
+ ${(Live.hasPri&&Live.hasDesc&&Live.hasDone)||window.__B2C_MOCK__?"":`<div class="card pad prwarn"><div><b>One-off setup: add new columns</b><span>${[!Live.hasPri&&"Priority",!Live.hasDesc&&"Description",!Live.hasDone&&"completion dates"].filter(Boolean).join(", ")} won't be saved for everyone until the SharePoint list has the matching columns.</span></div><button class="btn gold sm" id="addPri">${ico.plus} Add columns</button></div>`}
  <div class="card hero"><h2>${greet}</h2><p>There ${open.length===1?"is":"are"} <b>${open.length} open tasks</b> across ${DB.sections.length} sections — <b>${ip.length} in progress</b>, <b class="r">${over.length} overdue</b> and <b class="y">${soon.length} due in the next two weeks</b>. <b class="r">${qc.do.length} high-priority task${qc.do.length===1?" needs":"s need"} doing now</b>. ${thisM} task${thisM===1?"":"s"} completed so far this month.</p></div>
  <div class="kpis">
   ${kpi("Open tasks",open.length,`${ip.length} in progress · ${st["On hold"]} on hold`,ico.list,"var(--blue)","var(--bluebg)","open")}
@@ -1051,8 +1058,7 @@ function vOverview(){
  <div class="g ov2" style="grid-template-columns:1.25fr 1fr">
   <div class="card pad"><div class="ch"><div><h3>Needs attention</h3><div class="h">High priority first, then soonest deadline · tick the circle to complete</div></div><span class="pill p-On">${att.length}</span></div>
    <div class="scroll">${att.map(mrow).join("")||'<div class="empty"><b>All clear</b>Nothing overdue or due soon</div>'}</div></div>
-  <div class="card pad"><div class="ch"><div><h3>Status mix</h3><div class="h">All tasks in view · click to drill in</div></div></div>
-   <div class="donutwrap">${donut}<div class="dl">${STATUSES.map(s=>`<div data-st="${s}"><i style="background:${SCH[s]};box-shadow:0 0 6px ${SCH[s]}"></i><span>${s}</span><b>${st[s].toLocaleString("en-GB")}</b><small style="color:var(--muted);width:38px;text-align:right">${Math.round(st[s]/tot*100)}%</small></div>`).join("")}</div></div>
+  <div class="card pad">${recent}
    <div style="margin-top:18px;border-top:1px solid var(--line);padding-top:16px"><div class="ch" style="margin-bottom:4px"><div><h3>Completions per month</h3><div class="h">Last 12 months, by end date</div></div></div>${trend}</div></div>
  </div>
  <div class="g ov2" style="grid-template-columns:1.45fr 1fr">
@@ -1069,10 +1075,10 @@ function vOverview(){
  </div>`;
  $("view").querySelectorAll(".mrow").forEach(e=>e.onclick=()=>openTask(+e.dataset.id));
  $("view").querySelectorAll(".sc").forEach(e=>e.onclick=()=>go("section",e.dataset.s));
- $("view").querySelectorAll(".dl div").forEach(e=>e.onclick=()=>{UI.view="all";setOne(e.dataset.st);render()});
+ bindRecent();
  $("view").querySelectorAll(".kpi").forEach(e=>e.onclick=()=>{UI.view="all";setOne(e.dataset.f);UI.limit=80;render();window.scrollTo({top:0})});
  $("ovAddSec").onclick=()=>sectionModal();
- const ap=$("addPri");if(ap)ap.onclick=async()=>{ap.disabled=true;ap.textContent="Adding…";try{await Live.addPriColumn();toast("Columns added – priorities and descriptions now save for everyone")}catch(e){ap.disabled=false;ap.textContent="Add Priority column";toast("Couldn't add it automatically ("+e.message+"). Add it in SharePoint instead – see the setup note.")}};
+ const ap=$("addPri");if(ap)ap.onclick=async()=>{ap.disabled=true;ap.textContent="Adding…";try{await Live.addPriColumn();toast("Columns added – priorities, descriptions and completion dates now save for everyone")}catch(e){ap.disabled=false;ap.textContent="Add Priority column";toast("Couldn't add it automatically ("+e.message+"). Add it in SharePoint instead – see the setup note.")}};
  $("view").querySelectorAll("[data-q]").forEach(e=>e.onclick=()=>{UI.view="all";setOne("q_"+e.dataset.q);UI.sort="pri";UI.limit=80;render();window.scrollTo({top:0})});
  $("view").querySelectorAll(".qdot").forEach(e=>e.onclick=ev=>{ev.stopPropagation();openTask(+e.dataset.id)});
  $("view").querySelectorAll("[data-pf]").forEach(e=>e.onclick=()=>{UI.view="all";setOne("open");UI.pris=new Set([e.dataset.pf]);UI.limit=80;render();window.scrollTo({top:0})});
@@ -1101,6 +1107,30 @@ ${H(t.ws)}</title></circle>`});
   <text x="${L+iw/2}" y="${Hh-2}" text-anchor="middle" font-size="10.5" fill="#6F7787" letter-spacing=".12em">DEADLINE →  SOONER ON THE LEFT</text>
   ${dots}</svg>${noDate?`<div class="h" style="margin-top:6px">${noDate} open task${noDate===1?"":"s"} without an end date aren't plotted.</div>`:""}`;
 }
+/* ---------- Recently completed ---------- */
+const RCW=[[0,"Today"],[2,"Last 3 days"],[6,"Last 7 days"],[13,"Last 14 days"],[29,"Last 30 days"]];
+function doneAt(t){ // when the task was completed: recorded time, else end date (if past), else last edit
+ if(t.done)return{d:new Date(t.done),est:false};
+ if(t.end&&D(t.end)<=T)return{d:D(t.end),est:true};
+ return t.updated?{d:new Date(t.updated),est:true}:null}
+const daysAgo=d=>{const x=new Date(d);x.setHours(0,0,0,0);return Math.round((T-x)/DAY)};
+function recentDone(ts){
+ const R=UI.rc||(UI.rc={win:6,sec:"",who:""});
+ const all=ts.filter(t=>t.status==="Complete").map(t=>({t,a:doneAt(t)})).filter(x=>x.a&&daysAgo(x.a.d)>=0&&daysAgo(x.a.d)<=R.win);
+ const L=s=>s.toLowerCase();
+ const rows=all.filter(x=>(!R.sec||x.t.ws===R.sec)&&(!R.who||people(x.t).some(p=>L(p)===L(R.who)))).sort((a,b)=>b.a.d-a.a.d);
+ const secs=[...new Set(all.map(x=>x.t.ws))],ppl=[...new Set(all.flatMap(x=>people(x.t)))].sort();
+ const when=a=>{const n=daysAgo(a.d);const s=n===0?(a.est?"Today":ago(a.d)):n===1?"Yesterday":n+" days ago";return s};
+ return`<div class="ch" style="margin-bottom:10px"><div><h3>Recently completed</h3><div class="h">${rows.length} task${rows.length===1?"":"s"} · ${RCW.find(w=>w[0]===R.win)[1].toLowerCase()}</div></div><span class="pill p-Complete">${rows.length}</span></div>
+ <div class="rcbar"><div class="seg" id="rcWin">${RCW.map(([v,l])=>`<button data-rw="${v}" class="${R.win===v?"on":""}">${l.replace("Last ","")}</button>`).join("")}</div>
+  <select class="sel" id="rcSec"><option value="">All sections</option>${[...new Set([...secs,...(R.sec?[R.sec]:[])])].map(s=>`<option ${R.sec===s?"selected":""}>${H(s)}</option>`).join("")}</select>
+  <select class="sel" id="rcWho"><option value="">Everyone</option>${[...new Set([...ppl,...(R.who?[R.who]:[])])].map(p=>`<option ${R.who===p?"selected":""}>${H(p)}</option>`).join("")}</select></div>
+ <div class="scroll" style="max-height:300px;margin-top:8px">${rows.map(({t,a})=>`<div class="mrow" data-id="${t.id}">${doneBtn(t)}<span class="bar" style="background:${secColor(t.ws)}"></span><div class="b"><div class="t">${H(t.task)}</div><div class="m">${H(t.ws)}${t.doneBy?` · ticked by ${H(t.doneBy)}`:""}</div></div>${avatars(t,3)}<div style="width:96px;text-align:right"><span class="due g" title="${a.est?"Completion time not recorded – using "+(t.end&&D(t.end)<=T?"end date":"last edit"):"Completed "+a.d.toLocaleString("en-GB")}">${when(a)}${a.est?"*":""}</span></div></div>`).join("")||`<div class="empty"><b>Nothing completed</b>No completed tasks match these filters</div>`}</div>
+ ${rows.some(x=>x.a.est)?`<div class="h" style="margin-top:6px;font-size:11.5px;color:var(--muted)">* completion time wasn't recorded (completed before this feature), so the end date is used.</div>`:""}`}
+function bindRecent(){const R=UI.rc,v=$("view");
+ v.querySelectorAll("[data-rw]").forEach(b=>b.onclick=()=>{R.win=+b.dataset.rw;render()});
+ const s=$("rcSec");if(s)s.onchange=()=>{R.sec=s.value;render()};
+ const w=$("rcWho");if(w)w.onchange=()=>{R.who=w.value;render()}}
 function kpi(l,v,s,ic,c,bg,f){return`<div class="card kpi" data-f="${f}"><div class="ic" style="background:${bg};color:${c}">${ic}</div><div class="l">${l}</div><div class="v">${v.toLocaleString("en-GB")}</div><div class="s">${s}</div></div>`}
 
 const FILTERS=[["open","Open",isOpen],["over","Overdue",isOver],["soon","Due soon",isSoon],["In progress","In progress",t=>t.status==="In progress"],["Not started","Not started",t=>t.status==="Not started"],["On hold","On hold",t=>t.status==="On hold"],["Complete","Complete",t=>t.status==="Complete"],["done","Done this month",t=>t.status==="Complete"&&t.end&&D(t.end).getMonth()===T.getMonth()&&D(t.end).getFullYear()===T.getFullYear()],["high","High priority",t=>isOpen(t)&&t.pri==="High"],["q_do","Do now",t=>quadOf(t)==="do"],["q_plan","Plan",t=>quadOf(t)==="plan"],["q_fit","Fit in",t=>quadOf(t)==="fit"],["q_later","Later",t=>quadOf(t)==="later"],["all","All",()=>true]];
@@ -1145,7 +1175,7 @@ function bindRows(){
    const a=el.dataset.a;
    if(a==="edit")el.onclick=e=>{e.stopPropagation();if(UI.selMode&&el.classList.contains("tt")){UI.sel.has(t.id)?UI.sel.delete(t.id):UI.sel.add(t.id);render()}else openTask(t.id)};
    if(a==="prog"){el.oninput=()=>{el.style.setProperty("--p",el.value+"%");el.nextElementSibling.textContent=el.value+"%"};
-     el.onchange=()=>{const was=t.status;setProg(t,el.value/100);touch(t);save(t.status==="Complete"&&was!=="Complete"?"✓ “"+short(t.task)+"” completed":"Progress updated to "+el.value+"%");render()}}
+     el.onchange=()=>{const was=t.status;setProg(t,el.value/100);touch(t);save(was==="Complete"&&t.status!=="Complete"?"Reopened “"+short(t.task)+"” at "+el.value+"%":el.value==100&&t.status!=="Complete"?"Progress 100% – tick Done when it's finished":"Progress updated to "+el.value+"%");render()}}
    if(a==="start"||a==="end")el.onchange=()=>{const val=el.value||null;const s=a==="start"?val:t.start,e=a==="end"?val:t.end;
      if(s&&e&&e<s){toast("End date can't be before the start date");el.value=t[a]||"";return}
      t[a]=val;touch(t);save((a==="start"?"Start":"End")+" date updated");render()};
@@ -1456,7 +1486,7 @@ const MOCK=!!window.__B2C_MOCK__;
 const Live=(()=>{
  const G="https://graph.microsoft.com/v1.0";
  const SCOPES=["User.Read","Sites.ReadWrite.All"];
- let TF="Title,Section,ProjectManagers,Analysts,Progress,Status,StartDate,EndDate,Notes";let hasPri=false,hasDesc=false,actListId=null;
+ let TF="Title,Section,ProjectManagers,Analysts,Progress,Status,StartDate,EndDate,Notes";let hasPri=false,hasDesc=false,hasDone=false,actListId=null;
  let pca=null,account=null,siteId=null,taskListId=null,secListId=null,peopleListId=null,listUrl="";
  let state="init",msg="",me="",lastPull=0,timer=null,pushing=false,dirty=false,pollT=null,retryT=null,progress="";
  const snapT=new Map(),snapS=new Map();
@@ -1505,11 +1535,11 @@ const Live=(()=>{
  /* ---------- Mapping ---------- */
  const iso2sp=d=>d?d+"T00:00:00Z":null;
  const sp2iso=v=>v?new Date(new Date(v).getTime()+6*36e5).toISOString().slice(0,10):null;
- const ser=t=>JSON.stringify([t.ws,t.task,t.pm.join("/"),t.an.join("/"),Math.round(t.prog*100),t.status,t.start||"",t.end||"",t.notes||"",t.pri,t.desc||""]);
+ const ser=t=>JSON.stringify([t.ws,t.task,t.pm.join("/"),t.an.join("/"),Math.round(t.prog*100),t.status,t.start||"",t.end||"",t.notes||"",t.pri,t.desc||"",t.done||"",t.doneBy||""]);
  const sser=s=>JSON.stringify([s.name,s.color,s.order]);
- const toFields=t=>({...(hasPri?{Priority:t.pri}:{}),...(hasDesc?{Description:t.desc||""}:{}),Title:t.task,Section:t.ws,ProjectManagers:t.pm.join("/"),Analysts:t.an.join("/"),Progress:Math.round(t.prog*100)/100,Status:t.status,StartDate:iso2sp(t.start),EndDate:iso2sp(t.end),Notes:t.notes||""});
+ const toFields=t=>({...(hasDone?{CompletedOn:t.status==="Complete"?(t.done||null):null,CompletedBy:t.status==="Complete"?(t.doneBy||""):""}:{}),...(hasPri?{Priority:t.pri}:{}),...(hasDesc?{Description:t.desc||""}:{}),Title:t.task,Section:t.ws,ProjectManagers:t.pm.join("/"),Analysts:t.an.join("/"),Progress:Math.round(t.prog*100)/100,Status:t.status,StartDate:iso2sp(t.start),EndDate:iso2sp(t.end),Notes:t.notes||""});
  const toSFields=s=>({Title:s.name,Color:s.color,SortOrder:s.order});
- function toTask(it){const f=it.fields||{};const t=norm({id:+it.id,sp:String(it.id),ws:f.Section||"Unsorted",task:f.Title||"(untitled)",pm:f.ProjectManagers||"",an:f.Analysts||"",prog:+f.Progress||0,status:f.Status||"",start:sp2iso(f.StartDate),end:sp2iso(f.EndDate),notes:f.Notes||"",pri:f.Priority||"",desc:f.Description||""});
+ function toTask(it){const f=it.fields||{};const t=norm({id:+it.id,sp:String(it.id),ws:f.Section||"Unsorted",task:f.Title||"(untitled)",pm:f.ProjectManagers||"",an:f.Analysts||"",prog:+f.Progress||0,status:f.Status||"",start:sp2iso(f.StartDate),end:sp2iso(f.EndDate),notes:f.Notes||"",pri:f.Priority||"",desc:f.Description||"",done:f.CompletedOn||null,doneBy:f.CompletedBy||""});
   if(t.status==="Complete")t.prog=1;t.updated=it.lastModifiedDateTime;t.by=(it.lastModifiedBy&&it.lastModifiedBy.user&&it.lastModifiedBy.user.displayName)||"";return t}
  function toSec(it,i){const f=it.fields||{};return{sp:String(it.id),name:f.Title||"Section",color:/^#[0-9a-f]{6}$/i.test(f.Color||"")?f.Color:PALETTE[i%PALETTE.length],order:f.SortOrder!=null?+f.SortOrder:i+1}}
 
@@ -1607,15 +1637,18 @@ const Live=(()=>{
   set(tasks.length||secs.length?"ready":"empty");render();
   clearInterval(pollT);pollT=setInterval(()=>{if(document.visibilityState==="visible")pull()},CONFIG.pollSeconds*1000)}
  async function checkPri(){
-  try{const j=await api(`/sites/${siteId}/lists/${taskListId}/columns?$select=name`);const cn=(j.value||[]).map(c=>c.name);hasPri=cn.includes("Priority");hasDesc=cn.includes("Description")}catch(e){hasPri=false;hasDesc=false}
-  TF="Title,Section,ProjectManagers,Analysts,Progress,Status,StartDate,EndDate,Notes"+(hasPri?",Priority":"")+(hasDesc?",Description":"")}
+  try{const j=await api(`/sites/${siteId}/lists/${taskListId}/columns?$select=name`);const cn=(j.value||[]).map(c=>c.name);hasPri=cn.includes("Priority");hasDesc=cn.includes("Description");hasDone=cn.includes("CompletedOn")&&cn.includes("CompletedBy")}catch(e){hasPri=false;hasDesc=false;hasDone=false}
+  TF="Title,Section,ProjectManagers,Analysts,Progress,Status,StartDate,EndDate,Notes"+(hasPri?",Priority":"")+(hasDesc?",Description":"")+(hasDone?",CompletedOn,CompletedBy":"")}
  async function addPriColumn(){
   const C=`/sites/${siteId}/lists/${taskListId}/columns`,sc=["Sites.Manage.All"];
   if(!hasPri)await api(C,{method:"POST",body:JSON.stringify({name:"Priority",displayName:"Priority",choice:{choices:PRIS,displayAs:"dropDownMenu"},defaultValue:{value:"Medium"}})},sc);
   if(!hasDesc)await api(C,{method:"POST",body:JSON.stringify({name:"Description",displayName:"Description",text:{allowMultipleLines:true,linesForEditing:6}})},sc);
-  await checkPri();if(!hasPri||!hasDesc)throw new Error("Column not found after creating it");
-  const keep=new Map(DB.tasks.filter(t=>t.sp).map(t=>[t.sp,[t.pri,t.desc]]));await connect();
-  DB.tasks.forEach(t=>{const p=keep.get(t.sp);if(p){t.pri=p[0];t.desc=p[1]}});push()}
+  if(!hasDone){const cs=(await api(C+"?$select=name")).value.map(c=>c.name);
+   if(!cs.includes("CompletedOn"))await api(C,{method:"POST",body:JSON.stringify({name:"CompletedOn",displayName:"CompletedOn",dateTime:{format:"dateTime"}})},sc);
+   if(!cs.includes("CompletedBy"))await api(C,{method:"POST",body:JSON.stringify({name:"CompletedBy",displayName:"CompletedBy",text:{}})},sc)}
+  await checkPri();if(!hasPri||!hasDesc||!hasDone)throw new Error("Column not found after creating it");
+  const keep=new Map(DB.tasks.filter(t=>t.sp).map(t=>[t.sp,[t.pri,t.desc,t.done,t.doneBy]]));await connect();
+  DB.tasks.forEach(t=>{const p=keep.get(t.sp);if(p){t.pri=p[0];t.desc=p[1];if(p[2]&&!t.done){t.done=p[2];t.doneBy=p[3]}}});push()}
  async function createActivityList(){
   await api(`/sites/${siteId}/lists`,{method:"POST",body:JSON.stringify({displayName:CONFIG.activityList,list:{template:"genericList"},columns:[{name:"Action",text:{}},{name:"TaskRef",text:{}},{name:"Details",text:{allowMultipleLines:true}},{name:"UserName",text:{}}]})},["Sites.Manage.All"]);
   await findLists();if(!actListId)throw new Error("List not found after creating it")}
@@ -1657,7 +1690,7 @@ const Live=(()=>{
   const mk=(name,cols)=>api(`/sites/${siteId}/lists`,{method:"POST",body:JSON.stringify({displayName:name,list:{template:"genericList"},columns:cols})},sc);
   if(!taskListId)await mk(CONFIG.tasksList,[{name:"Section",text:{}},{name:"ProjectManagers",text:{}},{name:"Analysts",text:{}},{name:"Progress",number:{}},
    {name:"Status",choice:{choices:STATUSES,displayAs:"dropDownMenu"}},{name:"StartDate",dateTime:{format:"dateOnly"}},{name:"EndDate",dateTime:{format:"dateOnly"}},
-   {name:"Notes",text:{allowMultipleLines:true,linesForEditing:6}},{name:"Description",text:{allowMultipleLines:true,linesForEditing:6}},{name:"Priority",choice:{choices:PRIS,displayAs:"dropDownMenu"},defaultValue:{value:"Medium"}}]);
+   {name:"Notes",text:{allowMultipleLines:true,linesForEditing:6}},{name:"Description",text:{allowMultipleLines:true,linesForEditing:6}},{name:"Priority",choice:{choices:PRIS,displayAs:"dropDownMenu"},defaultValue:{value:"Medium"}},{name:"CompletedOn",dateTime:{format:"dateTime"}},{name:"CompletedBy",text:{}}]);
   if(!secListId)await mk(CONFIG.sectionsList,[{name:"Color",text:{}},{name:"SortOrder",number:{}}]);
   if(!actListId)await mk(CONFIG.activityList,[{name:"Action",text:{}},{name:"TaskRef",text:{}},{name:"Details",text:{allowMultipleLines:true}},{name:"UserName",text:{}}]).catch(()=>{});
   if(!peopleListId)await mk(CONFIG.peopleList,[{name:"Email",text:{}},{name:"DisplayName",text:{}}]).catch(()=>{});
@@ -1671,7 +1704,7 @@ const Live=(()=>{
   const base=-Date.now();d.tasks.forEach((t,i)=>{delete t.sp;t.id=base-i;DB.tasks.push(t)});
   set("ready");go("overview");toast("Uploading to SharePoint – keep this tab open until it finishes");await push();
   if(state==="ready")toast(`Imported ${d.tasks.length.toLocaleString("en-GB")} tasks – everyone can see them now`)}
- return{get hasDesc(){return hasDesc},get hasAct(){return!!actListId},createActivityList,getActivity,deletePerson,get hasPeople(){return!!peopleListId},get email(){return MOCK?"test.user@savills.com":(account&&account.username)||""},createPeopleList,savePeople,get hasPri(){return hasPri},addPriColumn,init,pull,push,signIn,signOut,createLists,startFresh,importWorkbook,configured,
+ return{get hasDone(){return hasDone},get hasDesc(){return hasDesc},get hasAct(){return!!actListId},createActivityList,getActivity,deletePerson,get hasPeople(){return!!peopleListId},get email(){return MOCK?"test.user@savills.com":(account&&account.username)||""},createPeopleList,savePeople,get hasPri(){return hasPri},addPriColumn,init,pull,push,signIn,signOut,createLists,startFresh,importWorkbook,configured,
   schedule(){clearTimeout(timer);timer=setTimeout(push,400)},
    pending:()=>pushing||DB.tasks.some(t=>!t.sp||!snapT.has(t.sp)||ser(t)!==snapT.get(t.sp)),
   get state(){return state},get msg(){return msg},get me(){return me},get lastPull(){return lastPull},get listUrl(){return listUrl},get account(){return account}}
