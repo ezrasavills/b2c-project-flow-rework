@@ -534,6 +534,29 @@ textarea.fld.title{font-size:15.5px;font-weight:600;min-height:56px}
 .pdel svg{width:14px;height:14px}
 .back{color:var(--muted);font-weight:600;font-size:12.5px;cursor:pointer;background:none;border:0;padding:0}
 .back:hover{color:var(--gold2)}
+.f label.rctog,.rctog{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.04);cursor:pointer;margin:0!important}
+.rctog input{display:none}
+.rctog i{width:36px;height:20px;border-radius:20px;background:rgba(255,255,255,.14);position:relative;flex:none;transition:.15s}
+.rctog i::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.15s}
+.rctog input:checked+i{background:var(--gold)}.rctog input:checked+i::after{left:18px}
+.rctog b{display:block;font-size:13.5px;color:var(--ink)}.rctog small{color:var(--muted);font-size:12px;font-weight:400}
+.rcbox{margin-top:10px;padding:14px;border:1px solid rgba(245,196,0,.35);border-radius:14px;background:rgba(245,196,0,.05);display:flex;flex-direction:column;gap:10px}
+.rclbl{font-size:11px;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:.08em}
+.rclbl small{text-transform:none;letter-spacing:0;color:var(--muted);font-weight:400}
+.rcchips{display:flex;flex-wrap:wrap;gap:6px}
+.rcchips button{border:1px solid var(--line);background:rgba(255,255,255,.05);border-radius:10px;padding:7px 11px;font-size:12px;font-weight:600;color:var(--ink2);display:inline-flex;gap:6px;align-items:baseline}
+.rcchips button:hover{background:rgba(255,255,255,.1)}
+.rcchips button em{font-style:normal;font-weight:500;color:var(--muted);font-size:11px}
+.rcchips button.on{background:var(--gold);border-color:var(--gold);color:#15161A}.rcchips button.on em{color:rgba(21,22,26,.65)}
+.rcrow{display:flex;align-items:center;gap:8px;font-size:13px;flex-wrap:wrap}
+.rchint{font-size:11.5px;color:var(--muted);line-height:1.5}
+.rcchk{display:flex!important;gap:8px;align-items:center;font-size:12.5px!important;color:var(--ink2);font-weight:500!important;margin:0!important}.rcchk small{color:var(--muted)}
+.rcprev{border-top:1px solid var(--line);padding-top:10px;font-size:12.5px}
+.rcprev div{display:flex;justify-content:space-between;gap:10px;padding:4px 0}.rcprev span{color:var(--muted);white-space:nowrap}
+.rcdet{border:1px solid rgba(110,155,255,.4);background:rgba(110,155,255,.08);border-radius:12px;padding:11px 13px;font-size:12.5px;line-height:1.55;color:var(--ink2)}
+.rcdet b{color:var(--ink)}.rcdh{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:4px}.rcdh b{color:var(--blue)!important}
+.rcnote{margin-top:6px;font-size:12px;color:var(--muted)}.rcnote.warn{color:var(--amber)}
+.rcbadge{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:6px;background:rgba(245,196,0,.16);color:var(--gold2);font-size:11px;margin-right:6px;vertical-align:1px}
 </style>
 </head>
 <body>
@@ -659,7 +682,7 @@ const pillCls=s=>"p-"+s.split(" ")[0];
 function matchPeople(t){if(!UI.people.length)return true;const ps=people(t).map(x=>x.toLowerCase()),sel=UI.people.map(x=>x.toLowerCase());return UI.pmode==="all"?sel.every(p=>ps.includes(p)):sel.some(p=>ps.includes(p))}
 const TLS=[["over","Overdue",isOver],["soon","Due in next 14 days",isSoon],["later","Due later",t=>isOpen(t)&&t.status!=="On hold"&&t.end&&daysLeft(t)>14],["nodate","No end date",t=>!t.end],["donem","Completed this month",t=>t.status==="Complete"&&t.end&&D(t.end).getMonth()===T.getMonth()&&D(t.end).getFullYear()===T.getFullYear()]];
 const TLF=Object.fromEntries(TLS.map(x=>[x[0],x[2]]));const TLN=Object.fromEntries(TLS.map(x=>[x[0],x[1]]));
-function matches(t,ex){const q=UI.q.toLowerCase();return(!q||(t.task+" "+(t.desc||"")+" "+t.pm.join(" ")+" "+t.an.join(" ")+" "+t.ws+" "+t.notes).toLowerCase().includes(q))&&matchPeople(t)&&(ex==="st"||!UI.statuses.size||UI.statuses.has(t.status))&&(ex==="sec"||!UI.sections.size||UI.sections.has(t.ws))&&(ex==="pri"||!UI.pris.size||UI.pris.has(t.pri))&&(ex==="tl"||!UI.tls.size||[...UI.tls].some(k=>TLF[k](t)))}
+function matches(t,ex){const q=UI.q.toLowerCase();return(!q||(t.task+" "+(t.desc||"")+" "+t.pm.join(" ")+" "+t.an.join(" ")+" "+t.ws+" "+String(t.notes||"").replace(/\s*\[\[rec:[\s\S]*\]\]\s*$/,"")).toLowerCase().includes(q))&&matchPeople(t)&&(ex==="st"||!UI.statuses.size||UI.statuses.has(t.status))&&(ex==="sec"||!UI.sections.size||UI.sections.has(t.ws))&&(ex==="pri"||!UI.pris.size||UI.pris.has(t.pri))&&(ex==="tl"||!UI.tls.size||[...UI.tls].some(k=>TLF[k](t)))}
 const setOne=k=>{UI.filters=new Set([k]);UI.statuses.clear();UI.tls.clear();UI.quad=null;UI.showDone=false;
  if(k==="all")UI.showDone=true;
  else if(STATUSES.includes(k)){UI.statuses.add(k);if(k==="Complete")UI.showDone=true}
@@ -1754,6 +1777,272 @@ function fitNav(){const n=$("topnav"),tb=n.querySelector(".tabs"),cls=["c1","c2"
   return w>n.clientWidth+1||n.scrollWidth>n.clientWidth+1||n.querySelector(".search").getBoundingClientRect().width<=136};
  for(const c of cls){if(!over())break;n.classList.add(c)}}
 new ResizeObserver(()=>fitNav()).observe(document.body);
+/* =====================================================================
+   RECURRING TASKS
+   Repeat settings are stored at the end of each task's Notes (hidden in
+   the dashboard), so no extra SharePoint setup is needed.
+   ===================================================================== */
+(function(){
+const RTAG=/\s*\[\[rec:(\{[\s\S]*\})\]\]\s*$/;
+const stripRec=s=>String(s||"").replace(RTAG,"");
+function getRec(t){const m=String((t&&t.notes)||"").match(RTAG);if(!m)return null;try{return JSON.parse(m[1])}catch(e){return null}}
+function setRec(t,r){const b=stripRec(t.notes).trim();t.notes=r?(b?b+"\n\n":"")+"[[rec:"+JSON.stringify(r)+"]]":b}
+window.getRec=getRec;window.stripRec=stripRec;
+
+const RFREQ=[["daily","Daily",1,"d"],["weekly","Weekly",1,"w"],["fortnightly","Fortnightly",2,"w"],["monthly","Monthly",1,"m"],["quarterly","Quarterly",3,"m"],["half","Every 6 months",6,"m"],["yearly","Yearly",12,"m"],["custom","Custom",0,""]];
+const RSUB=[["none","None",""],["day","Day","14 Oct 2026"],["week","Week","w/c 6 Oct"],["weekno","Week no.","Wk 41 2026"],["month","Month","June 2026"],["quarter","Quarter","Q3 2026"],["half","Half-year","H2 2026"],["year","Year","2026"],["custom","Custom",""]];
+const RSEP=" \u2013 ";
+const addD=(s,n)=>{const x=D(s);x.setDate(x.getDate()+n);return iso(x)};
+function rStep(d,r,n){const x=D(d)||new Date();const f=RFREQ.find(q=>q[0]===r.freq)||RFREQ[3];let k=f[2],u=f[3];
+ if(r.freq==="custom"){k=Math.max(1,+r.every||1);u=r.unit||"w"}
+ if(u==="d")x.setDate(x.getDate()+k*n);
+ else if(u==="w")x.setDate(x.getDate()+7*k*n);
+ else{const day=x.getDate();x.setDate(1);x.setMonth(x.getMonth()+k*n);x.setDate(Math.min(day,new Date(x.getFullYear(),x.getMonth()+1,0).getDate()))}
+ return iso(x)}
+function rLabel(r,s){if(!r||!r.sub||r.sub==="none"||!s)return"";const lag=r.lag!=null?+r.lag:(r.prev?1:0);const d=D(lag?rStep(s,r,-lag):s);
+ const M=d.toLocaleDateString("en-GB",{month:"long"}),m=d.toLocaleDateString("en-GB",{month:"short"}),Y=d.getFullYear(),Q=Math.floor(d.getMonth()/3)+1,Hf=d.getMonth()<6?1:2;
+ if(r.sub==="month")return M+" "+Y;
+ if(r.sub==="quarter")return"Q"+Q+" "+Y;
+ if(r.sub==="half")return"H"+Hf+" "+Y;
+ if(r.sub==="year")return String(Y);
+ if(r.sub==="day")return d.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
+ if(r.sub==="weekno"){const k=isoWeek(d);return"Wk "+k[1]+" "+k[0]}
+ if(r.sub==="week"){const w=new Date(d);w.setDate(w.getDate()-((w.getDay()+6)%7));return"w/c "+w.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}
+ const wk=isoWeek(d);
+ return String(r.tpl||"").replace(/\{NYYYY\}/g,Y+1).replace(/\{NYY\}/g,String(Y+1).slice(2)).replace(/\{W\}/g,wk[1]).replace(/\{DD\}/g,d.getDate()).replace(/\{MM\}/g,String(d.getMonth()+1).padStart(2,"0")).replace(/\{MMMM\}/g,M).replace(/\{MMM\}/g,m).replace(/\{YYYY\}/g,Y).replace(/\{YY\}/g,String(Y).slice(2)).replace(/\{Q\}/g,Q).replace(/\{H\}/g,Hf).trim()}
+const rTitle=(r,s)=>{const l=rLabel(r,s);return(r.base||"")+(l?RSEP+l:"")};
+function rDesc(r){const f=RFREQ.find(q=>q[0]===r.freq),ev=Math.max(1,+r.every||1);
+ const fr=r.freq==="custom"?"every "+ev+" "+({d:"day",w:"week",m:"month"}[r.unit||"w"])+(ev>1?"s":""):(f?f[1].toLowerCase():"");
+ return"Repeats "+fr+(r.endType==="date"&&r.until?" until "+fmt(r.until,1):r.endType==="count"&&r.count?", "+r.count+" times in total":"")}
+window.rDesc=rDesc;
+/* ---------- Recognise periods in existing (non-standard) task names ---------- */
+const MONS=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+const MRX="jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?";
+const YRX="(20\\d{2}|['\u2019]?(?:1[5-9]|[2-4]\\d))(?!\\d)";            // 2026, 26, '26 (2-digit only 15-49 to avoid false hits)
+const YS="[\\s\\-/,_'\u2019.]*";                                          // separators allowed before a year
+const WD="(?:(?:mon|tue|tues|wed|thu|thur|thurs|fri|sat|sun)[a-z]*\\.?,?\\s*)?";
+const mi=s=>MONS.indexOf(String(s).slice(0,3).toLowerCase());
+const py=s=>{if(s==null||s==="")return null;s=String(s).replace(/['\u2019]/g,"");return s.length<=2?2000+(+s):+s};
+const ORD={first:1,"1st":1,second:2,"2nd":2,third:3,"3rd":3,fourth:4,"4th":4};
+const FREQW=[
+ [/\b(?:daily|every\s+day)\b/i,"daily"],
+ [/\b(?:fortnightly|bi-?weekly|every\s+(?:two|2)\s+weeks)\b/i,"fortnightly"],
+ [/\b(?:weekly|every\s+week)\b/i,"weekly"],
+ [/\b(?:monthly|every\s+month)\b/i,"monthly"],
+ [/\b(?:quarterly|every\s+quarter)\b/i,"quarterly"],
+ [/\b(?:half[\s\-]?yearly|bi-?annual(?:ly)?|semi[\s\-]?annual(?:ly)?|six[\s\-]?monthly|6[\s\-]?monthly|every\s+(?:six|6)\s+months)\b/i,"half"],
+ [/\b(?:annual(?:ly)?|yearly|every\s+year)\b/i,"yearly"]];
+const R=(s)=>new RegExp(s,"i");
+// Ordered most specific first; the first rule that matches wins
+const PRULES=[
+ // w/c 6 Oct 2026 · week commencing 06/10/26 · w/b 6th October
+ [R("\\b(?:w\\s?/\\s?[cb]|wc|wb|week\\s+(?:commencing|beginning|starting|of))\\.?\\s*:?\\s*"+WD+"(\\d{1,2})(?:st|nd|rd|th)?(?:\\s*[/.\\-]\\s*(\\d{1,2})|[\\s\\-]+("+MRX+")\\.?)(?:"+YS+YRX+")?(?![\\d])"),
+  m=>({type:"week",d:+m[1],m:m[2]?+m[2]-1:mi(m[3]),y:py(m[4])})],
+ // 2026-10-14
+ [/\b(20\d{2})-(\d{1,2})-(\d{1,2})\b/,m=>({type:"day",y:+m[1],m:+m[2]-1,d:+m[3]})],
+ // 14/10/2026 · 14.10.26 · 14-10-26 (UK order)
+ [/\b(\d{1,2})[\/.\-](\d{1,2})[\/.\-](20\d{2}|\d{2})\b/,m=>({type:"day",d:+m[1],m:+m[2]-1,y:py(m[3])})],
+ // 2026-W41 · 2026W41
+ [/\b(20\d{2})[\s\-]?W(\d{1,2})\b/i,m=>({type:"weekno",y:+m[1],w:+m[2]})],
+ // Week 41 · Wk41 · Week 41 2026   (bare "W1" is ignored – it's usually a postcode)
+ [R("\\b(?:week|wk)\\.?\\s?(?:no\\.?\\s?)?(\\d{1,2})\\b(?:"+YS+YRX+")?"),m=>({type:"weekno",w:+m[1],y:py(m[2])})],
+ // 14 Oct 2026 · Mon 14th October · 14-Oct-26
+ [R("\\b"+WD+"(\\d{1,2})(?:st|nd|rd|th)?[\\s\\-]*("+MRX+")\\.?\\b(?:"+YS+YRX+")?"),m=>({type:"day",d:+m[1],m:mi(m[2]),y:py(m[3])})],
+ // October 14th · October 14 2026 (needs an ordinal or a 4-digit year so "Jun 26" stays a month)
+ [R("\\b("+MRX+")\\.?\\s+(\\d{1,2})(?:(?:st|nd|rd|th)\\b(?:,?\\s*"+YRX+")?|,?\\s+(20\\d{2})\\b)"),m=>({type:"day",m:mi(m[1]),d:+m[2],y:py(m[3]||m[4])})],
+ // FY26 · FY2026 · FY 2025/26
+ [/\bFY\s?['\u2019]?(20\d{2}|\d{2})(?:\s?([\/\-])\s?(20\d{2}|\d{2}))?(?!\d)/i,m=>{const a=m[1],b=m[3];
+   return{type:"year",y:py(a),tpl:"FY"+(a.length===4?"{YYYY}":"{YY}")+(b?m[2]+(b.length===4?"{NYYYY}":"{NYY}"):"")}}],
+ // 2025/26 · 2025-2026
+ [/\b(20\d{2})\s?([\/\-])\s?(20\d{2}|\d{2})\b/,m=>{const a=+m[1],b=py(m[3]);if(b!==a+1)return null;return{type:"year",y:a,tpl:"{YYYY}"+m[2]+(m[3].length===4?"{NYYYY}":"{NYY}")}}],
+ // Q3 2026 · Q3-26 · Q3'26 · Q3
+ [R("\\bQ([1-4])(?:"+YS+YRX+")?(?![a-z\\d])"),m=>({type:"quarter",q:+m[1],y:py(m[2])})],
+ // 2026 Q3 · 2026Q3
+ [/\b(20\d{2})[\s\-\/]?Q([1-4])\b/i,m=>({type:"quarter",y:+m[1],q:+m[2]})],
+ // 3Q26 · 3Q 2026 · 3Q
+ [R("\\b([1-4])Q(?:[\\s\\-'\u2019]*"+YRX+"|\\b)"),m=>({type:"quarter",q:+m[1],y:py(m[2])})],
+ // Quarter 3 2026
+ [R("\\bquarter\\s*([1-4])\\b(?:"+YS+YRX+")?"),m=>({type:"quarter",q:+m[1],y:py(m[2])})],
+ // third quarter (of) 2026
+ [R("\\b(first|second|third|fourth|1st|2nd|3rd|4th)\\s+quarter\\b(?:\\s+(?:of\\s+)?"+YRX+")?"),m=>({type:"quarter",q:ORD[m[1].toLowerCase()],y:py(m[2])})],
+ // H1 2026 · H2-26 · H1
+ [R("\\bH([12])(?:"+YS+YRX+")?(?![a-z\\d])"),m=>({type:"half",h:+m[1],y:py(m[2])})],
+ // 2026 H1
+ [/\b(20\d{2})[\s\-\/]?H([12])\b/i,m=>({type:"half",y:+m[1],h:+m[2]})],
+ // 1H26 · 2H 2026
+ [R("\\b([12])H(?:[\\s\\-'\u2019]*"+YRX+"|\\b)"),m=>({type:"half",h:+m[1],y:py(m[2])})],
+ // first half (of) 2026
+ [R("\\b(first|second|1st|2nd)\\s+half\\b(?:\\s+(?:of\\s+)?"+YRX+")?"),m=>({type:"half",h:ORD[m[1].toLowerCase()],y:py(m[2])})],
+ // June 2026 · Jun-26 · Jun'26 · Sept · June
+ [R("\\b("+MRX+")\\.?\\b(?:"+YS+YRX+")?"),(m,src)=>{const w=m[1];
+   if(/^may$/i.test(w)&&!m[2]&&w!=="May")return null;            // "may" as a verb
+   return{type:"month",m:mi(w),y:py(m[2])}}],
+ // 06/2026 · 6-2026
+ [/\b(\d{1,2})[\/\-.](20\d{2})\b/,m=>{const k=+m[1];return k>=1&&k<=12?{type:"month",m:k-1,y:+m[2]}:null}],
+ // 2026-06 · 2026/06
+ [/\b(20\d{2})[\/\-.](\d{1,2})\b(?![\/\-.]\d)/,m=>{const k=+m[2];return k>=1&&k<=12?{type:"month",m:k-1,y:+m[1]}:null}],
+ // 2026
+ [/\b(20\d{2})\b/,m=>({type:"year",y:+m[1]})]];
+const TSUB={day:"day",week:"week",weekno:"weekno",month:"month",quarter:"quarter",half:"half",year:"year"};
+const TFREQ={day:"daily",week:"weekly",weekno:"weekly",month:"monthly",quarter:"quarterly",half:"half",year:"yearly"};
+const TNAME={day:"date",week:"week",weekno:"week number",month:"month",quarter:"quarter",half:"half-year",year:"year"};
+function isoWeek(d){const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const k=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-k);const y=t.getUTCFullYear();return[y,Math.ceil(((t-Date.UTC(y,0,1))/864e5+1)/7)]}
+function isoMonday(y,w){const s=new Date(y,0,4);s.setDate(s.getDate()-((s.getDay()+6)%7)+(w-1)*7);return s}
+function pKey(sub,d){const y=d.getFullYear(),m=d.getMonth(),dn=Math.round(Date.UTC(y,m,d.getDate())/864e5);
+ if(sub==="day")return dn;
+ if(sub==="week"||sub==="weekno")return Math.floor((dn-((d.getDay()+6)%7))/7);
+ if(sub==="month")return y*12+m;
+ if(sub==="quarter")return y*4+Math.floor(m/3);
+ if(sub==="half")return y*2+(m<6?0:1);
+ return y}
+function pDate(o,y){
+ if(o.type==="day"||o.type==="week")return new Date(y,o.m,o.d);
+ if(o.type==="weekno")return isoMonday(y,o.w);
+ if(o.type==="month")return new Date(y,o.m,1);
+ if(o.type==="quarter")return new Date(y,(o.q-1)*3,1);
+ if(o.type==="half")return new Date(y,(o.h-1)*6,1);
+ return new Date(y,0,1)}
+function tidyName(s){
+ for(let i=0;i<3;i++){
+  s=s.replace(/\(\s*\)|\[\s*\]|\{\s*\}/g," ").replace(/\s+([,.;:])/g,"$1").replace(/\s{2,}/g," ")
+   .replace(/^[\s\-\u2013\u2014:|\/,\u00b7\u2022_.]+|[\s\-\u2013\u2014:|\/,\u00b7\u2022_]+$/g,"")
+   .replace(/\s+(?:for|of|in|from|to|on|the|w\/c)$/i,"").replace(/^(?:for|of|in)\s+/i,"")
+   .replace(/\s([\-\u2013\u2014:|])\s+[\-\u2013\u2014:|]\s/g," $1 ")}
+ return s.trim()}
+// name: current task name · startIso: start date (or today) · returns null if nothing recognised
+function detectPeriod(name,startIso){
+ const src=String(name||"");if(!src.trim())return null;
+ let hit=null;
+ for(const [rx,fn] of PRULES){const m=rx.exec(src);if(!m)continue;
+  const o=fn(m,src);if(!o||(o.type==="day"||o.type==="week")&&(o.m<0||o.m>11||o.d<1||o.d>31)||o.type==="weekno"&&(o.w<1||o.w>53))continue;
+  hit={...o,s:m.index,e:m.index+m[0].length,text:m[0].trim()};break}
+ if(!hit)return null;
+ let fw=null,fwText="";for(const [rx,f] of FREQW){const m=rx.exec(src);if(m){fw=f;fwText=m[0];break}}
+ const sub=hit.tpl?"custom":TSUB[hit.type],freq=fw||TFREQ[hit.type];
+ const S=D(startIso)||new Date(new Date().setHours(0,0,0,0)),kSub=hit.tpl?"year":sub;
+ const noYear=hit.y==null;
+ if(noYear){let best=null;for(const c of [S.getFullYear()-1,S.getFullYear(),S.getFullYear()+1]){
+   const dd=Math.abs(pKey(kSub,pDate(hit,c))-pKey(kSub,S));if(!best||dd<best.dd||(dd===best.dd&&c<best.y))best={y:c,dd}}hit.y=best.y}
+ const P=pDate(hit,hit.y);
+ const r={freq,every:2,unit:"w"},kP=pKey(kSub,P);
+ let lag=-1;for(let k=0;k<=24;k++){if(pKey(kSub,D(rStep(iso(S),r,-k)))===kP){lag=k;break}}
+ const mismatch=lag<0;if(lag<0)lag=kP<pKey(kSub,S)?1:0;
+ const prev=lag>0;
+ const base=tidyName(src.slice(0,hit.s)+" "+src.slice(hit.e));
+ if(!base)return null;
+ return{type:hit.type,sub,tpl:hit.tpl||"",freq,freqWord:fwText,prev,lag,mismatch,noYear,year:hit.y,text:hit.text,base,orig:src}}
+window.detectPeriod=detectPeriod;
+
+
+/* ---------- Automatic generation ---------- */
+let busy=false;
+function recurGenerate(){
+ if(busy||Live.state!=="ready"||!DB||!DB.tasks)return;
+ if($("drawer").classList.contains("on"))return;
+ const td=new Date();td.setHours(0,0,0,0);const today=iso(td);
+ let changed=false;const made=[];
+ const seen={};
+ DB.tasks.slice().forEach(t=>{const r=getRec(t);if(!r||!r.sid||!t.sp)return;const k=r.sid+"|"+r.n,o=seen[k];if(!o){seen[k]=t;return}
+  const drop=+o.sp<+t.sp?t:o;
+  if(drop.status==="Not started"&&!drop.prog){DB.tasks.splice(DB.tasks.indexOf(drop),1);changed=true;seen[k]=drop===t?o:t}});
+ DB.tasks.slice().forEach(t0=>{let cur=t0,r=getRec(cur);
+  if(!r||!r.sid||r.on===false||r.spawned)return;
+  for(let g=0;g<24;g++){
+   const n=(+r.n||0)+1,s=rStep(r.anchor||cur.start,r,n);
+   if(r.endType==="date"&&r.until&&s>r.until)break;
+   if(r.endType==="count"&&r.count&&n>=+r.count)break;
+   if(!(cur.status==="Complete"||s<=today))break;
+   const nr={...r,n,spawned:false};
+   const nt=norm({id:-(Date.now()+made.length+1),ws:cur.ws,task:rTitle(nr,s),desc:cur.desc||"",pm:[...cur.pm],an:[...cur.an],prog:0,status:"Not started",pri:cur.pri,start:s,end:r.dur!=null?addD(s,+r.dur):null,notes:""});
+   setRec(nt,nr);touch(nt);
+   setRec(cur,{...r,spawned:true});touch(cur);
+   DB.tasks.push(nt);made.push(nt);changed=true;
+   if(s>today)break;
+   cur=nt;r=nr}});
+ if(!changed)return;
+ busy=true;
+ try{save(made.length===1?"\u21bb Next recurring task added: "+short(made[0].task):made.length?"\u21bb "+made.length+" recurring tasks added":"")}finally{busy=false}
+ render()}
+
+/* ---------- Repeat menu in the task panel ---------- */
+function recurUI(id){
+ const fd=$("fDur");if(!fd||$("rcWrap"))return;
+ const src=id?DB.tasks.find(x=>x.id===id):null;
+ const exAll=src?getRec(src):null,ex=exAll&&exAll.on!==false?exAll:null;
+ const S={on:!!ex,freq:ex?ex.freq:"monthly",every:ex?ex.every||2:2,unit:ex?ex.unit||"w":"w",sub:ex?ex.sub||"none":"month",tpl:ex&&ex.tpl?ex.tpl:"{MMMM} {YYYY}",prev:ex?!!ex.prev:false,endType:ex?ex.endType||"never":"never",until:ex?ex.until||"":"",count:ex?ex.count||12:12,lag:ex?(ex.lag!=null?+ex.lag:(ex.prev?1:0)):0,det:null,orig:""};
+ fd.insertAdjacentHTML("afterend",'<div class="f" id="rcWrap"></div>');
+ const build=()=>{const s=$("fStart").value||iso(new Date()),en=$("fEnd").value;
+  const r={freq:S.freq,every:Math.max(1,+S.every||1),unit:S.unit,sub:S.sub,tpl:S.tpl,prev:S.sub!=="none"&&S.prev,lag:S.sub!=="none"&&S.prev?Math.max(1,+S.lag||1):0,endType:S.endType,until:S.until,count:Math.max(1,+S.count||1),on:true};
+  r.sid=exAll&&exAll.sid?exAll.sid:"r"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  r.n=exAll?+exAll.n||0:0;r.spawned=exAll?!!exAll.spawned:false;
+  r.anchor=r.n?rStep(s,r,-r.n):s;r.dur=en&&en>=s?Math.round((D(en)-D(s))/DAY):null;
+  let v=$("fTask").value.trim();
+  [r,exAll].forEach(q=>{if(!q)return;const l=rLabel(q,s);if(l&&v.endsWith(RSEP+l))v=v.slice(0,-(RSEP+l).length)});
+  r.base=v;return{r,s}};
+ const keepOrig=()=>!!(S.det&&S.det.mismatch&&$("fTask").value.trim()===S.det.base);
+ const pv=()=>{const el=$("rcPv");if(!el||!S.on)return;const {r}=build();let h='<div class="rclbl" style="margin-bottom:4px">Coming up</div>',c=0;
+  for(let i=0;i<4;i++){const n=r.n+i,s=rStep(r.anchor,r,n);
+   if(r.endType==="date"&&r.until&&s>r.until)break;if(r.endType==="count"&&n>=r.count)break;
+   const e=r.dur!=null?addD(s,r.dur):null,ti=i===0&&keepOrig()?S.orig:rTitle({...r,n},s);c++;
+   h+=`<div><b>${H(r.base?ti:"Task name"+ti)}</b><span>${i===0?"this task \u00b7 ":""}${fmt(s,1)}${e&&e!==s?" \u2192 "+fmt(e,1):""}</span></div>`}
+  if(!c)h+='<div><span>No occurrences \u2013 check the end setting</span></div>';
+  el.innerHTML=h};
+ const draw=()=>{const box=$("rcWrap");if(!box)return;
+  box.innerHTML=`<label class="rctog"><input type="checkbox" id="rcOn" ${S.on?"checked":""}><i></i><span><b>Repeat this task</b><small>${S.on?"The next one is added automatically when this one is ticked done or its start date arrives":"Make this a recurring task"}</small></span></label>
+  ${S.on?`<div class="rcbox">
+   ${S.det?(()=>{const d=S.det,fn=(RFREQ.find(f=>f[0]===d.freq)||[])[1]||"",sn=d.tpl?"custom ("+H(d.tpl)+")":(RSUB.find(s=>s[0]===d.sub)||[])[1].toLowerCase();
+    return`<div class="rcdet"><div class="rcdh"><b>Recognised \u201c${H(d.text)}\u201d in the old name</b><button type="button" class="link" id="rcUndo">Undo</button></div>
+    <div>Set to <b>${fn}</b>${d.freqWord?` (from \u201c${H(d.freqWord)}\u201d)`:""} with a <b>${sn}</b> subtitle${d.lag>1?`, named <b>${d.lag} periods behind</b> the start date`:d.prev?", named after the <b>previous period</b>":""}. The name is now <b>${H(d.base)}</b> and the period always goes at the end.</div>
+    ${d.noYear?`<div class="rcnote">The old name had no year, so ${d.year} was assumed from the start date.</div>`:""}
+    ${d.mismatch?`<div class="rcnote warn">The start date is in a different ${TNAME[d.type]} to the name. This task keeps its current name; later tasks are named from their start dates \u2013 check Coming up below.</div>`:""}</div>`})():""}
+   <div class="rclbl">How often</div>
+   <div class="rcchips">${RFREQ.map(f=>`<button type="button" data-rf="${f[0]}" class="${S.freq===f[0]?"on":""}">${f[1]}</button>`).join("")}</div>
+   ${S.freq==="custom"?`<div class="rcrow">Every <input type="number" min="1" max="99" class="fld" id="rcEvery" value="${S.every}" style="width:76px;padding:8px 10px"><select class="fld" id="rcUnit" style="width:auto;padding:8px 10px">${[["d","days"],["w","weeks"],["m","months"]].map(([k,l])=>`<option value="${k}" ${S.unit===k?"selected":""}>${l}</option>`).join("")}</select></div>`:""}
+   <div class="rclbl">Subtitle <small>added to the end of the task name</small></div>
+   <div class="rcchips">${RSUB.map(s=>`<button type="button" data-rs="${s[0]}" class="${S.sub===s[0]?"on":""}">${s[1]}${s[2]?`<em>${s[2]}</em>`:""}</button>`).join("")}</div>
+   ${S.sub==="custom"?`<input class="fld" id="rcTpl" value="${H(S.tpl)}" placeholder="e.g. {MMM} {YY} update"><div class="rchint">Codes: {MMMM} June \u00b7 {MMM} Jun \u00b7 {MM} 06 \u00b7 {DD} 14 \u00b7 {YYYY} 2026 \u00b7 {YY} 26 \u00b7 {NYY} 27 (next year) \u00b7 {Q} 3 \u00b7 {H} 2 \u00b7 {W} 41 (week no.) \u00b7 e.g. FY{YY}/{NYY}</div>`:""}
+   ${S.sub!=="none"?`<label class="rcchk"><input type="checkbox" id="rcPrev" ${S.prev?"checked":""}>Name it after the previous period <small>${S.prev&&S.lag>1?`(currently ${S.lag} periods behind the start date)`:"(e.g. the Q3 report produced in October)"}</small></label>`:""}
+   <div class="rclbl">Ends</div>
+   <div class="rcchips">${[["never","Never"],["date","On a date"],["count","After a number of times"]].map(([k,l])=>`<button type="button" data-re="${k}" class="${S.endType===k?"on":""}">${l}</button>`).join("")}</div>
+   ${S.endType==="date"?`<div class="rcrow">Last one starts on or before <input type="date" class="fld" id="rcUntil" value="${S.until}" style="width:auto;padding:8px 10px"></div>`:S.endType==="count"?`<div class="rcrow">Stop after <input type="number" min="1" max="999" class="fld" id="rcCount" value="${S.count}" style="width:76px;padding:8px 10px"> in total</div>`:""}
+   <div class="rchint">The start date above is the first occurrence. The gap between start and end date is kept for every repeat.</div>
+   <div class="rcprev" id="rcPv"></div></div>`:""}`;
+  $("rcOn").onchange=e=>{S.on=e.target.checked;if(S.on&&!$("fStart").value)$("fStart").value=iso(new Date());
+   if(S.on&&!ex){const d=detectPeriod($("fTask").value,$("fStart").value);
+    if(d){S.det=d;S.orig=d.orig;$("fTask").value=d.base;S.freq=d.freq;S.sub=d.sub;if(d.tpl)S.tpl=d.tpl;S.prev=d.prev;S.lag=d.lag}}
+   if(!S.on&&S.det){if($("fTask").value.trim()===S.det.base)$("fTask").value=S.orig;S.det=null}
+   draw()};
+  const ud=$("rcUndo");if(ud)ud.onclick=()=>{$("fTask").value=S.orig;S.sub="none";S.det=null;draw()};
+  box.querySelectorAll("[data-rf]").forEach(b=>b.onclick=()=>{S.freq=b.dataset.rf;draw()});
+  box.querySelectorAll("[data-rs]").forEach(b=>b.onclick=()=>{S.sub=b.dataset.rs;draw()});
+  box.querySelectorAll("[data-re]").forEach(b=>b.onclick=()=>{S.endType=b.dataset.re;if(S.endType==="date"&&!S.until){const d=new Date();d.setFullYear(d.getFullYear()+1);S.until=iso(d)}draw()});
+  const inp=(i,f)=>{const el=$(i);if(el)el.oninput=el.onchange=()=>{f(el);pv()}};
+  inp("rcEvery",el=>S.every=el.value);inp("rcUnit",el=>S.unit=el.value);inp("rcTpl",el=>S.tpl=el.value);
+  inp("rcPrev",el=>{S.prev=el.checked;S.lag=el.checked?(S.lag>1?S.lag:1):0});inp("rcUntil",el=>S.until=el.value);inp("rcCount",el=>S.count=el.value);
+  pv()};
+ ["fTask","fStart","fEnd"].forEach(i=>{const el=$(i);if(el){el.addEventListener("input",pv);el.addEventListener("change",pv)}});
+ const plan=()=>{if(!$("fTask").value.trim())return null;
+  if(!S.on)return exAll?{r:{...exAll,on:false}}:{none:true};
+  const {r,s}=build();if(!$("fStart").value)$("fStart").value=s;$("fTask").value=keepOrig()?S.orig:rTitle(r,s);return{r}};
+ ["dSave","dDone"].forEach(k=>{const b=$(k);if(!b)return;const oh=b.onclick;
+  b.onclick=e=>{const p=plan(),newObj=id?null:editing;
+   if(oh)oh(e);
+   if($("drawer").classList.contains("on")||!p||p.none)return;
+   const tgt=id?DB.tasks.find(x=>x.id===id):newObj;if(!tgt)return;
+   setRec(tgt,p.r);touch(tgt);save();render()}});
+ draw()}
+
+/* ---------- Hooks ---------- */
+const _open=openTask;
+openTask=function(id,sec){_open(id,sec);
+ try{const n=$("fNotes");if(n)n.value=stripRec(n.value).trim();recurUI(id)}catch(e){console.error("Recurring tasks:",e)}};
+const _row=row;
+row=function(t,s){const h=_row(t,s),r=getRec(t);
+ return r&&r.on!==false?h.replace('<div class="tt" data-a="edit">','<div class="tt" data-a="edit"><span class="rcbadge" title="'+H(rDesc(r))+'">\u21bb</span>'):h};
+const _render=render;
+render=function(){_render.apply(this,arguments);clearTimeout(window.__rcT);window.__rcT=setTimeout(recurGenerate,800)};
+})();
+
 DB=blank();Live.init();
 </script>
 </body>
