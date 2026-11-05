@@ -462,6 +462,7 @@ textarea.fld.title{font-size:15.5px;font-weight:600;min-height:56px}
 .subtabs button.on{background:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,.09));color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 3px 10px rgba(0,0,0,.3)}
 .subtabs em{font-style:normal;font-size:11px;background:rgba(255,255,255,.1);padding:1px 8px;border-radius:20px;color:var(--ink2)}
 .rcbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.rcbar .seg button{padding:6px 11px;font-size:12px}.rcbar .sel{height:34px;font-size:12.5px;max-width:190px}
+.auditbar{position:fixed;left:50%;top:86px;transform:translate(-50%,-10px);z-index:70;display:none;align-items:center;gap:14px;padding:8px 8px 8px 16px;border-radius:12px;background:rgba(242,176,74,.16);border:1px solid rgba(242,176,74,.5);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);font-size:12.5px;color:var(--ink2)}.auditbar.on{display:flex;transform:translate(-50%,0)}.auditbar b{color:var(--amber)}
 .toast.hasundo{padding:10px 10px 10px 20px;overflow:hidden;border-color:rgba(245,196,0,.5)}
 .toast.hasundo #undo{background:#F5C400;color:#15161A;font-size:13px;padding:8px 16px}
 .toast .tbar{position:absolute;left:0;bottom:0;height:3px;width:100%;background:#F5C400;animation:tbar 8s linear forwards}
@@ -716,30 +717,70 @@ function ring(pct,size,stroke,color,track){const r=(size-stroke)/2,c=2*Math.PI*r
  return`<svg class="ring" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="filter:drop-shadow(0 0 6px ${color}55)"><circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${track}" stroke-width="${stroke}"/><circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}" stroke-linecap="round" stroke-dasharray="${c*pct} ${c}" transform="rotate(-90 ${size/2} ${size/2})"/><text x="50%" y="50%" text-anchor="middle" dominant-baseline="central" ${size>80?'style="font-size:15px"':""}>${Math.round(pct*100)}%</text></svg>`}
 const short=s=>s.length>40?s.slice(0,38)+"…":s;
 
-/* ---------- Completing tasks ---------- */
-// Progress never completes a task on its own – only the Done tick (or choosing "Complete") does.
-function setProg(t,p){t.prog=Math.max(0,Math.min(1,p));
+/* ---------- Completing tasks ----------
+   t.done = the "100% date": when progress first reached 100%. It is the single source of
+   truth for when a task was finished. Ticking Done also moves the end date to that date.
+   Audit mode (Settings) backdates completions to the task's end date so clearing old
+   tasks doesn't make them look as if they were finished today. */
+const AUDITKEY="b2c_audit_mode";
+const isAudit=()=>localStorage.getItem(AUDITKEY)==="1";
+const nowISO=()=>new Date().toISOString();
+const meName=()=>(typeof Live!=="undefined"&&Live.me)||"";
+// the date a task should be recorded as reaching 100% right now
+function fullDate(t){return isAudit()&&t.end&&D(t.end)<T?D(t.end).toISOString():nowISO()}
+function markFull(t,when){t.done=when||t.done||fullDate(t);t.doneBy=meName()+(t.done.slice(0,10)<iso(new Date())?" · audit":"")}
+function setProg(t,p){const was=t.prog;t.prog=Math.max(0,Math.min(1,p));
+ if(t.prog>=1&&was<1&&!t.done)markFull(t);
+ if(t.prog<1){t.done=null;t.doneBy=""}
  if(t.status==="Complete"&&t.prog<1)setStatus(t,t.prog>0?"In progress":"Not started",true);
  else if(t.prog>0&&t.status==="Not started")t.status="In progress"}
-function setStatus(t,s,keepProg){const was=t.status;t.status=s;
- if(s==="Complete"){t.prog=1;if(was!=="Complete"){t.done=new Date().toISOString();t.doneBy=(typeof Live!=="undefined"&&Live.me)||""}}
- else{if(was==="Complete"){t.done=null;t.doneBy="";if(!keepProg&&t.prog>=1)t.prog=.9}if(s==="Not started"&&!keepProg)t.prog=0}}
+function setStatus(t,s,keepProg,when){const was=t.status;t.status=s;
+ if(s==="Complete"){if(t.prog<1||!t.done){t.prog=1;markFull(t,when)}else if(when){t.done=when;t.doneBy=meName()+" · audit"}
+  t.end=iso(new Date(t.done));if(t.start&&t.end<t.start)t.start=t.end}
+ else{if(was==="Complete"&&!keepProg&&t.prog>=1)t.prog=.9;if(s==="Not started"&&!keepProg)t.prog=0;if(t.prog<1){t.done=null;t.doneBy=""}}}
+/* ask when an overdue task was really finished (skipped in audit mode or if already at 100%) */
+function askWhen(tasks,cb){
+ const late=tasks.filter(t=>!t.done&&t.end&&D(t.end)<new Date(T.getTime()-2*DAY));
+ if(isAudit()||!late.length){cb(null);return}
+ const one=late.length===1&&tasks.length===1,t=late[0];
+ $("modal").innerHTML=`<div class="mb"><h3>When was ${one?"this":"the work"} finished?</h3>
+  <p>${one?`<b>${H(short(t.task))}</b> was due <b>${fmt(t.end,1)}</b>.`:`${late.length} of these tasks are past their end dates.`} If you're tidying up old tasks, record them as finished on their end date so the analytics stay accurate.</p>
+  <div style="display:flex;flex-direction:column;gap:8px">
+   <button class="btn gold" id="wEnd">${one?`Finished on its end date (${fmt(t.end,1)})`:"Finished on their end dates"}</button>
+   ${one?`<div style="display:flex;gap:8px"><input type="date" class="fld" id="wDate" value="${t.end}" max="${iso(new Date())}" style="flex:1"><button class="btn" id="wPick">Use this date</button></div>`:""}
+   <button class="btn" id="wNow">Finished today</button></div>
+  <label class="rcchk" style="margin-top:14px!important"><input type="checkbox" id="wAud">Turn on audit mode (don't ask again while I clear old tasks)</label></div>`;
+ const close=()=>{$("modal").classList.remove("on");if(!$("drawer").classList.contains("on"))$("scrim").classList.remove("on")};
+ const go=mode=>{if($("wAud").checked){localStorage.setItem(AUDITKEY,"1");renderAuditBar()}close();cb(mode)};
+ $("wEnd").onclick=()=>go("end");$("wNow").onclick=()=>go("now");
+ const pk=$("wPick");if(pk)pk.onclick=()=>{const v=$("wDate").value;if(!v)return;go(new Date(v+"T12:00:00").toISOString())};
+ $("modal").classList.add("on");$("scrim").classList.add("on");
+}
+const whenFor=(t,mode)=>mode==="end"&&t.end&&!t.done?D(t.end).toISOString():mode&&mode!=="end"&&mode!=="now"?mode:null;
 function toggleDone(id,el){
  const t=DB.tasks.find(x=>x.id===id);if(!t)return;
- const bak={status:t.status,prog:t.prog,updated:t.updated};
+ const bak={status:t.status,prog:t.prog,updated:t.updated,end:t.end,start:t.start,done:t.done,doneBy:t.doneBy};
  const undo=()=>{Object.assign(t,bak);save("Undone");render()};
- if(t.status==="Complete"){setStatus(t,bak.prog>0&&bak.prog<1?"In progress":"In progress");touch(t);save("Reopened “"+short(t.task)+"”",undo);render();return}
- setStatus(t,"Complete");touch(t);
- if(el){el.classList.add("on","pop-anim");const row=el.closest(".tr,.mrow,.grow2");if(row){row.classList.add("flash","leaving")}}
- save("✓ “"+short(t.task)+"” completed",undo);
- setTimeout(render,el?650:0);
+ if(t.status==="Complete"){setStatus(t,"In progress");touch(t);save("Reopened “"+short(t.task)+"”",undo);render();return}
+ askWhen([t],mode=>{
+  setStatus(t,"Complete",false,whenFor(t,mode));if(mode==="now"&&!bak.done){t.done=nowISO();t.end=iso(new Date());t.doneBy=meName()}
+  touch(t);
+  if(el){el.classList.add("on","pop-anim");const row=el.closest(".tr,.mrow,.grow2");if(row){row.classList.add("flash","leaving")}}
+  save("✓ “"+short(t.task)+"” completed"+(bak.end!==t.end?" · end date set to "+fmt(t.end,1):""),undo);
+  setTimeout(render,el?650:0)});
 }
 function bulkComplete(){
- const ids=[...UI.sel];const baks=ids.map(id=>{const t=DB.tasks.find(x=>x.id===id);return[t,{status:t.status,prog:t.prog,updated:t.updated}]});
- baks.forEach(([t])=>{setStatus(t,"Complete");touch(t)});
- UI.sel.clear();UI.selMode=false;
- save(`✓ ${ids.length} task${ids.length===1?"":"s"} marked complete`,()=>{baks.forEach(([t,b])=>Object.assign(t,b));save("Undone");render()});render();
+ const ids=[...UI.sel];const ts=ids.map(id=>DB.tasks.find(x=>x.id===id));
+ const baks=ts.map(t=>[t,{status:t.status,prog:t.prog,updated:t.updated,end:t.end,start:t.start,done:t.done,doneBy:t.doneBy}]);
+ askWhen(ts,mode=>{
+  ts.forEach(t=>{if(t.status==="Complete")return;setStatus(t,"Complete",false,whenFor(t,mode));if(mode==="now"&&!t.doneBy.includes("·")&&t.done&&t.done.slice(0,10)!==iso(new Date())&&!baks.find(b=>b[0]===t)[1].done){t.done=nowISO();t.end=iso(new Date())}touch(t)});
+  UI.sel.clear();UI.selMode=false;
+  save(`✓ ${ids.length} task${ids.length===1?"":"s"} marked complete`,()=>{baks.forEach(([t,b])=>Object.assign(t,b));save("Undone");render()});render()});
 }
+function renderAuditBar(){let b=$("auditBar");const on=isAudit();
+ if(!b){b=document.createElement("div");b.id="auditBar";b.className="auditbar";document.body.appendChild(b)}
+ b.innerHTML=on?`<span><b>Audit mode is on</b> · tasks you complete are recorded as finished on their end date, not today</span><button class="btn sm" id="auditOff">Turn off</button>`:"";
+ b.classList.toggle("on",on);const o=$("auditOff");if(o)o.onclick=()=>{localStorage.removeItem(AUDITKEY);renderAuditBar();if(UI.view==="settings")render();toast("Audit mode off – completions use today's date again")}}
 function bulkStatus(s){const ids=[...UI.sel];ids.forEach(id=>{const t=DB.tasks.find(x=>x.id===id);setStatus(t,s);touch(t)});UI.sel.clear();UI.selMode=false;save(`${ids.length} task(s) set to ${s}`);render()}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-done]");if(b){e.stopPropagation();toggleDone(+b.dataset.done,b)}},true);
 function renderBulk(){
@@ -965,6 +1006,8 @@ function vMine(){
 }
 
 /* ---------- Settings ---------- */
+// completed tasks ticked on/after `from` that were due 3+ days before the tick (typical of tidying up old tasks)
+function backdateCandidates(from){return DB.tasks.filter(t=>t.status==="Complete"&&t.done&&t.end&&t.done.slice(0,10)>=from&&!(t.doneBy||"").includes("audit")&&dayDiff(D(t.end),new Date(t.done))>=3)}
 function vSettings(){
  const mine=myIni(),st=Live.state,ok=st==="ready";
  const row=(title,sub,btn)=>`<div class="setrow"><div class="b"><b>${title}</b>${sub?`<small>${sub}</small>`:""}</div>${btn||""}</div>`;
@@ -977,6 +1020,11 @@ function vSettings(){
  <div class="card pad setcard"><div class="ch"><h3><span class="ic">${ico.db}</span>Shared data</h3></div>
   ${row(`<span class="${ok?"okdot":"nodot"}"></span>${ok?"Live – changes save instantly":st==="busy"?"Saving…":H(Live.msg||"Not connected")}`,Live.lastPull?`Last refreshed ${new Date(Live.lastPull).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"})} · refreshes every ${CONFIG.pollSeconds} seconds`:"",`<button class="btn sm" id="sRef">${ico.refresh} Refresh now</button>`)}
   ${row("SharePoint list","Open the underlying task list in SharePoint",Live.listUrl?`<button class="btn sm" id="sOpen">${ico.link} Open</button>`:"")}
+ </div>
+ <div class="card pad setcard"><div class="ch"><h3><span class="ic">${ico.done}</span>Clearing old tasks</h3></div>
+  ${row("Audit mode",isAudit()?"<span style='color:var(--amber)'>On</span> \u2013 completions are recorded on each task\u2019s end date, so old work doesn\u2019t look finished today":"Turn on while you tick off old tasks. Completions are backdated to each task\u2019s end date, so they don\u2019t appear as finished today",`<label class="tgl"><input type="checkbox" id="sAud" ${isAudit()?"checked":""}><i></i></label>`)}
+  <div class="setrow" style="flex-wrap:wrap"><div class="b" style="flex-basis:100%"><b>Fix completions already made</b><small>Tasks ticked done on or after the date below that were due at least 3 days earlier \u2013 set their completion date back to their end date.</small></div>
+   <input type="date" class="sel" id="sFixFrom" value="${iso(new Date(T.getTime()-30*DAY))}" style="height:34px"><span style="font-size:12.5px;color:var(--ink2)"><b style="display:inline" id="sFixN">${backdateCandidates(iso(new Date(T.getTime()-30*DAY))).length}</b> found</span><span class="sp" style="flex:1"></span><button class="btn sm" id="sBack">Backdate to end dates</button></div>
  </div>
  <div class="card pad setcard"><div class="ch"><h3><span class="ic">${ico.hist}</span>Recent changes</h3></div>
   ${row("Change history","Every task added, edited, completed, re-dated or removed – and who did it",`<button class="btn gold sm" id="sAct">View recent changes</button>`)}
@@ -999,6 +1047,13 @@ function vSettings(){
  on("sAct",()=>{UI.act=null;go("activity")});
  on("sXlsx",()=>{dl(`B2C_Project_Flow_Backup_${iso(T)}.xlsx`,XL.build(DB));toast("Backup downloaded")});
  on("sCsv",exportCsv);on("sImp",()=>$("file").click());
+ const au=$("sAud");if(au)au.onchange=()=>{au.checked?localStorage.setItem(AUDITKEY,"1"):localStorage.removeItem(AUDITKEY);renderAuditBar();render()};
+ const ff=$("sFixFrom");if(ff)ff.onchange=()=>{$("sFixN").textContent=backdateCandidates(ff.value).length};
+ on("sBack",()=>{const c=backdateCandidates($("sFixFrom").value);if(!c.length){toast("Nothing to backdate");return}
+  if(!confirm(`Backdate ${c.length} completed task${c.length===1?"":"s"} to their end dates?\n\nThey were ticked done on or after ${fmt($("sFixFrom").value,1)} but were due at least 3 days earlier. Their completion (100%) date will be set to their end date.`))return;
+  const baks=c.map(t=>[t,{done:t.done,doneBy:t.doneBy}]);
+  c.forEach(t=>{t.done=D(t.end).toISOString();t.doneBy=(t.doneBy||"")+" · audit";touch(t)});
+  save(`Backdated ${c.length} completion${c.length===1?"":"s"}`,()=>{baks.forEach(([t,b])=>Object.assign(t,b));save("Undone");render()});render()});
  on("sFix",async()=>{const b=$("sFix");b.disabled=true;b.textContent="Setting up…";const errs=[];
   if(!Live.hasPri||!Live.hasDesc||!Live.hasDone){try{await Live.addPriColumn()}catch(e){errs.push("columns: "+e.message)}}
   if(!Live.hasPeople){try{await Live.createPeopleList()}catch(e){errs.push("team list: "+e.message)}}
@@ -1160,7 +1215,7 @@ function doneAt(t){ // when the task was completed: recorded time, else end date
 const daysAgo=d=>{const x=new Date(d);x.setHours(0,0,0,0);return Math.round((T-x)/DAY)};
 function recentDone(ts){
  const R=UI.rc||(UI.rc={win:6,sec:"",who:""});
- const all=ts.filter(t=>t.status==="Complete").map(t=>({t,a:doneAt(t)})).filter(x=>x.a&&daysAgo(x.a.d)>=0&&daysAgo(x.a.d)<=R.win);
+ const all=ts.filter(t=>t.status==="Complete"&&!(t.doneBy||"").includes("audit")).map(t=>({t,a:doneAt(t)})).filter(x=>x.a&&daysAgo(x.a.d)>=0&&daysAgo(x.a.d)<=R.win);
  const L=s=>s.toLowerCase();
  const rows=all.filter(x=>(!R.sec||x.t.ws===R.sec)&&(!R.who||people(x.t).some(p=>L(p)===L(R.who)))).sort((a,b)=>b.a.d-a.a.d);
  const secs=[...new Set(all.map(x=>x.t.ws))],ppl=[...new Set(all.flatMap(x=>people(x.t)))].sort();
@@ -1393,8 +1448,8 @@ function openTask(id,sec){
   closeDrawer();render()};
  if(id){
   $("dDone").onclick=()=>{if(!commit())return;const tt=DB.tasks.find(x=>x.id===id);const bak={...tt,pm:[...tt.pm],an:[...tt.an]};
-   if(editing.status==="Complete")setStatus(editing,"In progress");else setStatus(editing,"Complete");
-   Object.assign(tt,editing);save(tt.status==="Complete"?"✓ “"+short(tt.task)+"” completed":"Reopened “"+short(tt.task)+"”",()=>{Object.assign(tt,bak);save("Undone");render()});closeDrawer();render()};
+   const fin=()=>{Object.assign(tt,editing);save(tt.status==="Complete"?"✓ “"+short(tt.task)+"” completed":"Reopened “"+short(tt.task)+"”",()=>{Object.assign(tt,bak);save("Undone");render()});closeDrawer();render()};
+   if(editing.status==="Complete"){setStatus(editing,"In progress");fin()}else askWhen([editing],mode=>{setStatus(editing,"Complete",false,whenFor(editing,mode));if(mode==="now"&&!tt.done){editing.done=nowISO();editing.end=iso(new Date())}fin()})};
   $("dDel").onclick=()=>{const idx=DB.tasks.findIndex(x=>x.id===id),bak=DB.tasks[idx];DB.tasks.splice(idx,1);save();closeDrawer();render();
    toast("Task deleted",()=>{DB.tasks.splice(idx,0,bak);save("Restored");render()})};
  }
@@ -1581,7 +1636,7 @@ const Live=(()=>{
  const sp2iso=v=>v?new Date(new Date(v).getTime()+6*36e5).toISOString().slice(0,10):null;
  const ser=t=>JSON.stringify([t.ws,t.task,t.pm.join("/"),t.an.join("/"),Math.round(t.prog*100),t.status,t.start||"",t.end||"",t.notes||"",t.pri,t.desc||"",t.done||"",t.doneBy||""]);
  const sser=s=>JSON.stringify([s.name,s.color,s.order]);
- const toFields=t=>({...(hasDone?{CompletedOn:t.status==="Complete"?(t.done||null):null,CompletedBy:t.status==="Complete"?(t.doneBy||""):""}:{}),...(hasPri?{Priority:t.pri}:{}),...(hasDesc?{Description:t.desc||""}:{}),Title:t.task,Section:t.ws,ProjectManagers:t.pm.join("/"),Analysts:t.an.join("/"),Progress:Math.round(t.prog*100)/100,Status:t.status,StartDate:iso2sp(t.start),EndDate:iso2sp(t.end),Notes:t.notes||""});
+ const toFields=t=>({...(hasDone?{CompletedOn:t.done||null,CompletedBy:t.done?(t.doneBy||""):""}:{}),...(hasPri?{Priority:t.pri}:{}),...(hasDesc?{Description:t.desc||""}:{}),Title:t.task,Section:t.ws,ProjectManagers:t.pm.join("/"),Analysts:t.an.join("/"),Progress:Math.round(t.prog*100)/100,Status:t.status,StartDate:iso2sp(t.start),EndDate:iso2sp(t.end),Notes:t.notes||""});
  const toSFields=s=>({Title:s.name,Color:s.color,SortOrder:s.order});
  function toTask(it){const f=it.fields||{};const t=norm({id:+it.id,sp:String(it.id),ws:f.Section||"Unsorted",task:f.Title||"(untitled)",pm:f.ProjectManagers||"",an:f.Analysts||"",prog:+f.Progress||0,status:f.Status||"",start:sp2iso(f.StartDate),end:sp2iso(f.EndDate),notes:f.Notes||"",pri:f.Priority||"",desc:f.Description||"",done:f.CompletedOn||null,doneBy:f.CompletedBy||""});
   if(t.status==="Complete")t.prog=1;t.updated=it.lastModifiedDateTime;t.by=(it.lastModifiedBy&&it.lastModifiedBy.user&&it.lastModifiedBy.user.displayName)||"";return t}
@@ -2083,6 +2138,7 @@ const dayDiff=(a,b)=>Math.round((b-a)/DAY);
 const med=a=>{if(!a.length)return null;const s=[...a].sort((x,y)=>x-y),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2};
 const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
 const fd=n=>n==null?"–":(Math.abs(n)<10&&n%1?n.toFixed(1):Math.round(n))+"d";
+const planDur=t=>{if(!t.start)return null;const f=t.done?new Date(t.done):t.end?D(t.end):null;if(!f)return null;const x=dayDiff(D(t.start),new Date(f.getFullYear(),f.getMonth(),f.getDate()));return x>=0&&x<400?x:null};
 const monday=d=>{const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return x};
 function anFilter(t){const A=UI.an,q=UI.q.toLowerCase();
  return(!q||(t.task+" "+(t.desc||"")+" "+t.pm.join(" ")+" "+t.an.join(" ")+" "+t.ws).toLowerCase().includes(q))&&matchPeople(t)&&(!UI.sections.size||UI.sections.has(t.ws))&&(!UI.pris.size||UI.pris.has(t.pri))}
@@ -2099,7 +2155,7 @@ function buildSeries(ts){const g={};
   let name=last.task;try{const d=detectPeriod(last.task,last.start||last.end);if(d&&d.base)name=d.base}catch(e){}
   if(rec&&rec.base)name=rec.base;
   const done=v.filter(t=>t.status==="Complete"),dur=[],late=[],gaps=[],cad=[];
-  done.forEach(t=>{const a=doneAt(t);if(a&&t.start){const x=dayDiff(D(t.start),a.d);if(x>=0&&x<400)dur.push(x)}if(a&&t.end&&!a.est)late.push(dayDiff(D(t.end),a.d))});
+  done.forEach(t=>{const x=planDur(t);if(x!=null)dur.push(x);const a=doneAt(t);if(a&&t.end&&!a.est)late.push(dayDiff(D(t.end),a.d))});
   for(let i=1;i<v.length;i++){const p=v[i-1],c=v[i];if(p.end&&c.start){const x=dayDiff(D(p.end),D(c.start));if(x>-60&&x<400)gaps.push(x)}
    const ps=p.start||p.end,cs=c.start||c.end;if(ps&&cs){const x=dayDiff(D(ps),D(cs));if(x>0)cad.push(x)}}
   const nxt=v.filter(isOpen).sort((a,b)=>(a.end||"9")<(b.end||"9")?-1:1)[0];
@@ -2118,7 +2174,7 @@ function vAnalytics(){
  const all=DB.tasks.filter(anFilter);
  const from=new Date(T.getFullYear(),T.getMonth()-A.range+1,1);
  const doneIn=all.filter(t=>t.status==="Complete").map(t=>({t,a:doneAt(t)})).filter(x=>x.a&&x.a.d>=from);
- const cyc=doneIn.filter(x=>x.t.start).map(x=>dayDiff(D(x.t.start),x.a.d)).filter(x=>x>=0&&x<400);
+ const cyc=doneIn.map(x=>planDur(x.t)).filter(x=>x!=null);
  const timed=doneIn.filter(x=>x.t.end&&!x.a.est),onT=timed.filter(x=>x.a.d<=new Date(D(x.t.end).getTime()+DAY-1));
  const open=all.filter(isOpen),over=open.filter(isOver);
  const series=buildSeries(all),recN=series.filter(s=>s.rec).length;
@@ -2155,7 +2211,7 @@ function vAnalytics(){
  const proj=projectRecurring(all,hzEnd);
  const live=open.filter(t=>t.status!=="On hold");
  // historical typical durations
- const histAll=DB.tasks.filter(t=>t.status==="Complete"&&t.start).map(t=>{const a=doneAt(t);return a?{t,d:dayDiff(D(t.start),a.d)}:null}).filter(x=>x&&x.d>=0&&x.d<200);
+ const histAll=DB.tasks.filter(t=>t.status==="Complete").map(t=>({t,d:planDur(t)})).filter(x=>x.d!=null&&x.d<200);
  const secMed={};DB.sections.forEach(s=>{secMed[s.name]=med(histAll.filter(x=>x.t.ws===s.name).map(x=>x.d))});
  const serMed={};buildSeries(DB.tasks).forEach(s=>{if(s.medDur!=null)s.tasks.forEach(t=>serMed[seriesKey(t)]=s.medDur)});
  const wdays=(a,b)=>{let n=0;const x=new Date(a);while(x<=b){const g=x.getDay();if(g&&g<6)n++;x.setDate(x.getDate()+1)}return n};
@@ -2207,14 +2263,14 @@ function vAnalytics(){
   const free=load.slice(r.s,r.e+1).reduce((a,x)=>a+x.free,0)/ (heads?1:1);const avgPct=load.slice(r.s,r.e+1).reduce((a,x)=>a+x.pct,0)/wks;return{sd,ed,wks,free,avgPct}}).sort((a,b)=>b.free-a.free||a.sd-b.sd);
  const busy=load.filter(x=>x.b).sort((a,b)=>b.pct-a.pct).slice(0,5);
  /* ---- cycle time by section ---- */
- const bySec=DB.sections.map(s=>{const x=doneIn.filter(d=>d.t.ws===s.name&&d.t.start).map(d=>dayDiff(D(d.t.start),d.a.d)).filter(v=>v>=0&&v<400);
+ const bySec=DB.sections.map(s=>{const x=doneIn.filter(d=>d.t.ws===s.name).map(d=>planDur(d.t)).filter(v=>v!=null);
   const tm=doneIn.filter(d=>d.t.ws===s.name&&d.t.end&&!d.a.est);const ok=tm.filter(d=>d.a.d<=new Date(D(d.t.end).getTime()+DAY-1)).length;
   return{s,n:doneIn.filter(d=>d.t.ws===s.name).length,avg:avg(x),med:med(x),ot:tm.length?ok/tm.length:null,open:open.filter(t=>t.ws===s.name).length}}).filter(x=>x.n||x.open);
  const cmx=Math.max(1,...bySec.map(x=>x.med||0));
  /* ---- series table ---- */
  const sk={n:(a,b)=>b.n-a.n,dur:(a,b)=>(b.medDur??-1)-(a.medDur??-1),late:(a,b)=>(b.avgLate??-1e9)-(a.avgLate??-1e9),name:(a,b)=>a.name.localeCompare(b.name),next:(a,b)=>((a.next&&a.next.end)||"9")<((b.next&&b.next.end)||"9")?-1:1}[A.sort]||((a,b)=>b.n-a.n);
  const srows=[...series].sort(sk);
- const spark=s=>{const v=s.tasks.filter(t=>t.status==="Complete"&&t.start).map(t=>{const a=doneAt(t);return a?dayDiff(D(t.start),a.d):null}).filter(x=>x!=null&&x>=0&&x<400).slice(-12);
+ const spark=s=>{const v=s.tasks.filter(t=>t.status==="Complete").map(planDur).filter(x=>x!=null).slice(-12);
   if(v.length<2)return"";const mx=Math.max(...v,1),w=90,h=22;return`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><path d="${v.map((x,i)=>(i?"L":"M")+(i/(v.length-1)*w).toFixed(1)+","+(h-2-x/mx*(h-4)).toFixed(1)).join(" ")}" fill="none" stroke="#F5C400" stroke-width="1.6"/></svg>`};
  const pct=x=>x==null?"–":Math.round(x*100)+"%";
  const otCol=x=>x==null?"var(--muted)":x>=.8?"var(--green)":x>=.5?"var(--amber)":"var(--red)";
@@ -2230,7 +2286,7 @@ function vAnalytics(){
  $("view").innerHTML=pageHead("Analytics",`How the team's work flows · completions over the last ${rangeTxt}, workload over the next ${AN_HZ.find(h=>h[0]===A.hz)[1]}`)+`<div class="g fade">${fbar}
  <div class="kpis">
   ${kp("Completed",doneIn.length.toLocaleString("en-GB"),`last ${rangeTxt} · ${(doneIn.length/Math.max(1,A.range)).toFixed(1)} a month`,"var(--green)")}
-  ${kp("Typical time to complete",fd(med(cyc)),`median, start → done · average ${fd(avg(cyc))}`)}
+  ${kp("Typical time to complete",fd(med(cyc)),`median, start → 100% date · average ${fd(avg(cyc))}`)}
   ${kp("Open now",open.length,`${open.filter(t=>t.status==="In progress").length} in progress \u00b7 ${open.filter(t=>t.status==="Not started").length} not started`,"var(--blue)")}
   ${kp("Repeated work",series.length,`${recN} set up as recurring · ${series.length-recN} spotted by name`)}
  </div>
@@ -2239,7 +2295,7 @@ function vAnalytics(){
   ${fw}
   <div class="legend" style="margin-top:8px">${BANDS.map(b=>`<span><i style="background:${b[3]}"></i>${b[2]}</span>`).join("")}<span style="margin-left:10px">Bar colours = priority:</span>${["High","Medium","Low"].map(p=>`<span><i style="background:${PCH[p]}"></i>${p}</span>`).join("")}<span>Faded = mostly projected recurring</span><span><i style="background:repeating-linear-gradient(45deg,rgba(255,255,255,.35) 0 2px,transparent 2px 4px)"></i>Expected ad hoc work</span><span>Click a week for detail</span></div>
   <div id="anHowBox" class="anhow" style="display:none"><b>How the workload estimate works</b><ul>
-   <li><b>Effort per task</b> \u2013 the typical time to complete for that repeat series, else for its section, else the task\u2019s own start\u2013end span (default 5 days). Roughly ${Math.round(WORKSHARE*100)}% of elapsed days are counted as hands-on work.</li>
+   <li><b>Effort per task</b> \u2013 the typical time to complete (start date \u2192 date it reached 100%) for that repeat series, else for its section, else the task\u2019s own start\u2013end span (default 5 days). Roughly ${Math.round(WORKSHARE*100)}% of elapsed days are counted as hands-on work.</li>
    <li><b>Work left</b> \u2013 reduced by the progress already recorded, then spread over the working days between now (or its start) and its deadline. Overdue work is spread over the next two weeks as catch-up; tasks more than 30 days overdue and not in progress are treated as stale backlog and left out.</li>
    <li><b>Expected ad hoc work</b> \u2013 future weeks look emptier only because tasks haven\u2019t been created yet, so the typical weekly volume of non-recurring work from the last 6 months is added (phased in over the first 6 weeks).</li>
    <li><b>Priority</b> \u2013 High work counts 1.5\u00d7, Medium 1\u00d7, Low 0.6\u00d7. A deadline in a week adds extra pressure (High +1, Medium +0.5, Low +0.25).</li>
@@ -2255,13 +2311,13 @@ function vAnalytics(){
   <div class="card pad"><div class="ch"><div><h3>Throughput</h3><div class="h">Tasks completed each month (bars) vs tasks started (dashed line)</div></div></div>${thru}
    <div class="legend" style="margin-top:6px"><span><i style="background:#3DDC97"></i>Completed</span><span><i style="background:#F5C400"></i>Started</span></div></div>
  </div>
- <div class="card pad"><div class="ch"><div><h3>Repeated &amp; recurring tasks</h3><div class="h">Recurring series plus tasks with matching names (e.g. “Market Share Report Q1” and “Q2”). Time to complete = start date → ticked done. Click a row for its history.</div></div>
+ <div class="card pad"><div class="ch"><div><h3>Repeated &amp; recurring tasks</h3><div class="h">Recurring series plus tasks with matching names (e.g. “Market Share Report Q1” and “Q2”). Time to complete = start date → date it reached 100%. Click a row for its history.</div></div>
   <select class="sel" id="anSort">${[["n","Sort: Most occurrences"],["dur","Sort: Longest to complete"],["next","Sort: Next due"],["name","Sort: A–Z"]].map(([k,l])=>`<option value="${k}" ${A.sort===k?"selected":""}>${l}</option>`).join("")}</select></div>
   ${srows.length?`<div class="antab"><div class="anh"><span>Task</span><span>Cadence</span><span>Times</span><span>Time to complete</span><span>Trend</span><span>Gap between</span><span>Next due</span></div>
   ${srows.slice(0,A.all?999:15).map(s=>`<div class="anr ${A.exp===s.k?"on":""}" data-sk="${H(s.k)}"><span><b>${s.rec?'<span class="rcbadge">\u21bb</span>':""}${H(s.name)}</b><small><i style="background:${secColor(s.ws)}"></i>${H(s.ws)}</small></span><span>${H(s.cadence)}</span><span>${s.n}<small>${s.done} done</small></span><span>${fd(s.medDur)}<small>${s.avgDur!=null?"avg "+fd(s.avgDur):""}</small></span><span>${spark(s)}</span><span>${s.gap==null?"–":s.gap<0?"overlap":fd(s.gap)}</span><span>${s.next?dueChip(s.next):'<span class="due m">–</span>'}</span></div>
-   ${A.exp===s.k?`<div class="anx">${s.tasks.slice().reverse().map(t=>{const a=t.status==="Complete"?doneAt(t):null,d=a&&t.start?dayDiff(D(t.start),a.d):null;return`<div class="mrow" data-id="${t.id}"><span class="bar" style="background:${SCH[t.status]}"></span><div class="b"><div class="t">${H(t.task)}</div><div class="m">${t.start?fmt(t.start,1):"no start"} → ${t.end?fmt(t.end,1):"no end"}${a?` · done ${a.d.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}${a.est?"*":""}`:""}${d!=null?` · ${d} days`:""}</div></div>${dueChip(t)}</div>`}).join("")}<button class="link" data-q="${H(s.name)}">Show in All tasks →</button></div>`:""}`).join("")}</div>
+   ${A.exp===s.k?`<div class="anx">${s.tasks.slice().reverse().map(t=>{const a=t.status==="Complete"?doneAt(t):null,d=t.status==="Complete"?planDur(t):null;return`<div class="mrow" data-id="${t.id}"><span class="bar" style="background:${SCH[t.status]}"></span><div class="b"><div class="t">${H(t.task)}</div><div class="m">${t.start?fmt(t.start,1):"no start"} → ${t.end?fmt(t.end,1):"no end"}${a?` · done ${a.d.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}${a.est?"*":""}`:""}${d!=null?` · ${d} days`:""}</div></div>${dueChip(t)}</div>`}).join("")}<button class="link" data-q="${H(s.name)}">Show in All tasks →</button></div>`:""}`).join("")}</div>
   ${srows.length>15?`<div class="showmore"><button class="btn sm" id="anAll">${A.all?"Show fewer":"Show all "+srows.length}</button></div>`:""}`:`<div class="empty"><b>No repeated work found</b>Set tasks to repeat, or give repeated tasks matching names.</div>`}</div>
- <div class="card pad"><div class="ch"><div><h3>By section</h3><div class="h">Completed tasks in the last ${rangeTxt}, typical time to complete and open work</div></div></div>
+ <div class="card pad"><div class="ch"><div><h3>By section</h3><div class="h">Completed tasks in the last ${rangeTxt}, typical time to complete (start → 100% date) and open work</div></div></div>
   <div class="antab sec"><div class="anh"><span>Section</span><span>Completed</span><span>Typical time to complete</span><span>Open now</span></div>
   ${bySec.map(x=>`<div class="anr" data-sec="${H(x.s.name)}"><span><b><i class="sd" style="background:${x.s.color}"></i>${H(x.s.name)}</b></span><span>${x.n}</span><span class="cbar"><div class="track"><div style="width:${(x.med||0)/cmx*100}%;background:${x.s.color}"></div></div><b>${fd(x.med)}</b></span><span>${x.open}</span></div>`).join("")}</div></div>
  </div>`;
@@ -2293,7 +2349,7 @@ function vAnalytics(){
  v.querySelectorAll("[data-wi]").forEach(e=>e.onclick=()=>showWk(+e.dataset.wi));
 }
 
-DB=blank();Live.init();
+DB=blank();Live.init();renderAuditBar();
 </script>
 </body>
 </html>
