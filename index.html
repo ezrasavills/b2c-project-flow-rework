@@ -556,7 +556,26 @@ textarea.fld.title{font-size:15.5px;font-weight:600;min-height:56px}
 .rcdet{border:1px solid rgba(110,155,255,.4);background:rgba(110,155,255,.08);border-radius:12px;padding:11px 13px;font-size:12.5px;line-height:1.55;color:var(--ink2)}
 .rcdet b{color:var(--ink)}.rcdh{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:4px}.rcdh b{color:var(--blue)!important}
 .rcnote{margin-top:6px;font-size:12px;color:var(--muted)}.rcnote.warn{color:var(--amber)}
+.rcsug{display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:10px;border:1px solid rgba(245,196,0,.45);background:rgba(245,196,0,.08);border-radius:12px;font-size:12.5px;line-height:1.5;color:var(--ink2);animation:fade .25s ease}.rcsug span{flex:1}
 .rcbadge{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:6px;background:rgba(245,196,0,.16);color:var(--gold2);font-size:11px;margin-right:6px;vertical-align:1px}
+.anq{display:flex;justify-content:space-between;gap:10px;padding:9px 12px;border-radius:10px;background:rgba(61,220,151,.07);border:1px solid rgba(61,220,151,.25);margin-bottom:6px;font-size:12.5px}
+.anq span{color:var(--muted)}.anq.busy{background:rgba(255,107,107,.07);border-color:rgba(255,107,107,.28);cursor:pointer}
+.anw{cursor:pointer}.anw:hover rect:first-child{fill:rgba(255,255,255,.04)}.anw.sel rect:first-child{fill:rgba(245,196,0,.1)}
+.anwk{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:14px;background:rgba(0,0,0,.18);max-height:320px;overflow:auto}
+.anbar{display:grid;grid-template-columns:96px 1fr 34px;gap:10px;align-items:center;padding:7px 0;font-size:12.5px}.anbar b{text-align:right}
+.anwd{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:200px}
+.anwd div{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;font-size:11px;color:var(--muted)}
+.anwd i{width:70%;border-radius:5px 5px 2px 2px;background:linear-gradient(180deg,#F5C400,#F5C40066)}.anwd b{color:var(--ink);font-size:11.5px}
+.antab{overflow-x:auto}
+.antab .anh,.antab .anr{display:grid;grid-template-columns:minmax(220px,2.4fr) 1fr .6fr 1fr 100px .8fr 110px;gap:10px;align-items:center;padding:10px 12px;min-width:820px}
+.antab.sec .anh,.antab.sec .anr{grid-template-columns:minmax(200px,1.6fr) .7fr 1.8fr .6fr;min-width:600px}
+.antab .anh{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:600;border-bottom:1px solid var(--line)}
+.antab .anr{border-radius:12px;cursor:pointer;font-size:13px}.antab .anr+.anr{margin-top:2px}
+.antab .anr:hover,.antab .anr.on{background:rgba(255,255,255,.055)}
+.antab .anr small{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+.antab .anr small i,.antab .sd{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.antab .cbar{display:grid;grid-template-columns:1fr 46px;gap:10px;align-items:center}.antab .cbar b{text-align:right}
+.anx{margin:4px 0 10px 12px;padding:8px 10px;border-left:2px solid rgba(245,196,0,.4);min-width:880px}
 </style>
 </head>
 <body>
@@ -566,6 +585,7 @@ textarea.fld.title{font-size:15.5px;font-weight:600;min-height:56px}
   <div class="tabs">
    <button class="tab" data-v="overview" title="Overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="2.5"/><rect x="14" y="3" width="7" height="5" rx="2.5"/><rect x="14" y="12" width="7" height="9" rx="2.5"/><rect x="3" y="16" width="7" height="5" rx="2.5"/></svg><span class="tl">Overview</span></button>
    <button class="tab" data-v="timeline" title="Timeline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M8 12h12M4 18h8"/></svg><span class="tl">Timeline</span></button>
+   <button class="tab" data-v="analytics" title="Analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="tl">Analytics</span></button>
    <button class="tab" data-v="mine" title="My tasks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.4 4.2-6.5 8-6.5s7 2.1 8 6.5"/></svg><span class="tl">My tasks</span><span class="ct" id="minect"></span></button>
    <button class="tab" data-v="all" title="All tasks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg><span class="tl">All tasks</span><span class="ct" id="allct"></span></button>
    <span style="position:relative"><button class="tab" id="secBtn" data-v="section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span id="secLbl" class="tl">Sections</span><svg class="car" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg></button>
@@ -1022,7 +1042,7 @@ function vActivity(){
 }
 
 /* ---------- Views ---------- */
-function render(){{const k=UI.view+"|"+UI.mineTab+"|"+UI.section;document.body.classList.toggle("nofade",UI._lv===k);UI._lv=k}renderNav();if(Live.state!=="ready"&&Live.state!=="busy"&&Live.state!=="err")vGate();else({settings:vSettings,activity:vActivity,mine:vMine,overview:vOverview,section:vSection,all:vAll,timeline:vTimeline})[UI.view]();
+function render(){{const k=UI.view+"|"+UI.mineTab+"|"+UI.section;document.body.classList.toggle("nofade",UI._lv===k);UI._lv=k}renderNav();if(Live.state!=="ready"&&Live.state!=="busy"&&Live.state!=="err")vGate();else({analytics:vAnalytics,settings:vSettings,activity:vActivity,mine:vMine,overview:vOverview,section:vSection,all:vAll,timeline:vTimeline})[UI.view]();
  $("view").querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{UI.people=UI.people.filter(x=>x!==b.dataset.rm);render()});$("view").querySelectorAll("[data-rms]").forEach(b=>b.onclick=()=>{UI.statuses.delete(b.dataset.rms);render()});$("view").querySelectorAll("[data-rmsec]").forEach(b=>b.onclick=()=>{UI.sections.delete(b.dataset.rmsec);render()});$("view").querySelectorAll("[data-rmp]").forEach(b=>b.onclick=()=>{UI.pris.delete(b.dataset.rmp);render()});$("view").querySelectorAll("[data-rmtl]").forEach(b=>b.onclick=()=>{UI.tls.delete(b.dataset.rmtl);render()});$("view").querySelectorAll("[data-rmq]").forEach(b=>b.onclick=()=>{UI.quad=null;render()});renderBulk()}
 function vGate(){
  const st=Live.state,cfg=`<pre style="text-align:left;background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:12px;overflow:auto">clientId: "${H(CONFIG.clientId)}"\ntenantId: "${H(CONFIG.tenantId)}"</pre>`;
@@ -1082,7 +1102,7 @@ function vOverview(){
   <div class="card pad"><div class="ch"><div><h3>Needs attention</h3><div class="h">High priority first, then soonest deadline · tick the circle to complete</div></div><span class="pill p-On">${att.length}</span></div>
    <div class="scroll">${att.map(mrow).join("")||'<div class="empty"><b>All clear</b>Nothing overdue or due soon</div>'}</div></div>
   <div class="card pad">${recent}
-   <div style="margin-top:18px;border-top:1px solid var(--line);padding-top:16px"><div class="ch" style="margin-bottom:4px"><div><h3>Completions per month</h3><div class="h">Last 12 months, by end date</div></div></div>${trend}</div></div>
+   <div style="margin-top:14px;border-top:1px solid var(--line);padding-top:12px;display:flex;justify-content:space-between;align-items:center"><span class="h" style="color:var(--muted);font-size:12px">Monthly completions, quiet periods and repeat-task timings</span><button class="link" id="goAn">Open Analytics →</button></div></div>
  </div>
  <div class="g ov2" style="grid-template-columns:1.45fr 1fr">
   <div class="card pad"><div class="ch"><div><h3>Priority × deadline</h3><div class="h">Open tasks with an end date · click a dot to open it, or a quadrant to list its tasks</div></div></div>${quadrant}</div>
@@ -1098,7 +1118,7 @@ function vOverview(){
  </div>`;
  $("view").querySelectorAll(".mrow").forEach(e=>e.onclick=()=>openTask(+e.dataset.id));
  $("view").querySelectorAll(".sc").forEach(e=>e.onclick=()=>go("section",e.dataset.s));
- bindRecent();
+ bindRecent();const ga=$("goAn");if(ga)ga.onclick=()=>go("analytics");
  $("view").querySelectorAll(".kpi").forEach(e=>e.onclick=()=>{UI.view="all";setOne(e.dataset.f);UI.limit=80;render();window.scrollTo({top:0})});
  $("ovAddSec").onclick=()=>sectionModal();
  const ap=$("addPri");if(ap)ap.onclick=async()=>{ap.disabled=true;ap.textContent="Adding…";try{await Live.addPriColumn();toast("Columns added – priorities, descriptions and completion dates now save for everyone")}catch(e){ap.disabled=false;ap.textContent="Add Priority column";toast("Couldn't add it automatically ("+e.message+"). Add it in SharePoint instead – see the setup note.")}};
@@ -1814,7 +1834,7 @@ const rTitle=(r,s)=>{const l=rLabel(r,s);return(r.base||"")+(l?RSEP+l:"")};
 function rDesc(r){const f=RFREQ.find(q=>q[0]===r.freq),ev=Math.max(1,+r.every||1);
  const fr=r.freq==="custom"?"every "+ev+" "+({d:"day",w:"week",m:"month"}[r.unit||"w"])+(ev>1?"s":""):(f?f[1].toLowerCase():"");
  return"Repeats "+fr+(r.endType==="date"&&r.until?" until "+fmt(r.until,1):r.endType==="count"&&r.count?", "+r.count+" times in total":"")}
-window.rDesc=rDesc;
+window.rDesc=rDesc;window.rStep=rStep;window.addD=addD;
 /* ---------- Recognise periods in existing (non-standard) task names ---------- */
 const MONS=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
 const MRX="jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?";
@@ -1970,7 +1990,7 @@ function recurUI(id){
  const src=id?DB.tasks.find(x=>x.id===id):null;
  const exAll=src?getRec(src):null,ex=exAll&&exAll.on!==false?exAll:null;
  const S={on:!!ex,freq:ex?ex.freq:"monthly",every:ex?ex.every||2:2,unit:ex?ex.unit||"w":"w",sub:ex?ex.sub||"none":"month",tpl:ex&&ex.tpl?ex.tpl:"{MMMM} {YYYY}",prev:ex?!!ex.prev:false,endType:ex?ex.endType||"never":"never",until:ex?ex.until||"":"",count:ex?ex.count||12:12,lag:ex?(ex.lag!=null?+ex.lag:(ex.prev?1:0)):0,det:null,orig:""};
- fd.insertAdjacentHTML("afterend",'<div class="f" id="rcWrap"></div>');
+ const anchorEl=$("fTask").closest(".f");anchorEl.insertAdjacentHTML("afterend",'<div class="f" id="rcWrap"></div>');
  const build=()=>{const s=$("fStart").value||iso(new Date()),en=$("fEnd").value;
   const r={freq:S.freq,every:Math.max(1,+S.every||1),unit:S.unit,sub:S.sub,tpl:S.tpl,prev:S.sub!=="none"&&S.prev,lag:S.sub!=="none"&&S.prev?Math.max(1,+S.lag||1):0,endType:S.endType,until:S.until,count:Math.max(1,+S.count||1),on:true};
   r.sid=exAll&&exAll.sid?exAll.sid:"r"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
@@ -1978,6 +1998,7 @@ function recurUI(id){
   r.anchor=r.n?rStep(s,r,-r.n):s;r.dur=en&&en>=s?Math.round((D(en)-D(s))/DAY):null;
   let v=$("fTask").value.trim();
   [r,exAll].forEach(q=>{if(!q)return;const l=rLabel(q,s);if(l&&v.endsWith(RSEP+l))v=v.slice(0,-(RSEP+l).length)});
+  S.stripped="";if(r.sub!=="none"){for(let g=0;g<3;g++){const d=detectPeriod(v,s);if(!d||!d.base||d.base===v)break;S.stripped+=(S.stripped?", ":"")+d.text;v=d.base}}
   r.base=v;return{r,s}};
  const keepOrig=()=>!!(S.det&&S.det.mismatch&&$("fTask").value.trim()===S.det.base);
  const pv=()=>{const el=$("rcPv");if(!el||!S.on)return;const {r}=build();let h='<div class="rclbl" style="margin-bottom:4px">Coming up</div>',c=0;
@@ -1986,14 +2007,16 @@ function recurUI(id){
    const e=r.dur!=null?addD(s,r.dur):null,ti=i===0&&keepOrig()?S.orig:rTitle({...r,n},s);c++;
    h+=`<div><b>${H(r.base?ti:"Task name"+ti)}</b><span>${i===0?"this task \u00b7 ":""}${fmt(s,1)}${e&&e!==s?" \u2192 "+fmt(e,1):""}</span></div>`}
   if(!c)h+='<div><span>No occurrences \u2013 check the end setting</span></div>';
+  if(S.stripped&&!keepOrig())h+=`<div class="rcnote" style="display:block">\u201c${H(S.stripped)}\u201d is left out of the name \u2013 the subtitle adds the period automatically.</div>`;
   el.innerHTML=h};
  const draw=()=>{const box=$("rcWrap");if(!box)return;
-  box.innerHTML=`<label class="rctog"><input type="checkbox" id="rcOn" ${S.on?"checked":""}><i></i><span><b>Repeat this task</b><small>${S.on?"The next one is added automatically when this one is ticked done or its start date arrives":"Make this a recurring task"}</small></span></label>
+  const sug=!S.on&&!ex&&!S.dismiss?suggest():null;
+  box.innerHTML=`${sug?`<div class="rcsug"><span>${sug}</span><button type="button" class="btn gold sm" id="rcYes">Make recurring</button><button type="button" class="x" id="rcNo" title="Dismiss" style="width:28px;height:28px;font-size:14px;margin:0">\u00d7</button></div>`:""}<label class="rctog"><input type="checkbox" id="rcOn" ${S.on?"checked":""}><i></i><span><b>Repeat this task</b><small>${S.on?"The next one is added automatically when this one is ticked done or its start date arrives":"Make this a recurring task"}</small></span></label>
   ${S.on?`<div class="rcbox">
    ${S.det?(()=>{const d=S.det,fn=(RFREQ.find(f=>f[0]===d.freq)||[])[1]||"",sn=d.tpl?"custom ("+H(d.tpl)+")":(RSUB.find(s=>s[0]===d.sub)||[])[1].toLowerCase();
-    return`<div class="rcdet"><div class="rcdh"><b>Recognised \u201c${H(d.text)}\u201d in the old name</b><button type="button" class="link" id="rcUndo">Undo</button></div>
+    return`<div class="rcdet"><div class="rcdh"><b>Recognised \u201c${H(d.text)}\u201d in the name</b><button type="button" class="link" id="rcUndo">Undo</button></div>
     <div>Set to <b>${fn}</b>${d.freqWord?` (from \u201c${H(d.freqWord)}\u201d)`:""} with a <b>${sn}</b> subtitle${d.lag>1?`, named <b>${d.lag} periods behind</b> the start date`:d.prev?", named after the <b>previous period</b>":""}. The name is now <b>${H(d.base)}</b> and the period always goes at the end.</div>
-    ${d.noYear?`<div class="rcnote">The old name had no year, so ${d.year} was assumed from the start date.</div>`:""}
+    ${d.noYear?`<div class="rcnote">The name had no year, so ${d.year} was assumed from the start date.</div>`:""}
     ${d.mismatch?`<div class="rcnote warn">The start date is in a different ${TNAME[d.type]} to the name. This task keeps its current name; later tasks are named from their start dates \u2013 check Coming up below.</div>`:""}</div>`})():""}
    <div class="rclbl">How often</div>
    <div class="rcchips">${RFREQ.map(f=>`<button type="button" data-rf="${f[0]}" class="${S.freq===f[0]?"on":""}">${f[1]}</button>`).join("")}</div>
@@ -2005,13 +2028,15 @@ function recurUI(id){
    <div class="rclbl">Ends</div>
    <div class="rcchips">${[["never","Never"],["date","On a date"],["count","After a number of times"]].map(([k,l])=>`<button type="button" data-re="${k}" class="${S.endType===k?"on":""}">${l}</button>`).join("")}</div>
    ${S.endType==="date"?`<div class="rcrow">Last one starts on or before <input type="date" class="fld" id="rcUntil" value="${S.until}" style="width:auto;padding:8px 10px"></div>`:S.endType==="count"?`<div class="rcrow">Stop after <input type="number" min="1" max="999" class="fld" id="rcCount" value="${S.count}" style="width:76px;padding:8px 10px"> in total</div>`:""}
-   <div class="rchint">The start date above is the first occurrence. The gap between start and end date is kept for every repeat.</div>
+   <div class="rchint">The task\u2019s start date is the first occurrence. The gap between start and end date is kept for every repeat.</div>
    <div class="rcprev" id="rcPv"></div></div>`:""}`;
   $("rcOn").onchange=e=>{S.on=e.target.checked;if(S.on&&!$("fStart").value)$("fStart").value=iso(new Date());
    if(S.on&&!ex){const d=detectPeriod($("fTask").value,$("fStart").value);
     if(d){S.det=d;S.orig=d.orig;$("fTask").value=d.base;S.freq=d.freq;S.sub=d.sub;if(d.tpl)S.tpl=d.tpl;S.prev=d.prev;S.lag=d.lag}}
    if(!S.on&&S.det){if($("fTask").value.trim()===S.det.base)$("fTask").value=S.orig;S.det=null}
    draw()};
+  const ys=$("rcYes");if(ys)ys.onclick=()=>{const c=$("rcOn");c.checked=true;c.onchange({target:c})};
+  const no=$("rcNo");if(no)no.onclick=()=>{S.dismiss=true;draw()};
   const ud=$("rcUndo");if(ud)ud.onclick=()=>{$("fTask").value=S.orig;S.sub="none";S.det=null;draw()};
   box.querySelectorAll("[data-rf]").forEach(b=>b.onclick=()=>{S.freq=b.dataset.rf;draw()});
   box.querySelectorAll("[data-rs]").forEach(b=>b.onclick=()=>{S.sub=b.dataset.rs;draw()});
@@ -2020,6 +2045,11 @@ function recurUI(id){
   inp("rcEvery",el=>S.every=el.value);inp("rcUnit",el=>S.unit=el.value);inp("rcTpl",el=>S.tpl=el.value);
   inp("rcPrev",el=>{S.prev=el.checked;S.lag=el.checked?(S.lag>1?S.lag:1):0});inp("rcUntil",el=>S.until=el.value);inp("rcCount",el=>S.count=el.value);
   pv()};
+ const FW=/\b(daily|weekly|fortnightly|bi-?weekly|monthly|quarterly|half[\s-]?yearly|bi-?annual(?:ly)?|semi[\s-]?annual(?:ly)?|annual(?:ly)?|yearly)\b/i;
+ function suggest(){const v=$("fTask").value;if(!v.trim())return null;const d=detectPeriod(v,$("fStart").value||iso(new Date())),f=v.match(FW);
+  if(d)return`\u201c${H(d.text)}\u201d looks like a repeating period. Make this a recurring task so the next one is created automatically?`;
+  if(f)return`\u201c${H(f[0])}\u201d suggests this repeats. Make it a recurring task?`;return null}
+ let sugT;$("fTask").addEventListener("input",()=>{if(S.on||ex)return;clearTimeout(sugT);sugT=setTimeout(()=>{const had=!!$("rcYes"),has=!!suggest();if(had!==has)draw();else if(has){const sp=document.querySelector(".rcsug span");if(sp)sp.innerHTML=suggest()}},350)});
  ["fTask","fStart","fEnd"].forEach(i=>{const el=$(i);if(el){el.addEventListener("input",pv);el.addEventListener("change",pv)}});
  const plan=()=>{if(!$("fTask").value.trim())return null;
   if(!S.on)return exAll?{r:{...exAll,on:false}}:{none:true};
@@ -2042,6 +2072,182 @@ row=function(t,s){const h=_row(t,s),r=getRec(t);
 const _render=render;
 render=function(){_render.apply(this,arguments);clearTimeout(window.__rcT);window.__rcT=setTimeout(recurGenerate,800)};
 })();
+
+/* =====================================================================
+   ANALYTICS
+   ===================================================================== */
+const AN_RANGES=[[3,"3 months"],[6,"6 months"],[12,"12 months"],[24,"2 years"]];
+const AN_HZ=[[8,"8 weeks"],[13,"3 months"],[26,"6 months"],[52,"12 months"]];
+const dayDiff=(a,b)=>Math.round((b-a)/DAY);
+const med=a=>{if(!a.length)return null;const s=[...a].sort((x,y)=>x-y),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2};
+const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
+const fd=n=>n==null?"–":(Math.abs(n)<10&&n%1?n.toFixed(1):Math.round(n))+"d";
+const monday=d=>{const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return x};
+function anFilter(t){const A=UI.an,q=UI.q.toLowerCase();
+ return(!q||(t.task+" "+(t.desc||"")+" "+t.pm.join(" ")+" "+t.an.join(" ")+" "+t.ws).toLowerCase().includes(q))&&matchPeople(t)&&(!UI.sections.size||UI.sections.has(t.ws))&&(!UI.pris.size||UI.pris.has(t.pri))}
+/* group repeated / recurring work into series */
+function seriesKey(t){const r=window.getRec?getRec(t):null;if(r&&r.sid)return"r:"+r.sid;
+ let b=t.task;try{const d=window.detectPeriod&&detectPeriod(t.task,t.start||t.end);if(d&&d.base)b=d.base}catch(e){}
+ b=b.toLowerCase().replace(/\b(daily|weekly|fortnightly|monthly|quarterly|annual|annually|yearly|bi-?annual|half[- ]?yearly)\b/g,"").replace(/[^a-z0-9]+/g," ").trim();
+ return b.length>=4?"n:"+t.ws+"|"+b:null}
+function buildSeries(ts){const g={};
+ ts.forEach(t=>{const k=seriesKey(t);if(!k)return;(g[k]=g[k]||[]).push(t)});
+ return Object.entries(g).filter(([k,v])=>v.length>=2||k.startsWith("r:")).map(([k,v])=>{
+  v.sort((a,b)=>(a.start||a.end||"")<(b.start||b.end||"")?-1:1);
+  const last=v[v.length-1],rec=window.getRec?v.map(getRec).find(Boolean):null;
+  let name=last.task;try{const d=detectPeriod(last.task,last.start||last.end);if(d&&d.base)name=d.base}catch(e){}
+  if(rec&&rec.base)name=rec.base;
+  const done=v.filter(t=>t.status==="Complete"),dur=[],late=[],gaps=[],cad=[];
+  done.forEach(t=>{const a=doneAt(t);if(a&&t.start){const x=dayDiff(D(t.start),a.d);if(x>=0&&x<400)dur.push(x)}if(a&&t.end&&!a.est)late.push(dayDiff(D(t.end),a.d))});
+  for(let i=1;i<v.length;i++){const p=v[i-1],c=v[i];if(p.end&&c.start){const x=dayDiff(D(p.end),D(c.start));if(x>-60&&x<400)gaps.push(x)}
+   const ps=p.start||p.end,cs=c.start||c.end;if(ps&&cs){const x=dayDiff(D(ps),D(cs));if(x>0)cad.push(x)}}
+  const nxt=v.filter(isOpen).sort((a,b)=>(a.end||"9")<(b.end||"9")?-1:1)[0];
+  const c=med(cad);const cadName=rec?rDesc(rec).replace(/^Repeats /,""):c==null?"–":c<=2?"daily":c<=10?"weekly":c<=20?"fortnightly":c<=45?"monthly":c<=120?"quarterly":c<=240?"6-monthly":"yearly";
+  return{k,name,ws:last.ws,tasks:v,n:v.length,done:done.length,rec:!!rec,avgDur:avg(dur),medDur:med(dur),durs:dur,avgLate:avg(late),onTime:late.length?late.filter(x=>x<=0).length/late.length:null,gap:med(gaps),cadence:cadName,cadDays:c,next:nxt,lastDone:done.length?done.map(doneAt).filter(Boolean).sort((a,b)=>b.d-a.d)[0]:null}})}
+/* future recurring occurrences not yet created */
+function projectRecurring(ts,until){const out=[];if(!window.rStep||!window.getRec)return out;
+ const latest={};ts.forEach(t=>{const r=getRec(t);if(r&&r.sid&&r.on!==false&&(!latest[r.sid]||+r.n>+getRec(latest[r.sid]).n))latest[r.sid]=t});
+ Object.values(latest).forEach(t=>{const r=getRec(t);if(!r.anchor)return;
+  for(let n=(+r.n||0)+1,i=0;i<120;n++,i++){const s=rStep(r.anchor,r,n);if(D(s)>until)break;
+   if(r.endType==="date"&&r.until&&s>r.until)break;if(r.endType==="count"&&r.count&&n>=+r.count)break;
+   out.push({ws:t.ws,task:(r.base||t.task),start:s,end:r.dur!=null?addD(s,+r.dur):s,proj:true,pri:t.pri,pm:t.pm,an:t.an})}});
+ return out}
+function vAnalytics(){
+ const A=UI.an||(UI.an={range:12,hz:26,mode:"active",sort:"n",exp:null});
+ const all=DB.tasks.filter(anFilter);
+ const from=new Date(T.getFullYear(),T.getMonth()-A.range+1,1);
+ const doneIn=all.filter(t=>t.status==="Complete").map(t=>({t,a:doneAt(t)})).filter(x=>x.a&&x.a.d>=from);
+ const cyc=doneIn.filter(x=>x.t.start).map(x=>dayDiff(D(x.t.start),x.a.d)).filter(x=>x>=0&&x<400);
+ const timed=doneIn.filter(x=>x.t.end&&!x.a.est),onT=timed.filter(x=>x.a.d<=new Date(D(x.t.end).getTime()+DAY-1));
+ const open=all.filter(isOpen),over=open.filter(isOver);
+ const series=buildSeries(all),recN=series.filter(s=>s.rec).length;
+ /* ---- monthly throughput ---- */
+ const months=[];for(let i=A.range-1;i>=0;i--)months.push(new Date(T.getFullYear(),T.getMonth()-i,1));
+ const mkey=d=>d.getFullYear()*12+d.getMonth();
+ const mm=months.map(m=>({m,on:0,late:0,unk:0,st:0}));const mi=new Map(mm.map((x,i)=>[mkey(x.m),i]));
+ doneIn.forEach(({t,a})=>{const i=mi.get(mkey(a.d));if(i==null)return;if(!t.end||a.est)mm[i].unk++;else if(a.d<=new Date(D(t.end).getTime()+DAY-1))mm[i].on++;else mm[i].late++});
+ all.forEach(t=>{if(!t.start)return;const i=mi.get(mkey(D(t.start)));if(i!=null)mm[i].st++});
+ const thru=(()=>{const W=900,Hh=250,L=34,B=26,iw=W-L-6,ih=Hh-B-14,bw=iw/mm.length,mx=Math.max(1,...mm.map(x=>Math.max(x.on+x.late+x.unk,x.st)));
+  const y=v=>14+ih-v/mx*ih;let s=`<svg viewBox="0 0 ${W} ${Hh}" width="100%" style="display:block">`;
+  [0,.5,1].forEach(f=>{s+=`<line x1="${L}" x2="${W}" y1="${y(mx*f)}" y2="${y(mx*f)}" stroke="rgba(255,255,255,.07)"/><text x="${L-6}" y="${y(mx*f)+4}" text-anchor="end" font-size="10" fill="#8B93A3">${Math.round(mx*f)}</text>`});
+  mm.forEach((x,i)=>{const cx=L+i*bw+bw*.18,w=bw*.64;let yy=14+ih;
+   const tot=x.on+x.late+x.unk;if(tot){const h=tot/mx*ih;yy-=h;s+=`<rect x="${cx}" y="${yy}" width="${w}" height="${h}" rx="3" fill="#3DDC97" opacity=".85"><title>${x.m.toLocaleDateString("en-GB",{month:"long",year:"numeric"})}: ${tot} completed</title></rect>`}if(tot)s+=`<text x="${cx+w/2}" y="${yy-4}" text-anchor="middle" font-size="10.5" font-weight="600" fill="#E6E9EF">${tot}</text>`;
+   if(mm.length<=13||i%2===0)s+=`<text x="${cx+w/2}" y="${Hh-8}" text-anchor="middle" font-size="10" fill="#8B93A3">${x.m.toLocaleDateString("en-GB",{month:"short"})}${x.m.getMonth()===0||i===0?" "+String(x.m.getFullYear()).slice(2):""}</text>`});
+  const pts=mm.map((x,i)=>[L+i*bw+bw/2,y(x.st)]);
+  s+=`<path d="${pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ")}" fill="none" stroke="#F5C400" stroke-width="2" stroke-dasharray="5 4"/>`;
+  pts.forEach((p,i)=>s+=`<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="#F5C400"><title>${mm[i].st} tasks started</title></circle>`);
+  return s+"</svg>"})();
+ /* ---- forward workload & quiet periods ---- */
+ const w0=monday(T),weeks=[];for(let i=0;i<A.hz;i++)weeks.push(new Date(w0.getTime()+i*7*DAY));
+ const hzEnd=new Date(w0.getTime()+A.hz*7*DAY);
+ const proj=projectRecurring(all,hzEnd);
+ const live=open.filter(t=>t.status!=="On hold"&&(t.start||t.end));
+ const load=weeks.map(w=>{const we=new Date(w.getTime()+7*DAY-1),hit=(t)=>{const s=D(t.start||t.end),e=D(t.end||t.start);return A.mode==="due"?(e>=w&&e<=we):(s<=we&&e>=w)};
+  const a=live.filter(hit),p=proj.filter(hit);return{w,a:a.length,p:p.length,n:a.length+p.length,items:[...a,...p]}});
+ const nz=load.map(x=>x.n),base=Math.max(1,med(nz.filter(x=>x>0))||1),qth=Math.max(0,Math.floor(base*.4)),bth=base*1.6;
+ load.forEach(x=>{x.q=x.n<=qth;x.b=x.n>=bth&&x.n>0});
+ const runs=[];let cur=null;load.forEach((x,i)=>{if(x.q){if(!cur)cur={s:i,e:i};else cur.e=i}else if(cur){runs.push(cur);cur=null}});if(cur)runs.push(cur);
+ const wfmt=d=>d.toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+ const fw=(()=>{const W=1300,Hh=260,L=34,B=30,iw=W-L-6,ih=Hh-B-18,bw=iw/load.length,mx=Math.max(1,...nz);
+  const y=v=>18+ih-v/mx*ih;let s=`<svg viewBox="0 0 ${W} ${Hh}" width="100%" style="display:block">`;
+  runs.forEach(r=>{s+=`<rect x="${L+r.s*bw}" y="10" width="${(r.e-r.s+1)*bw}" height="${ih+8}" rx="6" fill="#3DDC97" opacity=".08"/>`});
+  [0,.5,1].forEach(f=>{s+=`<line x1="${L}" x2="${W}" y1="${y(mx*f)}" y2="${y(mx*f)}" stroke="rgba(255,255,255,.07)"/><text x="${L-6}" y="${y(mx*f)+4}" text-anchor="end" font-size="10" fill="#8B93A3">${Math.round(mx*f)}</text>`});
+  s+=`<line x1="${L}" x2="${W}" y1="${y(base)}" y2="${y(base)}" stroke="rgba(245,196,0,.5)" stroke-dasharray="3 4"/><text x="${W-4}" y="${y(base)-5}" text-anchor="end" font-size="10" fill="#F5C400">typical ${Math.round(base)}</text>`;
+  load.forEach((x,i)=>{const cx=L+i*bw+bw*.15,w=bw*.7,c=x.q?"#3DDC97":x.b?"#FF6B6B":"#6E9BFF";
+   const ha=x.a/mx*ih,hp=x.p/mx*ih;
+   s+=`<g class="anw" data-w="${i}"><rect x="${L+i*bw}" y="10" width="${bw}" height="${ih+8}" fill="transparent"/>`;
+   if(x.a)s+=`<rect x="${cx}" y="${18+ih-ha}" width="${w}" height="${ha}" rx="3" fill="${c}" opacity=".85"/>`;
+   if(x.p)s+=`<rect x="${cx}" y="${18+ih-ha-hp}" width="${w}" height="${hp}" rx="3" fill="${c}" opacity=".35" stroke="${c}" stroke-dasharray="3 2"/>`;
+   if(!x.n)s+=`<rect x="${cx}" y="${18+ih-3}" width="${w}" height="3" rx="1.5" fill="#3DDC97"/>`;
+   s+=`<title>w/c ${wfmt(x.w)}: ${x.n} task${x.n===1?"":"s"} ${A.mode==="due"?"due":"active"} (${x.a} scheduled${x.p?`, ${x.p} projected recurring`:""})${x.q?" – quiet":x.b?" – busy":""}</title></g>`;
+   if(load.length<=14||i%Math.ceil(load.length/13)===0)s+=`<text x="${L+i*bw+bw/2}" y="${Hh-10}" text-anchor="middle" font-size="10" fill="#8B93A3">${wfmt(x.w)}</text>`});
+  return s+"</svg>"})();
+ const quietList=runs.map(r=>{const wks=r.e-r.s+1,sd=load[r.s].w,ed=new Date(load[r.e].w.getTime()+4*DAY);
+  const ln=load.slice(r.s,r.e+1).reduce((a,x)=>a+x.n,0);return{sd,ed,wks,ln}}).sort((a,b)=>b.wks-a.wks||a.sd-b.sd);
+ const busy=load.filter(x=>x.b).sort((a,b)=>b.n-a.n).slice(0,5);
+ /* ---- cycle time by section ---- */
+ const bySec=DB.sections.map(s=>{const x=doneIn.filter(d=>d.t.ws===s.name&&d.t.start).map(d=>dayDiff(D(d.t.start),d.a.d)).filter(v=>v>=0&&v<400);
+  const tm=doneIn.filter(d=>d.t.ws===s.name&&d.t.end&&!d.a.est);const ok=tm.filter(d=>d.a.d<=new Date(D(d.t.end).getTime()+DAY-1)).length;
+  return{s,n:doneIn.filter(d=>d.t.ws===s.name).length,avg:avg(x),med:med(x),ot:tm.length?ok/tm.length:null,open:open.filter(t=>t.ws===s.name).length}}).filter(x=>x.n||x.open);
+ const cmx=Math.max(1,...bySec.map(x=>x.med||0));
+ /* ---- overdue ageing ---- */
+ const age=[["1–7 days",1,7],["8–30 days",8,30],["1–3 months",31,90],["3 months+",91,1e9]].map(([l,a,b])=>({l,n:over.filter(t=>{const d=-daysLeft(t);return d>=a&&d<=b}).length}));
+ const amx=Math.max(1,...age.map(x=>x.n));
+ /* ---- weekday pattern ---- */
+ const wd=[0,0,0,0,0,0,0];doneIn.filter(x=>!x.a.est).forEach(x=>wd[(x.a.d.getDay()+6)%7]++);const wdm=Math.max(1,...wd);
+ /* ---- series table ---- */
+ const sk={n:(a,b)=>b.n-a.n,dur:(a,b)=>(b.medDur??-1)-(a.medDur??-1),late:(a,b)=>(b.avgLate??-1e9)-(a.avgLate??-1e9),name:(a,b)=>a.name.localeCompare(b.name),next:(a,b)=>((a.next&&a.next.end)||"9")<((b.next&&b.next.end)||"9")?-1:1}[A.sort]||((a,b)=>b.n-a.n);
+ const srows=[...series].sort(sk);
+ const spark=s=>{const v=s.tasks.filter(t=>t.status==="Complete"&&t.start).map(t=>{const a=doneAt(t);return a?dayDiff(D(t.start),a.d):null}).filter(x=>x!=null&&x>=0&&x<400).slice(-12);
+  if(v.length<2)return"";const mx=Math.max(...v,1),w=90,h=22;return`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><path d="${v.map((x,i)=>(i?"L":"M")+(i/(v.length-1)*w).toFixed(1)+","+(h-2-x/mx*(h-4)).toFixed(1)).join(" ")}" fill="none" stroke="#F5C400" stroke-width="1.6"/></svg>`};
+ const pct=x=>x==null?"–":Math.round(x*100)+"%";
+ const otCol=x=>x==null?"var(--muted)":x>=.8?"var(--green)":x>=.5?"var(--amber)":"var(--red)";
+ /* ---- filters ---- */
+ const dd=(key,label,set,items)=>{const n=set.size;return`<span class="dd"><button class="ddb ${n?"act":""} ${UI.openDD===key?"open":""}" data-dd="${key}">${label}${n?`<span class="nb">${n}</span>`:""}<svg viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg></button>
+  <div class="pop ddp ${UI.openDD===key?"on":""}" data-ddp="${key}"><h6>${label} · select any</h6>${items.map(([v,l,col])=>`<label class="ddi"><input type="checkbox" data-k="${key}" value="${H(v)}" ${[...set].some(x=>x.toLowerCase()===String(v).toLowerCase())?"checked":""}><i class="cb"></i>${col?`<span class="dot" style="background:${col}"></span>`:""}<span class="nm">${H(l)}</span></label>`).join("")}</div></span>`};
+ const pplSet=new Set(UI.people);
+ const fbar=`<div class="tb" style="margin-top:0"><div class="ddbar"><span class="lbl">History</span><div class="seg" id="anR">${AN_RANGES.map(([v,l])=>`<button data-r="${v}" class="${A.range===v?"on":""}">${l}</button>`).join("")}</div>
+  <span class="lbl" style="margin-left:6px">Filter</span>${dd("sec","Section",UI.sections,DB.sections.map(s=>[s.name,s.name,s.color]))}${dd("pri","Priority",UI.pris,PRIS.map(p=>[p,p,PCH[p]]))}${dd("ppl","People",pplSet,allPeople().map(([p])=>[p,p+((pInfo(p)||{}).name?" – "+pInfo(p).name:""),pColor(p)]))}
+  ${UI.sections.size||UI.pris.size||UI.people.length?`<button class="link" id="anClr">Clear filters</button>`:""}</div></div>`;
+ const kp=(l,v,s,c)=>`<div class="card kpi" style="cursor:default"><div class="l">${l}</div><div class="v" style="color:${c||"inherit"}">${v}</div><div class="s">${s}</div></div>`;
+ const rangeTxt=AN_RANGES.find(r=>r[0]===A.range)[1];
+ $("view").innerHTML=pageHead("Analytics",`How the team's work flows · completions over the last ${rangeTxt}, workload over the next ${AN_HZ.find(h=>h[0]===A.hz)[1]}`)+`<div class="g fade">${fbar}
+ <div class="kpis">
+  ${kp("Completed",doneIn.length.toLocaleString("en-GB"),`last ${rangeTxt} · ${(doneIn.length/Math.max(1,A.range)).toFixed(1)} a month`,"var(--green)")}
+  ${kp("Typical time to complete",fd(med(cyc)),`median, start → done · average ${fd(avg(cyc))}`)}
+  ${kp("Open now",open.length,`${open.filter(t=>t.status==="In progress").length} in progress \u00b7 ${open.filter(t=>t.status==="Not started").length} not started`,"var(--blue)")}
+  ${kp("Repeated work",series.length,`${recN} set up as recurring · ${series.length-recN} spotted by name`)}
+ </div>
+ <div class="card pad"><div class="ch"><div><h3>Workload ahead &amp; quiet periods</h3><div class="h">Tasks ${A.mode==="due"?"due":"in progress"} each week, including recurring tasks that haven't been created yet (faded). Green weeks are quiet – good for longer-term or ad hoc work.</div></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><div class="seg" id="anM"><button data-m="active" class="${A.mode==="active"?"on":""}">Active</button><button data-m="due" class="${A.mode==="due"?"on":""}">Deadlines</button></div><div class="seg" id="anH">${AN_HZ.map(([v,l])=>`<button data-h="${v}" class="${A.hz===v?"on":""}">${l}</button>`).join("")}</div></div></div>
+  ${fw}
+  <div class="legend" style="margin-top:8px"><span><i style="background:#3DDC97"></i>Quiet (≤${qth} tasks)</span><span><i style="background:#6E9BFF"></i>Normal</span><span><i style="background:#FF6B6B"></i>Busy (≥${Math.ceil(bth)})</span><span><i style="background:rgba(255,255,255,.3)"></i>Faded = projected recurring</span><span>Click a week to see its tasks</span></div>
+  <div id="anWk"></div>
+  <div class="g ov2" style="grid-template-columns:1fr 1fr;margin-top:16px">
+   <div><div class="rclbl" style="margin-bottom:8px">Quiet windows</div>${quietList.length?quietList.slice(0,6).map(q=>`<div class="anq"><b>${wfmt(q.sd)} – ${wfmt(q.ed)}</b><span>${q.wks} week${q.wks===1?"":"s"} · ${q.ln} task${q.ln===1?"":"s"} in total</span></div>`).join(""):`<div class="h">No quiet weeks in this window – the diary is full.</div>`}</div>
+   <div><div class="rclbl" style="margin-bottom:8px">Busiest weeks</div>${busy.length?busy.map(b=>`<div class="anq busy" data-wi="${load.indexOf(b)}"><b>w/c ${wfmt(b.w)}</b><span>${b.n} tasks${b.p?` (${b.p} projected recurring)`:""}</span></div>`).join(""):`<div class="h">No unusually busy weeks.</div>`}</div>
+  </div></div>
+ <div class="g ov2" style="grid-template-columns:1.5fr 1fr">
+  <div class="card pad"><div class="ch"><div><h3>Throughput</h3><div class="h">Tasks completed each month (bars) vs tasks started (dashed line)</div></div></div>${thru}
+   <div class="legend" style="margin-top:6px"><span><i style="background:#3DDC97"></i>Completed</span><span><i style="background:#F5C400"></i>Started</span></div></div>
+  <div class="card pad"><div class="ch"><div><h3>Completions by weekday</h3><div class="h">Which days the team usually ticks work off</div></div></div>
+   <div class="anwd">${["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map((d,i)=>`<div><i style="height:${wd[i]/wdm*150+2}px" title="${wd[i]} completed"></i><span>${d}</span><b>${wd[i]}</b></div>`).join("")}</div>
+   <div class="h" style="margin-top:6px">Only tasks ticked done in the dashboard.</div></div>
+ </div>
+ <div class="card pad"><div class="ch"><div><h3>Repeated &amp; recurring tasks</h3><div class="h">Recurring series plus tasks with matching names (e.g. “Market Share Report Q1” and “Q2”). Time to complete = start date → ticked done. Click a row for its history.</div></div>
+  <select class="sel" id="anSort">${[["n","Sort: Most occurrences"],["dur","Sort: Longest to complete"],["next","Sort: Next due"],["name","Sort: A–Z"]].map(([k,l])=>`<option value="${k}" ${A.sort===k?"selected":""}>${l}</option>`).join("")}</select></div>
+  ${srows.length?`<div class="antab"><div class="anh"><span>Task</span><span>Cadence</span><span>Times</span><span>Time to complete</span><span>Trend</span><span>Gap between</span><span>Next due</span></div>
+  ${srows.slice(0,A.all?999:15).map(s=>`<div class="anr ${A.exp===s.k?"on":""}" data-sk="${H(s.k)}"><span><b>${s.rec?'<span class="rcbadge">\u21bb</span>':""}${H(s.name)}</b><small><i style="background:${secColor(s.ws)}"></i>${H(s.ws)}</small></span><span>${H(s.cadence)}</span><span>${s.n}<small>${s.done} done</small></span><span>${fd(s.medDur)}<small>${s.avgDur!=null?"avg "+fd(s.avgDur):""}</small></span><span>${spark(s)}</span><span>${s.gap==null?"–":s.gap<0?"overlap":fd(s.gap)}</span><span>${s.next?dueChip(s.next):'<span class="due m">–</span>'}</span></div>
+   ${A.exp===s.k?`<div class="anx">${s.tasks.slice().reverse().map(t=>{const a=t.status==="Complete"?doneAt(t):null,d=a&&t.start?dayDiff(D(t.start),a.d):null;return`<div class="mrow" data-id="${t.id}"><span class="bar" style="background:${SCH[t.status]}"></span><div class="b"><div class="t">${H(t.task)}</div><div class="m">${t.start?fmt(t.start,1):"no start"} → ${t.end?fmt(t.end,1):"no end"}${a?` · done ${a.d.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}${a.est?"*":""}`:""}${d!=null?` · ${d} days`:""}</div></div>${dueChip(t)}</div>`}).join("")}<button class="link" data-q="${H(s.name)}">Show in All tasks →</button></div>`:""}`).join("")}</div>
+  ${srows.length>15?`<div class="showmore"><button class="btn sm" id="anAll">${A.all?"Show fewer":"Show all "+srows.length}</button></div>`:""}`:`<div class="empty"><b>No repeated work found</b>Set tasks to repeat, or give repeated tasks matching names.</div>`}</div>
+ <div class="card pad"><div class="ch"><div><h3>By section</h3><div class="h">Completed tasks in the last ${rangeTxt}, typical time to complete and open work</div></div></div>
+  <div class="antab sec"><div class="anh"><span>Section</span><span>Completed</span><span>Typical time to complete</span><span>Open now</span></div>
+  ${bySec.map(x=>`<div class="anr" data-sec="${H(x.s.name)}"><span><b><i class="sd" style="background:${x.s.color}"></i>${H(x.s.name)}</b></span><span>${x.n}</span><span class="cbar"><div class="track"><div style="width:${(x.med||0)/cmx*100}%;background:${x.s.color}"></div></div><b>${fd(x.med)}</b></span><span>${x.open}</span></div>`).join("")}</div></div>
+ </div>`;
+ /* ---- bindings ---- */
+ const v=$("view");
+ v.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{A.range=+b.dataset.r;render()});
+ v.querySelectorAll("[data-h]").forEach(b=>b.onclick=()=>{A.hz=+b.dataset.h;render()});
+ v.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{A.mode=b.dataset.m;render()});
+ $("anSort").onchange=e=>{A.sort=e.target.value;render()};
+ const al=$("anAll");if(al)al.onclick=()=>{A.all=!A.all;render()};
+ const cl=$("anClr");if(cl)cl.onclick=()=>{UI.sections.clear();UI.pris.clear();UI.people=[];render()};
+ v.querySelectorAll(".ddb").forEach(b=>b.onclick=e=>{e.stopPropagation();const k=b.dataset.dd,was=UI.openDD===k;closePops();UI.openDD=was?null:k;if(!was){v.querySelector(`[data-ddp="${k}"]`).classList.add("on");b.classList.add("open")}});
+ v.querySelectorAll(".ddp").forEach(p=>p.addEventListener("click",e=>e.stopPropagation()));
+ v.querySelectorAll(".ddi input").forEach(c=>c.onchange=()=>{const k=c.dataset.k,val=c.value;
+  if(k==="ppl"){UI.people=c.checked?[...UI.people,val]:UI.people.filter(x=>x.toLowerCase()!==val.toLowerCase())}
+  else{const s=k==="sec"?UI.sections:UI.pris;c.checked?s.add(val):s.delete(val)}render()});
+ v.querySelectorAll(".anr[data-sk]").forEach(r=>r.onclick=()=>{A.exp=A.exp===r.dataset.sk?null:r.dataset.sk;render()});
+ v.querySelectorAll(".anr[data-sec]").forEach(r=>r.onclick=()=>go("section",r.dataset.sec));
+ v.querySelectorAll(".anx .mrow").forEach(e=>e.onclick=ev=>{ev.stopPropagation();openTask(+e.dataset.id)});
+ v.querySelectorAll(".anx [data-q]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();UI.q=b.dataset.q;$("q").value=UI.q;UI.view="all";setOne("all");render();window.scrollTo({top:0})});
+ const showWk=i=>{const x=load[i];if(!x)return;v.querySelectorAll(".anw").forEach(g=>g.classList.toggle("sel",+g.dataset.w===i));
+  $("anWk").innerHTML=`<div class="anwk"><div class="ch" style="margin-bottom:6px"><b>w/c ${wfmt(x.w)} · ${x.n} task${x.n===1?"":"s"}</b><button class="link" id="anWkX">Close</button></div>${x.items.length?x.items.sort((a,b)=>(a.end||"")<(b.end||"")?-1:1).map(t=>`<div class="mrow" ${t.proj?"":`data-id="${t.id}"`}><span class="bar" style="background:${secColor(t.ws)}"></span><div class="b"><div class="t">${t.proj?'<span class="rcbadge">\u21bb</span>':""}${H(t.task)}${t.proj?' <small style="color:var(--muted)">(projected – not created yet)</small>':""}</div><div class="m">${H(t.ws)} · ${fmt(t.start,1)} → ${fmt(t.end,1)}</div></div>${t.proj?"":dueChip(t)}</div>`).join(""):`<div class="h">Nothing scheduled – a quiet week.</div>`}</div>`;
+  $("anWkX").onclick=()=>{$("anWk").innerHTML="";v.querySelectorAll(".anw").forEach(g=>g.classList.remove("sel"))};
+  $("anWk").querySelectorAll(".mrow[data-id]").forEach(e=>e.onclick=()=>openTask(+e.dataset.id))};
+ v.querySelectorAll(".anw").forEach(g=>g.onclick=()=>showWk(+g.dataset.w));
+ v.querySelectorAll("[data-wi]").forEach(e=>e.onclick=()=>showWk(+e.dataset.wi));
+}
 
 DB=blank();Live.init();
 </script>
