@@ -561,6 +561,7 @@ textarea.fld.title{font-size:15.5px;font-weight:600;min-height:56px}
 .anq{display:flex;justify-content:space-between;gap:10px;padding:9px 12px;border-radius:10px;background:rgba(61,220,151,.07);border:1px solid rgba(61,220,151,.25);margin-bottom:6px;font-size:12.5px}
 .anq span{color:var(--muted)}.anq.busy{background:rgba(255,107,107,.07);border-color:rgba(255,107,107,.28);cursor:pointer}
 .anw{cursor:pointer}.anw:hover rect:first-child{fill:rgba(255,255,255,.04)}.anw.sel rect:first-child{fill:rgba(245,196,0,.1)}
+.anhow{margin-top:12px;padding:12px 16px;border:1px solid var(--line);border-radius:12px;background:rgba(0,0,0,.2);font-size:12.5px;line-height:1.6;color:var(--ink2)}.anhow ul{margin:6px 0 0;padding-left:18px}.anhow b{color:var(--ink)}
 .anwk{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:14px;background:rgba(0,0,0,.18);max-height:320px;overflow:auto}
 .anbar{display:grid;grid-template-columns:96px 1fr 34px;gap:10px;align-items:center;padding:7px 0;font-size:12.5px}.anbar b{text-align:right}
 .anwd{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:200px}
@@ -2127,7 +2128,7 @@ function vAnalytics(){
  const mm=months.map(m=>({m,on:0,late:0,unk:0,st:0}));const mi=new Map(mm.map((x,i)=>[mkey(x.m),i]));
  doneIn.forEach(({t,a})=>{const i=mi.get(mkey(a.d));if(i==null)return;if(!t.end||a.est)mm[i].unk++;else if(a.d<=new Date(D(t.end).getTime()+DAY-1))mm[i].on++;else mm[i].late++});
  all.forEach(t=>{if(!t.start)return;const i=mi.get(mkey(D(t.start)));if(i!=null)mm[i].st++});
- const thru=(()=>{const W=900,Hh=250,L=34,B=26,iw=W-L-6,ih=Hh-B-14,bw=iw/mm.length,mx=Math.max(1,...mm.map(x=>Math.max(x.on+x.late+x.unk,x.st)));
+ const thru=(()=>{const W=1300,Hh=240,L=34,B=26,iw=W-L-6,ih=Hh-B-14,bw=iw/mm.length,mx=Math.max(1,...mm.map(x=>Math.max(x.on+x.late+x.unk,x.st)));
   const y=v=>14+ih-v/mx*ih;let s=`<svg viewBox="0 0 ${W} ${Hh}" width="100%" style="display:block">`;
   [0,.5,1].forEach(f=>{s+=`<line x1="${L}" x2="${W}" y1="${y(mx*f)}" y2="${y(mx*f)}" stroke="rgba(255,255,255,.07)"/><text x="${L-6}" y="${y(mx*f)+4}" text-anchor="end" font-size="10" fill="#8B93A3">${Math.round(mx*f)}</text>`});
   mm.forEach((x,i)=>{const cx=L+i*bw+bw*.18,w=bw*.64;let yy=14+ih;
@@ -2137,44 +2138,79 @@ function vAnalytics(){
   s+=`<path d="${pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ")}" fill="none" stroke="#F5C400" stroke-width="2" stroke-dasharray="5 4"/>`;
   pts.forEach((p,i)=>s+=`<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="#F5C400"><title>${mm[i].st} tasks started</title></circle>`);
   return s+"</svg>"})();
- /* ---- forward workload & quiet periods ---- */
+ /* ---- forward workload & quiet periods: effort-based model ----
+    Each open task gets an estimated effort (person-days) from history:
+      1) its repeat series' typical time to complete, else
+      2) its section's typical time to complete, else
+      3) its own start→end span, else 5 days.
+    Effort is converted to working days actually needed (≈60% of elapsed days),
+    reduced by progress already made, then spread across the working days
+    between today/start and its deadline (overdue work lands this week).
+    Each day of work is weighted by priority (High 1.5×, Medium 1×, Low 0.6×),
+    and a deadline falling in a week adds a crunch bump. The weekly total is
+    compared with team capacity (people active × 5 days × focus factor). */
+ const PW={High:1.5,Medium:1,Low:.6},CRUNCH={High:1,Medium:.5,Low:.25},FOCUS=.7,WORKSHARE=.6;
  const w0=monday(T),weeks=[];for(let i=0;i<A.hz;i++)weeks.push(new Date(w0.getTime()+i*7*DAY));
  const hzEnd=new Date(w0.getTime()+A.hz*7*DAY);
  const proj=projectRecurring(all,hzEnd);
- const live=open.filter(t=>t.status!=="On hold"&&(t.start||t.end));
- const load=weeks.map(w=>{const we=new Date(w.getTime()+7*DAY-1),hit=(t)=>{const s=D(t.start||t.end),e=D(t.end||t.start);return A.mode==="due"?(e>=w&&e<=we):(s<=we&&e>=w)};
-  const a=live.filter(hit),p=proj.filter(hit);return{w,a:a.length,p:p.length,n:a.length+p.length,items:[...a,...p]}});
- const nz=load.map(x=>x.n),base=Math.max(1,med(nz.filter(x=>x>0))||1),qth=Math.max(0,Math.floor(base*.4)),bth=base*1.6;
- load.forEach(x=>{x.q=x.n<=qth;x.b=x.n>=bth&&x.n>0});
+ const live=open.filter(t=>t.status!=="On hold");
+ // historical typical durations
+ const histAll=DB.tasks.filter(t=>t.status==="Complete"&&t.start).map(t=>{const a=doneAt(t);return a?{t,d:dayDiff(D(t.start),a.d)}:null}).filter(x=>x&&x.d>=0&&x.d<200);
+ const secMed={};DB.sections.forEach(s=>{secMed[s.name]=med(histAll.filter(x=>x.t.ws===s.name).map(x=>x.d))});
+ const serMed={};buildSeries(DB.tasks).forEach(s=>{if(s.medDur!=null)s.tasks.forEach(t=>serMed[seriesKey(t)]=s.medDur)});
+ const wdays=(a,b)=>{let n=0;const x=new Date(a);while(x<=b){const g=x.getDay();if(g&&g<6)n++;x.setDate(x.getDate()+1)}return n};
+ const estimate=t=>{const k=t.proj?null:seriesKey(t);let el=(k&&serMed[k]!=null)?serMed[k]:secMed[t.ws];let src=k&&serMed[k]!=null?"series history":secMed[t.ws]!=null?"section history":"";
+  if(el==null&&t.start&&t.end){el=dayDiff(D(t.start),D(t.end))+1;src="its own dates"}if(el==null){el=5;src="default"}
+  const total=Math.max(.5,Math.min(40,el*WORKSHARE)),rem=total*(1-(t.prog||0));return{total,rem,src}};
+ const items=[...live.map(t=>({...t,_t:t})),...proj].map(t=>{const e=estimate(t);
+  const s0=D(t.start||t.end)||T,e0=D(t.end)||new Date((D(t.start)||T).getTime()+Math.ceil(e.total/WORKSHARE)*DAY);
+  const over=!!(t.end&&D(t.end)<T),od=over?dayDiff(D(t.end),T):0,stale=over&&od>30&&t.status!=="In progress";
+  const from=s0<T?new Date(T):s0;let to=e0<from?from:e0;if(over)to=new Date(T.getTime()+11*DAY);
+  return{t,e,from,to,over,stale}});
+ const stale=items.filter(x=>x.stale),itemsW=items.filter(x=>!x.stale);
+ const ppl0=new Set();items.forEach(x=>(x.t.pm||[]).concat(x.t.an||[]).forEach(p=>ppl0.add(p.toLowerCase())));
+ const autoCap=Math.max(1,ppl0.size);A.cap=A.cap||null;const heads=A.cap||autoCap,capacity=heads*5*FOCUS;
+ const load=weeks.map(w=>({w,we:new Date(w.getTime()+6*DAY),pts:0,byP:{High:0,Medium:0,Low:0},proj:0,crunch:0,dl:0,items:[]}));
+ itemsW.forEach(x=>{const wt=PW[x.t.pri]||1;
+  const span=Math.max(1,wdays(x.from,x.to));const perDay=x.e.rem/span;
+  load.forEach(L=>{const a=x.from>L.w?x.from:L.w,b=x.to<L.we?x.to:L.we;if(a>b)return;const d=wdays(a,b);if(!d)return;
+   const eff=perDay*d;const pts=eff*wt;L.pts+=pts;L.byP[x.t.pri||"Medium"]+=pts;if(x.t.proj)L.proj+=pts;L.items.push({x,eff})});
+  const dl=x.over?null:D(x.t.end);load.forEach(L=>{if(dl&&dl>=L.w&&dl<=L.we){const c=CRUNCH[x.t.pri]||.5;L.pts+=c;L.byP[x.t.pri||"Medium"]+=c;L.crunch+=c;L.dl++}})});
+ // expected unplanned (ad hoc) work: typical weekly effort of non-recurring work that started in the last 26 weeks
+ const pastW=[];for(let i=1;i<=26;i++)pastW.push(new Date(w0.getTime()-i*7*DAY));
+ const nonRec=DB.tasks.filter(t=>anFilter(t)&&t.start&&!(window.getRec&&getRec(t)));
+ const pastPts=pastW.map(w=>{const we=new Date(w.getTime()+6*DAY);return nonRec.filter(t=>{const s=D(t.start);return s>=w&&s<=we}).reduce((a,t)=>a+estimate(t).total*(PW[t.pri]||1),0)});
+ const baseline=med(pastPts)||0;
+ if(A.adhoc===undefined)A.adhoc=true;
+ load.forEach((L,i)=>{const sched=L.pts-L.proj,ramp=Math.min(1,i/6);L.exp=A.adhoc?Math.max(0,baseline-sched)*ramp:0;L.pts+=L.exp});
+ const BANDS=[[.4,"quiet","Quiet","#3DDC97"],[.7,"light","Light","#8FD6B4"],[1,"normal","Normal","#6E9BFF"],[1.3,"busy","Busy","#F2B04A"],[1e9,"over","Overloaded","#FF6B6B"]];
+ load.forEach(L=>{L.pct=L.pts/capacity;const b=BANDS.find(b=>L.pct<b[0]);L.band=b[1];L.bl=b[2];L.bc=b[3];L.q=L.band==="quiet";L.b=L.band==="busy"||L.band==="over";L.free=Math.max(0,capacity-L.pts)});
  const runs=[];let cur=null;load.forEach((x,i)=>{if(x.q){if(!cur)cur={s:i,e:i};else cur.e=i}else if(cur){runs.push(cur);cur=null}});if(cur)runs.push(cur);
  const wfmt=d=>d.toLocaleDateString("en-GB",{day:"numeric",month:"short"});
- const fw=(()=>{const W=1300,Hh=260,L=34,B=30,iw=W-L-6,ih=Hh-B-18,bw=iw/load.length,mx=Math.max(1,...nz);
-  const y=v=>18+ih-v/mx*ih;let s=`<svg viewBox="0 0 ${W} ${Hh}" width="100%" style="display:block">`;
-  runs.forEach(r=>{s+=`<rect x="${L+r.s*bw}" y="10" width="${(r.e-r.s+1)*bw}" height="${ih+8}" rx="6" fill="#3DDC97" opacity=".08"/>`});
-  [0,.5,1].forEach(f=>{s+=`<line x1="${L}" x2="${W}" y1="${y(mx*f)}" y2="${y(mx*f)}" stroke="rgba(255,255,255,.07)"/><text x="${L-6}" y="${y(mx*f)+4}" text-anchor="end" font-size="10" fill="#8B93A3">${Math.round(mx*f)}</text>`});
-  s+=`<line x1="${L}" x2="${W}" y1="${y(base)}" y2="${y(base)}" stroke="rgba(245,196,0,.5)" stroke-dasharray="3 4"/><text x="${W-4}" y="${y(base)-5}" text-anchor="end" font-size="10" fill="#F5C400">typical ${Math.round(base)}</text>`;
-  load.forEach((x,i)=>{const cx=L+i*bw+bw*.15,w=bw*.7,c=x.q?"#3DDC97":x.b?"#FF6B6B":"#6E9BFF";
-   const ha=x.a/mx*ih,hp=x.p/mx*ih;
+ const fw=(()=>{const W=1300,Hh=290,L=40,B=44,iw=W-L-6,ih=Hh-B-18,bw=iw/load.length,mx=Math.min(2,Math.max(1.5,...load.map(x=>x.pct)))*1.05;
+  const y=v=>18+ih-v/mx*ih;let s=`<svg viewBox="0 0 ${W} ${Hh}" width="100%" style="display:block"><defs><pattern id="anHatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="rgba(255,255,255,.05)"/><line x1="0" y1="0" x2="0" y2="6" stroke="rgba(255,255,255,.28)" stroke-width="2"/></pattern></defs>`;
+  runs.forEach(r=>{s+=`<rect x="${L+r.s*bw}" y="10" width="${(r.e-r.s+1)*bw}" height="${ih+8}" rx="6" fill="#3DDC97" opacity=".07"/>`});
+  [0,.5,1,1.5,2].filter(f=>f<=mx).forEach(f=>{s+=`<line x1="${L}" x2="${W}" y1="${y(f)}" y2="${y(f)}" stroke="${f===1?"rgba(245,196,0,.55)":"rgba(255,255,255,.07)"}" ${f===1?'stroke-dasharray="4 4"':""}/><text x="${L-6}" y="${y(f)+4}" text-anchor="end" font-size="10" fill="${f===1?"#F5C400":"#8B93A3"}">${Math.round(f*100)}%</text>`});
+  s+=`<text x="${W-4}" y="${y(1)-6}" text-anchor="end" font-size="10" fill="#F5C400">team capacity</text>`;
+  s+=`<line x1="${L}" x2="${W}" y1="${y(.4)}" y2="${y(.4)}" stroke="rgba(61,220,151,.45)" stroke-dasharray="2 4"/><text x="${W-4}" y="${y(.4)-6}" text-anchor="end" font-size="10" fill="#3DDC97">quiet below 40%</text>`;
+  load.forEach((x,i)=>{const cx=L+i*bw+bw*.15,w=bw*.7;let yy=18+ih;
    s+=`<g class="anw" data-w="${i}"><rect x="${L+i*bw}" y="10" width="${bw}" height="${ih+8}" fill="transparent"/>`;
-   if(x.a)s+=`<rect x="${cx}" y="${18+ih-ha}" width="${w}" height="${ha}" rx="3" fill="${c}" opacity=".85"/>`;
-   if(x.p)s+=`<rect x="${cx}" y="${18+ih-ha-hp}" width="${w}" height="${hp}" rx="3" fill="${c}" opacity=".35" stroke="${c}" stroke-dasharray="3 2"/>`;
-   if(!x.n)s+=`<rect x="${cx}" y="${18+ih-3}" width="${w}" height="3" rx="1.5" fill="#3DDC97"/>`;
-   s+=`<title>w/c ${wfmt(x.w)}: ${x.n} task${x.n===1?"":"s"} ${A.mode==="due"?"due":"active"} (${x.a} scheduled${x.p?`, ${x.p} projected recurring`:""})${x.q?" – quiet":x.b?" – busy":""}</title></g>`;
-   if(load.length<=14||i%Math.ceil(load.length/13)===0)s+=`<text x="${L+i*bw+bw/2}" y="${Hh-10}" text-anchor="middle" font-size="10" fill="#8B93A3">${wfmt(x.w)}</text>`});
+   const top=18;["Low","Medium","High"].forEach(p=>{const v=x.byP[p]/capacity;if(v<=0)return;let h=v/mx*ih;if(yy-h<top)h=Math.max(0,yy-top);yy-=h;s+=`<rect x="${cx}" y="${yy}" width="${w}" height="${h}" fill="${PCH[p]}" opacity="${x.proj&&x.proj>=(x.pts-x.exp)*.5?.45:.85}"/>`});
+   if(x.exp>0){let h=x.exp/capacity/mx*ih;if(yy-h<top)h=Math.max(0,yy-top);yy-=h;s+=`<rect x="${cx}" y="${yy}" width="${w}" height="${h}" fill="url(#anHatch)" stroke="rgba(255,255,255,.25)" stroke-dasharray="2 2"/>`}
+   if(x.pct>mx)s+=`<text x="${cx+w/2}" y="${top-5}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#FF6B6B">${Math.round(x.pct*100)}%</text>`;
+   if(x.pts<=0)s+=`<rect x="${cx}" y="${18+ih-3}" width="${w}" height="3" rx="1.5" fill="#3DDC97"/>`;
+   s+=`<rect x="${cx}" y="${18+ih+6}" width="${w}" height="6" rx="3" fill="${x.bc}"/>`;
+   s+=`<title>w/c ${wfmt(x.w)} \u2013 ${x.bl} (${Math.round(x.pct*100)}% of capacity)\n\u2248${(x.items.reduce((a,i)=>a+i.eff,0)).toFixed(1)} person-days of work across ${x.items.length} task${x.items.length===1?"":"s"}${x.dl?`\n${x.dl} deadline${x.dl===1?"":"s"} this week`:""}${x.proj?`\nincludes projected recurring work`:""}${x.exp>.05?`\nincludes ~${(x.exp/capacity*100).toFixed(0)}% expected ad hoc work (from history)`:""}</title></g>`;
+   if(load.length<=14||i%Math.ceil(load.length/13)===0)s+=`<text x="${L+i*bw+bw/2}" y="${Hh-8}" text-anchor="middle" font-size="10" fill="#8B93A3">${wfmt(x.w)}</text>`});
   return s+"</svg>"})();
  const quietList=runs.map(r=>{const wks=r.e-r.s+1,sd=load[r.s].w,ed=new Date(load[r.e].w.getTime()+4*DAY);
-  const ln=load.slice(r.s,r.e+1).reduce((a,x)=>a+x.n,0);return{sd,ed,wks,ln}}).sort((a,b)=>b.wks-a.wks||a.sd-b.sd);
- const busy=load.filter(x=>x.b).sort((a,b)=>b.n-a.n).slice(0,5);
+  const free=load.slice(r.s,r.e+1).reduce((a,x)=>a+x.free,0)/ (heads?1:1);const avgPct=load.slice(r.s,r.e+1).reduce((a,x)=>a+x.pct,0)/wks;return{sd,ed,wks,free,avgPct}}).sort((a,b)=>b.free-a.free||a.sd-b.sd);
+ const busy=load.filter(x=>x.b).sort((a,b)=>b.pct-a.pct).slice(0,5);
  /* ---- cycle time by section ---- */
  const bySec=DB.sections.map(s=>{const x=doneIn.filter(d=>d.t.ws===s.name&&d.t.start).map(d=>dayDiff(D(d.t.start),d.a.d)).filter(v=>v>=0&&v<400);
   const tm=doneIn.filter(d=>d.t.ws===s.name&&d.t.end&&!d.a.est);const ok=tm.filter(d=>d.a.d<=new Date(D(d.t.end).getTime()+DAY-1)).length;
   return{s,n:doneIn.filter(d=>d.t.ws===s.name).length,avg:avg(x),med:med(x),ot:tm.length?ok/tm.length:null,open:open.filter(t=>t.ws===s.name).length}}).filter(x=>x.n||x.open);
  const cmx=Math.max(1,...bySec.map(x=>x.med||0));
- /* ---- overdue ageing ---- */
- const age=[["1–7 days",1,7],["8–30 days",8,30],["1–3 months",31,90],["3 months+",91,1e9]].map(([l,a,b])=>({l,n:over.filter(t=>{const d=-daysLeft(t);return d>=a&&d<=b}).length}));
- const amx=Math.max(1,...age.map(x=>x.n));
- /* ---- weekday pattern ---- */
- const wd=[0,0,0,0,0,0,0];doneIn.filter(x=>!x.a.est).forEach(x=>wd[(x.a.d.getDay()+6)%7]++);const wdm=Math.max(1,...wd);
  /* ---- series table ---- */
  const sk={n:(a,b)=>b.n-a.n,dur:(a,b)=>(b.medDur??-1)-(a.medDur??-1),late:(a,b)=>(b.avgLate??-1e9)-(a.avgLate??-1e9),name:(a,b)=>a.name.localeCompare(b.name),next:(a,b)=>((a.next&&a.next.end)||"9")<((b.next&&b.next.end)||"9")?-1:1}[A.sort]||((a,b)=>b.n-a.n);
  const srows=[...series].sort(sk);
@@ -2198,21 +2234,26 @@ function vAnalytics(){
   ${kp("Open now",open.length,`${open.filter(t=>t.status==="In progress").length} in progress \u00b7 ${open.filter(t=>t.status==="Not started").length} not started`,"var(--blue)")}
   ${kp("Repeated work",series.length,`${recN} set up as recurring · ${series.length-recN} spotted by name`)}
  </div>
- <div class="card pad"><div class="ch"><div><h3>Workload ahead &amp; quiet periods</h3><div class="h">Tasks ${A.mode==="due"?"due":"in progress"} each week, including recurring tasks that haven't been created yet (faded). Green weeks are quiet – good for longer-term or ad hoc work.</div></div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap"><div class="seg" id="anM"><button data-m="active" class="${A.mode==="active"?"on":""}">Active</button><button data-m="due" class="${A.mode==="due"?"on":""}">Deadlines</button></div><div class="seg" id="anH">${AN_HZ.map(([v,l])=>`<button data-h="${v}" class="${A.hz===v?"on":""}">${l}</button>`).join("")}</div></div></div>
+ <div class="card pad"><div class="ch"><div><h3>Workload ahead &amp; quiet periods</h3><div class="h">Estimated effort each week as a share of team capacity \u2013 based on how long similar work has taken before, how much is left to do, priority and deadlines. Recurring tasks not yet created are included. <a href="#" id="anHow" class="link" style="padding:0;font-size:12px">How it\u2019s calculated</a></div></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><label class="tgl" title="Add the typical weekly volume of ad hoc work that hasn\u2019t been created yet"><input type="checkbox" id="anAdhoc" ${A.adhoc?"checked":""}><i></i>Expected ad hoc</label><label class="rcrow" style="font-size:12.5px;color:var(--ink2)">Team size <input type="number" min="1" max="50" class="sel" id="anCap" value="${heads}" style="width:64px;height:34px;padding:0 8px" title="People sharing this work (auto: ${autoCap} people on these tasks)"></label><div class="seg" id="anH">${AN_HZ.map(([v,l])=>`<button data-h="${v}" class="${A.hz===v?"on":""}">${l}</button>`).join("")}</div></div></div>
   ${fw}
-  <div class="legend" style="margin-top:8px"><span><i style="background:#3DDC97"></i>Quiet (≤${qth} tasks)</span><span><i style="background:#6E9BFF"></i>Normal</span><span><i style="background:#FF6B6B"></i>Busy (≥${Math.ceil(bth)})</span><span><i style="background:rgba(255,255,255,.3)"></i>Faded = projected recurring</span><span>Click a week to see its tasks</span></div>
+  <div class="legend" style="margin-top:8px">${BANDS.map(b=>`<span><i style="background:${b[3]}"></i>${b[2]}</span>`).join("")}<span style="margin-left:10px">Bar colours = priority:</span>${["High","Medium","Low"].map(p=>`<span><i style="background:${PCH[p]}"></i>${p}</span>`).join("")}<span>Faded = mostly projected recurring</span><span><i style="background:repeating-linear-gradient(45deg,rgba(255,255,255,.35) 0 2px,transparent 2px 4px)"></i>Expected ad hoc work</span><span>Click a week for detail</span></div>
+  <div id="anHowBox" class="anhow" style="display:none"><b>How the workload estimate works</b><ul>
+   <li><b>Effort per task</b> \u2013 the typical time to complete for that repeat series, else for its section, else the task\u2019s own start\u2013end span (default 5 days). Roughly ${Math.round(WORKSHARE*100)}% of elapsed days are counted as hands-on work.</li>
+   <li><b>Work left</b> \u2013 reduced by the progress already recorded, then spread over the working days between now (or its start) and its deadline. Overdue work is spread over the next two weeks as catch-up; tasks more than 30 days overdue and not in progress are treated as stale backlog and left out.</li>
+   <li><b>Expected ad hoc work</b> \u2013 future weeks look emptier only because tasks haven\u2019t been created yet, so the typical weekly volume of non-recurring work from the last 6 months is added (phased in over the first 6 weeks).</li>
+   <li><b>Priority</b> \u2013 High work counts 1.5\u00d7, Medium 1\u00d7, Low 0.6\u00d7. A deadline in a week adds extra pressure (High +1, Medium +0.5, Low +0.25).</li>
+   <li><b>Capacity</b> \u2013 team size \u00d7 5 days \u00d7 ${Math.round(FOCUS*100)}% focus time (= ${capacity.toFixed(1)} weighted days a week). Team size defaults to the ${autoCap} people on these tasks; change it above.</li>
+   <li><b>Bands</b> \u2013 Quiet under 40% of capacity, Light 40\u201370%, Normal 70\u2013100%, Busy 100\u2013130%, Overloaded above 130%. On hold tasks are excluded.</li></ul></div>
+  ${stale.length?`<div class="h" style="margin-top:8px;color:var(--amber)">${stale.length} task${stale.length===1?" is":"s are"} more than 30 days overdue and not in progress \u2013 treated as stale backlog and not counted. <a href="#" class="link" id="anStale" style="padding:0;font-size:12px">Review them</a></div>`:""}
   <div id="anWk"></div>
   <div class="g ov2" style="grid-template-columns:1fr 1fr;margin-top:16px">
-   <div><div class="rclbl" style="margin-bottom:8px">Quiet windows</div>${quietList.length?quietList.slice(0,6).map(q=>`<div class="anq"><b>${wfmt(q.sd)} – ${wfmt(q.ed)}</b><span>${q.wks} week${q.wks===1?"":"s"} · ${q.ln} task${q.ln===1?"":"s"} in total</span></div>`).join(""):`<div class="h">No quiet weeks in this window – the diary is full.</div>`}</div>
-   <div><div class="rclbl" style="margin-bottom:8px">Busiest weeks</div>${busy.length?busy.map(b=>`<div class="anq busy" data-wi="${load.indexOf(b)}"><b>w/c ${wfmt(b.w)}</b><span>${b.n} tasks${b.p?` (${b.p} projected recurring)`:""}</span></div>`).join(""):`<div class="h">No unusually busy weeks.</div>`}</div>
+   <div><div class="rclbl" style="margin-bottom:8px">Quiet windows <small>most spare capacity first</small></div>${quietList.length?quietList.slice(0,6).map(q=>`<div class="anq"><b>${wfmt(q.sd)} \u2013 ${wfmt(q.ed)}</b><span>${q.wks} week${q.wks===1?"":"s"} \u00b7 ${Math.round(q.avgPct*100)}% loaded \u00b7 ~${Math.round(q.free/FOCUS)} person-days free</span></div>`).join(""):`<div class="h">No quiet weeks in this window – every week is above 40% of capacity.</div>`}</div>
+   <div><div class="rclbl" style="margin-bottom:8px">Busiest weeks</div>${busy.length?busy.map(b=>`<div class="anq busy" data-wi="${load.indexOf(b)}"><b>w/c ${wfmt(b.w)}</b><span>${b.bl} \u00b7 ${Math.round(b.pct*100)}% of capacity \u00b7 ${b.items.length} task${b.items.length===1?"":"s"}${b.dl?` \u00b7 ${b.dl} deadline${b.dl===1?"":"s"}`:""}</span></div>`).join(""):`<div class="h">No weeks above capacity – nothing looks overloaded.</div>`}</div>
   </div></div>
- <div class="g ov2" style="grid-template-columns:1.5fr 1fr">
+ <div class="g">
   <div class="card pad"><div class="ch"><div><h3>Throughput</h3><div class="h">Tasks completed each month (bars) vs tasks started (dashed line)</div></div></div>${thru}
    <div class="legend" style="margin-top:6px"><span><i style="background:#3DDC97"></i>Completed</span><span><i style="background:#F5C400"></i>Started</span></div></div>
-  <div class="card pad"><div class="ch"><div><h3>Completions by weekday</h3><div class="h">Which days the team usually ticks work off</div></div></div>
-   <div class="anwd">${["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map((d,i)=>`<div><i style="height:${wd[i]/wdm*150+2}px" title="${wd[i]} completed"></i><span>${d}</span><b>${wd[i]}</b></div>`).join("")}</div>
-   <div class="h" style="margin-top:6px">Only tasks ticked done in the dashboard.</div></div>
  </div>
  <div class="card pad"><div class="ch"><div><h3>Repeated &amp; recurring tasks</h3><div class="h">Recurring series plus tasks with matching names (e.g. “Market Share Report Q1” and “Q2”). Time to complete = start date → ticked done. Click a row for its history.</div></div>
   <select class="sel" id="anSort">${[["n","Sort: Most occurrences"],["dur","Sort: Longest to complete"],["next","Sort: Next due"],["name","Sort: A–Z"]].map(([k,l])=>`<option value="${k}" ${A.sort===k?"selected":""}>${l}</option>`).join("")}</select></div>
@@ -2228,7 +2269,10 @@ function vAnalytics(){
  const v=$("view");
  v.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{A.range=+b.dataset.r;render()});
  v.querySelectorAll("[data-h]").forEach(b=>b.onclick=()=>{A.hz=+b.dataset.h;render()});
- v.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{A.mode=b.dataset.m;render()});
+ const ah=$("anAdhoc");if(ah)ah.onchange=()=>{A.adhoc=ah.checked;render()};
+ const stl=$("anStale");if(stl)stl.onclick=e=>{e.preventDefault();setOne("over");UI.view="all";render();window.scrollTo({top:0})};
+ const cp=$("anCap");if(cp)cp.onchange=()=>{const n=Math.round(+cp.value);A.cap=n>0&&n!==autoCap?Math.min(50,n):null;render()};
+ const hw=$("anHow");if(hw)hw.onclick=e=>{e.preventDefault();const b=$("anHowBox");b.style.display=b.style.display==="none"?"block":"none"};
  $("anSort").onchange=e=>{A.sort=e.target.value;render()};
  const al=$("anAll");if(al)al.onclick=()=>{A.all=!A.all;render()};
  const cl=$("anClr");if(cl)cl.onclick=()=>{UI.sections.clear();UI.pris.clear();UI.people=[];render()};
@@ -2242,7 +2286,7 @@ function vAnalytics(){
  v.querySelectorAll(".anx .mrow").forEach(e=>e.onclick=ev=>{ev.stopPropagation();openTask(+e.dataset.id)});
  v.querySelectorAll(".anx [data-q]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();UI.q=b.dataset.q;$("q").value=UI.q;UI.view="all";setOne("all");render();window.scrollTo({top:0})});
  const showWk=i=>{const x=load[i];if(!x)return;v.querySelectorAll(".anw").forEach(g=>g.classList.toggle("sel",+g.dataset.w===i));
-  $("anWk").innerHTML=`<div class="anwk"><div class="ch" style="margin-bottom:6px"><b>w/c ${wfmt(x.w)} · ${x.n} task${x.n===1?"":"s"}</b><button class="link" id="anWkX">Close</button></div>${x.items.length?x.items.sort((a,b)=>(a.end||"")<(b.end||"")?-1:1).map(t=>`<div class="mrow" ${t.proj?"":`data-id="${t.id}"`}><span class="bar" style="background:${secColor(t.ws)}"></span><div class="b"><div class="t">${t.proj?'<span class="rcbadge">\u21bb</span>':""}${H(t.task)}${t.proj?' <small style="color:var(--muted)">(projected – not created yet)</small>':""}</div><div class="m">${H(t.ws)} · ${fmt(t.start,1)} → ${fmt(t.end,1)}</div></div>${t.proj?"":dueChip(t)}</div>`).join(""):`<div class="h">Nothing scheduled – a quiet week.</div>`}</div>`;
+  $("anWk").innerHTML=`<div class="anwk"><div class="ch" style="margin-bottom:6px"><b>w/c ${wfmt(x.w)} \u00b7 <span style="color:${x.bc}">${x.bl}</span> \u00b7 ${Math.round(x.pct*100)}% of capacity \u00b7 \u2248${x.items.reduce((a,i)=>a+i.eff,0).toFixed(1)} person-days</b><button class="link" id="anWkX">Close</button></div>${x.exp>.05?`<div class="h" style="margin:0 0 6px 10px">Plus ~${Math.round(x.exp/capacity*100)}% of capacity held for expected ad hoc work, based on recent weeks.</div>`:""}${x.items.length?x.items.sort((a,b)=>PRANK[a.x.t.pri]-PRANK[b.x.t.pri]||b.eff-a.eff).map(({x:it,eff})=>{const t=it.t;return`<div class="mrow" ${t.proj?"":`data-id="${t.id}"`}><span class="bar" style="background:${PCH[t.pri]}"></span><div class="b"><div class="t">${t.proj?'<span class="rcbadge">\u21bb</span>':""}${H(t.task)}${t.proj?' <small style="color:var(--muted)">(projected \u2013 not created yet)</small>':""}</div><div class="m">${H(t.ws)} \u00b7 ${t.pri} \u00b7 ~${eff.toFixed(1)}d this week of ~${it.e.rem.toFixed(1)}d left (from ${it.e.src})${it.over?' \u00b7 <span style="color:var(--red)">overdue</span>':""}</div></div>${t.proj?"":dueChip(t)}</div>`}).join(""):`<div class="h">Nothing scheduled \u2013 a quiet week.</div>`}</div>`;
   $("anWkX").onclick=()=>{$("anWk").innerHTML="";v.querySelectorAll(".anw").forEach(g=>g.classList.remove("sel"))};
   $("anWk").querySelectorAll(".mrow[data-id]").forEach(e=>e.onclick=()=>openTask(+e.dataset.id))};
  v.querySelectorAll(".anw").forEach(g=>g.onclick=()=>showWk(+g.dataset.w));
