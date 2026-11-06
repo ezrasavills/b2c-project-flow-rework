@@ -677,7 +677,7 @@ const avatars=(t,max=4)=>{const pmset=new Set(t.pm),ps=people(t);return'<span cl
 
 /* ---------- State ---------- */
 let DB,UI={view:"overview",section:null,filters:new Set(["open"]),statuses:new Set(),sections:new Set(),pris:new Set(),tls:new Set(),quad:null,showDone:false,openDD:null,mineTab:"overview",q:"",people:[],pmode:"any",limit:80,sort:"end",tlHold:false,selMode:false,sel:new Set()};
-function norm(t){t.pm=uniq(splitPeople(t.pm));t.an=uniq(splitPeople(t.an));t.prog=Math.max(0,Math.min(1,+t.prog||0));if(!STATUSES.includes(t.status))t.status=t.prog>=1?"Complete":t.prog>0?"In progress":"Not started";t.notes=t.notes||"";t.desc=t.desc||"";t.done=t.done||null;t.doneBy=t.doneBy||"";{const p=String(t.pri||"").trim().toLowerCase();t.pri=PRIS.find(x=>x.toLowerCase()===p)||(p==="med"?"Medium":"Medium")}return t}
+function norm(t){t.pm=uniq(splitPeople(t.pm));t.an=uniq(splitPeople(t.an));t.prog=Math.max(0,Math.min(1,+t.prog||0));if(!STATUSES.includes(t.status))t.status=t.prog>=1?"Complete":t.prog>0?"In progress":"Not started";t.notes=t.notes||"";t.desc=t.desc||"";t.done=t.done||null;t.doneBy=t.doneBy||"";t.holdDays=Math.max(0,+t.holdDays||0);t.holdSince=t.holdSince||null;{const p=String(t.pri||"").trim().toLowerCase();t.pri=PRIS.find(x=>x.toLowerCase()===p)||(p==="med"?"Medium":"Medium")}return t}
 const blank=()=>({tasks:[],sections:[],people:[],nextId:1});
 function recolor(d){const old=["#C9A227","#3567E0","#18976A","#E0685B","#7C5CF0","#0EA5B7","#E08A0B","#D9468F","#5B6B85","#2F9E44","#B4552D","#4C6EF5"];d.sections.forEach(s=>{const i=old.indexOf((s.color||"").toUpperCase());if(i>=0)s.color=PALETTE[i]})}
 const touch=t=>t.updated=new Date().toISOString();
@@ -734,7 +734,14 @@ function setProg(t,p){const was=t.prog;t.prog=Math.max(0,Math.min(1,p));
  if(t.prog<1){t.done=null;t.doneBy=""}
  if(t.status==="Complete"&&t.prog<1)setStatus(t,t.prog>0?"In progress":"Not started",true);
  else if(t.prog>0&&t.status==="Not started")t.status="In progress"}
-function setStatus(t,s,keepProg,when){const was=t.status;t.status=s;
+// days a task has spent on hold up to `asOf` (closed hold periods + any current one)
+function holdTotal(t,asOf){const end=asOf?new Date(asOf):new Date();let d=+t.holdDays||0;
+ if(t.status==="On hold"){const since=t.holdSince||t.updated;if(since){const x=Math.round((new Date(end.getFullYear(),end.getMonth(),end.getDate())-new Date(iso(new Date(since))+"T00:00:00"))/DAY);if(x>0)d+=x}}
+ return d}
+function trackHold(t,was,s){if(was===s)return;
+ if(s==="On hold"){t.holdSince=nowISO()}
+ else if(was==="On hold"){const since=t.holdSince||t.updated;if(since){const x=Math.round((T-new Date(iso(new Date(since))+"T00:00:00"))/DAY);if(x>0)t.holdDays=(+t.holdDays||0)+x}t.holdSince=null}}
+function setStatus(t,s,keepProg,when){const was=t.status;trackHold(t,was,s);t.status=s;
  if(s==="Complete"){if(t.prog<1||!t.done){t.prog=1;markFull(t,when)}else if(when){t.done=when;t.doneBy=meName()+" · audit"}
   t.end=iso(new Date(t.done));if(t.start&&t.end<t.start)t.start=t.end}
  else{if(was==="Complete"&&!keepProg&&t.prog>=1)t.prog=.9;if(s==="Not started"&&!keepProg)t.prog=0;if(t.prog<1){t.done=null;t.doneBy=""}}}
@@ -1011,7 +1018,7 @@ function backdateCandidates(from){return DB.tasks.filter(t=>t.status==="Complete
 function vSettings(){
  const mine=myIni(),st=Live.state,ok=st==="ready";
  const row=(title,sub,btn)=>`<div class="setrow"><div class="b"><b>${title}</b>${sub?`<small>${sub}</small>`:""}</div>${btn||""}</div>`;
- const setup=[["Priority column",Live.hasPri],["Description column",Live.hasDesc],["Completion date columns",Live.hasDone],["Team & initials list",Live.hasPeople],["Recent changes log",Live.hasAct]];
+ const setup=[["Priority column",Live.hasPri],["Description column",Live.hasDesc],["Completion date columns",Live.hasDone],["On-hold tracking columns",Live.hasHold],["Team & initials list",Live.hasPeople],["Recent changes log",Live.hasAct]];
  $("view").innerHTML=pageHead("Settings","Account, shared data, team, exports and change history")+`<div class="setgrid fade">
  <div class="card pad setcard"><div class="ch"><h3><span class="ic">${ico.users}</span>Account</h3></div>
   ${row(H(Live.me||"Not signed in"),H(Live.email||""),Live.account?`<button class="btn sm danger" id="sOut">Sign out</button>`:"")}
@@ -1055,7 +1062,7 @@ function vSettings(){
   c.forEach(t=>{t.done=D(t.end).toISOString();t.doneBy=(t.doneBy||"")+" · audit";touch(t)});
   save(`Backdated ${c.length} completion${c.length===1?"":"s"}`,()=>{baks.forEach(([t,b])=>Object.assign(t,b));save("Undone");render()});render()});
  on("sFix",async()=>{const b=$("sFix");b.disabled=true;b.textContent="Setting up…";const errs=[];
-  if(!Live.hasPri||!Live.hasDesc||!Live.hasDone){try{await Live.addPriColumn()}catch(e){errs.push("columns: "+e.message)}}
+  if(!Live.hasPri||!Live.hasDesc||!Live.hasDone||!Live.hasHold){try{await Live.addPriColumn()}catch(e){errs.push("columns: "+e.message)}}
   if(!Live.hasPeople){try{await Live.createPeopleList()}catch(e){errs.push("team list: "+e.message)}}
   if(!Live.hasAct){try{await Live.createActivityList()}catch(e){errs.push("change log: "+e.message)}}
   toast(errs.length?"Some items couldn't be created ("+errs.join("; ")+")":"All set up");render()});
@@ -1145,7 +1152,7 @@ function vOverview(){
  const mrow=t=>`<div class="mrow" data-id="${t.id}">${doneBtn(t)}<span class="bar" style="background:${secColor(t.ws)};box-shadow:0 0 8px ${secColor(t.ws)}88"></span><div class="b"><div class="t">${H(t.task)}</div><div class="m"><span style="color:${PCH[t.pri]};font-weight:700">● ${t.pri}</span> · ${H(t.ws)} · ${Math.round(t.prog*100)}% done</div></div>${avatars(t)}<div style="width:96px;text-align:right">${dueChip(t)}</div></div>`;
  const who=UI.people.length?` · ${UI.people.length===1?H(UI.people[0]):UI.people.length+" people selected"}`:"";
  $("view").innerHTML=pageHead("Overview",T.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"})+who)+`<div class="g fade">
- ${(Live.hasPri&&Live.hasDesc&&Live.hasDone)||window.__B2C_MOCK__?"":`<div class="card pad prwarn"><div><b>One-off setup: add new columns</b><span>${[!Live.hasPri&&"Priority",!Live.hasDesc&&"Description",!Live.hasDone&&"completion dates"].filter(Boolean).join(", ")} won't be saved for everyone until the SharePoint list has the matching columns.</span></div><button class="btn gold sm" id="addPri">${ico.plus} Add columns</button></div>`}
+ ${(Live.hasPri&&Live.hasDesc&&Live.hasDone&&Live.hasHold)||window.__B2C_MOCK__?"":`<div class="card pad prwarn"><div><b>One-off setup: add new columns</b><span>${[!Live.hasPri&&"Priority",!Live.hasDesc&&"Description",!Live.hasDone&&"completion dates",!Live.hasHold&&"on-hold time"].filter(Boolean).join(", ")} won't be saved for everyone until the SharePoint list has the matching columns.</span></div><button class="btn gold sm" id="addPri">${ico.plus} Add columns</button></div>`}
  <div class="card hero"><h2>${greet}</h2><p>There ${open.length===1?"is":"are"} <b>${open.length} open tasks</b> across ${DB.sections.length} sections — <b>${ip.length} in progress</b>, <b class="r">${over.length} overdue</b> and <b class="y">${soon.length} due in the next two weeks</b>. <b class="r">${qc.do.length} high-priority task${qc.do.length===1?" needs":"s need"} doing now</b>. ${thisM} task${thisM===1?"":"s"} completed so far this month.</p></div>
  <div class="kpis">
   ${kpi("Open tasks",open.length,`${ip.length} in progress · ${st["On hold"]} on hold`,ico.list,"var(--blue)","var(--bluebg)","open")}
@@ -1428,7 +1435,7 @@ function openTask(id,sec){
  const syncP=()=>{const v=Math.round(editing.prog*100);pr.value=v;pr.style.setProperty("--p",v+"%");pr.style.setProperty("--c",SCH[editing.status]);$("fProgL").textContent=v+"%";
   $("fSt").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.s===editing.status));
   $("fPr").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.p===editing.pri))};
- const syncD=()=>{const s=$("fStart").value,e=$("fEnd").value;$("fDur").textContent=s&&e?(e<s?"⚠ End date is before start date":`Duration: ${Math.round((D(e)-D(s))/DAY)+1} day(s) · ${fmt(s,1)} → ${fmt(e,1)}`):"Tip: add both dates so the task appears on the timeline"};
+ const syncD=()=>{const s=$("fStart").value,e=$("fEnd").value;$("fDur").textContent=s&&e?(e<s?"⚠ End date is before start date":`Duration: ${Math.round((D(e)-D(s))/DAY)+1} day(s) · ${fmt(s,1)} → ${fmt(e,1)}`+(holdTotal(editing)?` · ${holdTotal(editing)} day${holdTotal(editing)===1?"":"s"} on hold (not counted in time to complete)`:"")):"Tip: add both dates so the task appears on the timeline"};
  syncP();syncD();
  pr.oninput=()=>{setProg(editing,pr.value/100);syncP()};
  $("drawer").querySelectorAll(".quick button").forEach(b=>b.onclick=()=>{setProg(editing,b.dataset.v/100);syncP()});
@@ -1585,7 +1592,7 @@ const MOCK=!!window.__B2C_MOCK__;
 const Live=(()=>{
  const G="https://graph.microsoft.com/v1.0";
  const SCOPES=["User.Read","Sites.ReadWrite.All"];
- let TF="Title,Section,ProjectManagers,Analysts,Progress,Status,StartDate,EndDate,Notes";let hasPri=false,hasDesc=false,hasDone=false,actListId=null;
+ let TF="Title,Section,ProjectManagers,Analysts,Progress,Status,StartDate,EndDate,Notes";let hasPri=false,hasDesc=false,hasDone=false,hasHold=false,actListId=null;
  let pca=null,account=null,siteId=null,taskListId=null,secListId=null,peopleListId=null,listUrl="";
  let state="init",msg="",me="",lastPull=0,timer=null,pushing=false,dirty=false,pollT=null,retryT=null,progress="";
  const snapT=new Map(),snapS=new Map();
@@ -1634,11 +1641,11 @@ const Live=(()=>{
  /* ---------- Mapping ---------- */
  const iso2sp=d=>d?d+"T00:00:00Z":null;
  const sp2iso=v=>v?new Date(new Date(v).getTime()+6*36e5).toISOString().slice(0,10):null;
- const ser=t=>JSON.stringify([t.ws,t.task,t.pm.join("/"),t.an.join("/"),Math.round(t.prog*100),t.status,t.start||"",t.end||"",t.notes||"",t.pri,t.desc||"",t.done||"",t.doneBy||""]);
+ const ser=t=>JSON.stringify([t.ws,t.task,t.pm.join("/"),t.an.join("/"),Math.round(t.prog*100),t.status,t.start||"",t.end||"",t.notes||"",t.pri,t.desc||"",t.done||"",t.doneBy||"",t.holdDays||0,t.holdSince||""]);
  const sser=s=>JSON.stringify([s.name,s.color,s.order]);
- const toFields=t=>({...(hasDone?{CompletedOn:t.done||null,CompletedBy:t.done?(t.doneBy||""):""}:{}),...(hasPri?{Priority:t.pri}:{}),...(hasDesc?{Description:t.desc||""}:{}),Title:t.task,Section:t.ws,ProjectManagers:t.pm.join("/"),Analysts:t.an.join("/"),Progress:Math.round(t.prog*100)/100,Status:t.status,StartDate:iso2sp(t.start),EndDate:iso2sp(t.end),Notes:t.notes||""});
+ const toFields=t=>({...(hasHold?{HoldDays:+t.holdDays||0,HoldSince:t.holdSince||null}:{}),...(hasDone?{CompletedOn:t.done||null,CompletedBy:t.done?(t.doneBy||""):""}:{}),...(hasPri?{Priority:t.pri}:{}),...(hasDesc?{Description:t.desc||""}:{}),Title:t.task,Section:t.ws,ProjectManagers:t.pm.join("/"),Analysts:t.an.join("/"),Progress:Math.round(t.prog*100)/100,Status:t.status,StartDate:iso2sp(t.start),EndDate:iso2sp(t.end),Notes:t.notes||""});
  const toSFields=s=>({Title:s.name,Color:s.color,SortOrder:s.order});
- function toTask(it){const f=it.fields||{};const t=norm({id:+it.id,sp:String(it.id),ws:f.Section||"Unsorted",task:f.Title||"(untitled)",pm:f.ProjectManagers||"",an:f.Analysts||"",prog:+f.Progress||0,status:f.Status||"",start:sp2iso(f.StartDate),end:sp2iso(f.EndDate),notes:f.Notes||"",pri:f.Priority||"",desc:f.Description||"",done:f.CompletedOn||null,doneBy:f.CompletedBy||""});
+ function toTask(it){const f=it.fields||{};const t=norm({id:+it.id,sp:String(it.id),ws:f.Section||"Unsorted",task:f.Title||"(untitled)",pm:f.ProjectManagers||"",an:f.Analysts||"",prog:+f.Progress||0,status:f.Status||"",start:sp2iso(f.StartDate),end:sp2iso(f.EndDate),notes:f.Notes||"",pri:f.Priority||"",desc:f.Description||"",done:f.CompletedOn||null,doneBy:f.CompletedBy||"",holdDays:+f.HoldDays||0,holdSince:f.HoldSince||null});
   if(t.status==="Complete")t.prog=1;t.updated=it.lastModifiedDateTime;t.by=(it.lastModifiedBy&&it.lastModifiedBy.user&&it.lastModifiedBy.user.displayName)||"";return t}
  function toSec(it,i){const f=it.fields||{};return{sp:String(it.id),name:f.Title||"Section",color:/^#[0-9a-f]{6}$/i.test(f.Color||"")?f.Color:PALETTE[i%PALETTE.length],order:f.SortOrder!=null?+f.SortOrder:i+1}}
 
@@ -1736,8 +1743,8 @@ const Live=(()=>{
   set(tasks.length||secs.length?"ready":"empty");render();
   clearInterval(pollT);pollT=setInterval(()=>{if(document.visibilityState==="visible")pull()},CONFIG.pollSeconds*1000)}
  async function checkPri(){
-  try{const j=await api(`/sites/${siteId}/lists/${taskListId}/columns?$select=name`);const cn=(j.value||[]).map(c=>c.name);hasPri=cn.includes("Priority");hasDesc=cn.includes("Description");hasDone=cn.includes("CompletedOn")&&cn.includes("CompletedBy")}catch(e){hasPri=false;hasDesc=false;hasDone=false}
-  TF="Title,Section,ProjectManagers,Analysts,Progress,Status,StartDate,EndDate,Notes"+(hasPri?",Priority":"")+(hasDesc?",Description":"")+(hasDone?",CompletedOn,CompletedBy":"")}
+  try{const j=await api(`/sites/${siteId}/lists/${taskListId}/columns?$select=name`);const cn=(j.value||[]).map(c=>c.name);hasPri=cn.includes("Priority");hasDesc=cn.includes("Description");hasDone=cn.includes("CompletedOn")&&cn.includes("CompletedBy");hasHold=cn.includes("HoldDays")&&cn.includes("HoldSince")}catch(e){hasPri=false;hasDesc=false;hasDone=false;hasHold=false}
+  TF="Title,Section,ProjectManagers,Analysts,Progress,Status,StartDate,EndDate,Notes"+(hasPri?",Priority":"")+(hasDesc?",Description":"")+(hasDone?",CompletedOn,CompletedBy":"")+(hasHold?",HoldDays,HoldSince":"")}
  async function addPriColumn(){
   const C=`/sites/${siteId}/lists/${taskListId}/columns`,sc=["Sites.Manage.All"];
   if(!hasPri)await api(C,{method:"POST",body:JSON.stringify({name:"Priority",displayName:"Priority",choice:{choices:PRIS,displayAs:"dropDownMenu"},defaultValue:{value:"Medium"}})},sc);
@@ -1745,9 +1752,12 @@ const Live=(()=>{
   if(!hasDone){const cs=(await api(C+"?$select=name")).value.map(c=>c.name);
    if(!cs.includes("CompletedOn"))await api(C,{method:"POST",body:JSON.stringify({name:"CompletedOn",displayName:"CompletedOn",dateTime:{format:"dateTime"}})},sc);
    if(!cs.includes("CompletedBy"))await api(C,{method:"POST",body:JSON.stringify({name:"CompletedBy",displayName:"CompletedBy",text:{}})},sc)}
-  await checkPri();if(!hasPri||!hasDesc||!hasDone)throw new Error("Column not found after creating it");
-  const keep=new Map(DB.tasks.filter(t=>t.sp).map(t=>[t.sp,[t.pri,t.desc,t.done,t.doneBy]]));await connect();
-  DB.tasks.forEach(t=>{const p=keep.get(t.sp);if(p){t.pri=p[0];t.desc=p[1];if(p[2]&&!t.done){t.done=p[2];t.doneBy=p[3]}}});push()}
+  if(!hasHold){const cs=(await api(C+"?$select=name")).value.map(c=>c.name);
+   if(!cs.includes("HoldDays"))await api(C,{method:"POST",body:JSON.stringify({name:"HoldDays",displayName:"HoldDays",number:{}})},sc);
+   if(!cs.includes("HoldSince"))await api(C,{method:"POST",body:JSON.stringify({name:"HoldSince",displayName:"HoldSince",dateTime:{format:"dateTime"}})},sc)}
+  await checkPri();if(!hasPri||!hasDesc||!hasDone||!hasHold)throw new Error("Column not found after creating it");
+  const keep=new Map(DB.tasks.filter(t=>t.sp).map(t=>[t.sp,[t.pri,t.desc,t.done,t.doneBy,t.holdDays,t.holdSince]]));await connect();
+  DB.tasks.forEach(t=>{const p=keep.get(t.sp);if(p){t.pri=p[0];t.desc=p[1];if(p[2]&&!t.done){t.done=p[2];t.doneBy=p[3]}if(p[4]&&!t.holdDays)t.holdDays=p[4];if(p[5]&&!t.holdSince)t.holdSince=p[5]}});push()}
  async function createActivityList(){
   await api(`/sites/${siteId}/lists`,{method:"POST",body:JSON.stringify({displayName:CONFIG.activityList,list:{template:"genericList"},columns:[{name:"Action",text:{}},{name:"TaskRef",text:{}},{name:"Details",text:{allowMultipleLines:true}},{name:"UserName",text:{}}]})},["Sites.Manage.All"]);
   await findLists();if(!actListId)throw new Error("List not found after creating it")}
@@ -1789,7 +1799,7 @@ const Live=(()=>{
   const mk=(name,cols)=>api(`/sites/${siteId}/lists`,{method:"POST",body:JSON.stringify({displayName:name,list:{template:"genericList"},columns:cols})},sc);
   if(!taskListId)await mk(CONFIG.tasksList,[{name:"Section",text:{}},{name:"ProjectManagers",text:{}},{name:"Analysts",text:{}},{name:"Progress",number:{}},
    {name:"Status",choice:{choices:STATUSES,displayAs:"dropDownMenu"}},{name:"StartDate",dateTime:{format:"dateOnly"}},{name:"EndDate",dateTime:{format:"dateOnly"}},
-   {name:"Notes",text:{allowMultipleLines:true,linesForEditing:6}},{name:"Description",text:{allowMultipleLines:true,linesForEditing:6}},{name:"Priority",choice:{choices:PRIS,displayAs:"dropDownMenu"},defaultValue:{value:"Medium"}},{name:"CompletedOn",dateTime:{format:"dateTime"}},{name:"CompletedBy",text:{}}]);
+   {name:"Notes",text:{allowMultipleLines:true,linesForEditing:6}},{name:"Description",text:{allowMultipleLines:true,linesForEditing:6}},{name:"Priority",choice:{choices:PRIS,displayAs:"dropDownMenu"},defaultValue:{value:"Medium"}},{name:"CompletedOn",dateTime:{format:"dateTime"}},{name:"CompletedBy",text:{}},{name:"HoldDays",number:{}},{name:"HoldSince",dateTime:{format:"dateTime"}}]);
   if(!secListId)await mk(CONFIG.sectionsList,[{name:"Color",text:{}},{name:"SortOrder",number:{}}]);
   if(!actListId)await mk(CONFIG.activityList,[{name:"Action",text:{}},{name:"TaskRef",text:{}},{name:"Details",text:{allowMultipleLines:true}},{name:"UserName",text:{}}]).catch(()=>{});
   if(!peopleListId)await mk(CONFIG.peopleList,[{name:"Email",text:{}},{name:"DisplayName",text:{}}]).catch(()=>{});
@@ -1803,7 +1813,7 @@ const Live=(()=>{
   const base=-Date.now();d.tasks.forEach((t,i)=>{delete t.sp;t.id=base-i;DB.tasks.push(t)});
   set("ready");go("overview");toast("Uploading to SharePoint – keep this tab open until it finishes");await push();
   if(state==="ready")toast(`Imported ${d.tasks.length.toLocaleString("en-GB")} tasks – everyone can see them now`)}
- return{get hasDone(){return hasDone},get hasDesc(){return hasDesc},get hasAct(){return!!actListId},createActivityList,getActivity,deletePerson,get hasPeople(){return!!peopleListId},get email(){return MOCK?"test.user@savills.com":(account&&account.username)||""},createPeopleList,savePeople,get hasPri(){return hasPri},addPriColumn,init,pull,push,signIn,signOut,createLists,startFresh,importWorkbook,configured,
+ return{get hasHold(){return hasHold},get hasDone(){return hasDone},get hasDesc(){return hasDesc},get hasAct(){return!!actListId},createActivityList,getActivity,deletePerson,get hasPeople(){return!!peopleListId},get email(){return MOCK?"test.user@savills.com":(account&&account.username)||""},createPeopleList,savePeople,get hasPri(){return hasPri},addPriColumn,init,pull,push,signIn,signOut,createLists,startFresh,importWorkbook,configured,
   schedule(){clearTimeout(timer);timer=setTimeout(push,400)},
    pending:()=>pushing||DB.tasks.some(t=>!t.sp||!snapT.has(t.sp)||ser(t)!==snapT.get(t.sp)),
   get state(){return state},get msg(){return msg},get me(){return me},get lastPull(){return lastPull},get listUrl(){return listUrl},get account(){return account}}
@@ -2138,7 +2148,7 @@ const dayDiff=(a,b)=>Math.round((b-a)/DAY);
 const med=a=>{if(!a.length)return null;const s=[...a].sort((x,y)=>x-y),m=s.length>>1;return s.length%2?s[m]:(s[m-1]+s[m])/2};
 const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
 const fd=n=>n==null?"–":(Math.abs(n)<10&&n%1?n.toFixed(1):Math.round(n))+"d";
-const planDur=t=>{if(!t.start)return null;const f=t.done?new Date(t.done):t.end?D(t.end):null;if(!f)return null;const x=dayDiff(D(t.start),new Date(f.getFullYear(),f.getMonth(),f.getDate()));return x>=0&&x<400?x:null};
+const planDur=t=>{if(!t.start)return null;const f=t.done?new Date(t.done):t.end?D(t.end):null;if(!f)return null;const fin=new Date(f.getFullYear(),f.getMonth(),f.getDate());const x=dayDiff(D(t.start),fin)-holdTotal(t,fin);return x>=0&&x<400?x:(x<0&&x>-400?0:null)};
 const monday=d=>{const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return x};
 function anFilter(t){const A=UI.an,q=UI.q.toLowerCase();
  return(!q||(t.task+" "+(t.desc||"")+" "+t.pm.join(" ")+" "+t.an.join(" ")+" "+t.ws).toLowerCase().includes(q))&&matchPeople(t)&&(!UI.sections.size||UI.sections.has(t.ws))&&(!UI.pris.size||UI.pris.has(t.pri))}
@@ -2194,74 +2204,85 @@ function vAnalytics(){
   s+=`<path d="${pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ")}" fill="none" stroke="#F5C400" stroke-width="2" stroke-dasharray="5 4"/>`;
   pts.forEach((p,i)=>s+=`<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="#F5C400"><title>${mm[i].st} tasks started</title></circle>`);
   return s+"</svg>"})();
- /* ---- forward workload & quiet periods: effort-based model ----
-    Each open task gets an estimated effort (person-days) from history:
-      1) its repeat series' typical time to complete, else
-      2) its section's typical time to complete, else
-      3) its own start→end span, else 5 days.
-    Effort is converted to working days actually needed (≈60% of elapsed days),
-    reduced by progress already made, then spread across the working days
-    between today/start and its deadline (overdue work lands this week).
-    Each day of work is weighted by priority (High 1.5×, Medium 1×, Low 0.6×),
-    and a deadline falling in a week adds a crunch bump. The weekly total is
-    compared with team capacity (people active × 5 days × focus factor). */
- const PW={High:1.5,Medium:1,Low:.6},CRUNCH={High:1,Medium:.5,Low:.25},FOCUS=.7,WORKSHARE=.6;
- const w0=monday(T),weeks=[];for(let i=0;i<A.hz;i++)weeks.push(new Date(w0.getTime()+i*7*DAY));
- const hzEnd=new Date(w0.getTime()+A.hz*7*DAY);
+ /* ---- forward workload & quiet periods: person-day model, calibrated to the team's own history ----
+    1. Every task is spread over the working days it is active (start -> deadline, or start -> 100% date for history).
+    2. Each person on a task gets that task's weight on each of those days (priority, work left, deadline crunch).
+    3. A person's day saturates: 1 task = ~0.5 of a day, 2 = ~0.75, 4+ = ~0.95 – you can't be more than one person.
+    4. Weekly load = person-days occupied across the team.
+    5. The same calculation is run over the last 6 months of real work; "100%" = a typical (median) past week.
+       So a reading of 150% means "half as busy again as a normal week for this team", never "3 people's worth per person". */
+ const PW={High:1.4,Medium:1,Low:.65},SAT=2;
+ // long tasks are not worked on every day: effort grows slower than the span (1 day\u21921, 5\u21922.6, 20\u21926, 60\u219212 days of effort)
+ const dens=(a,b)=>{let n=0;for(let i=a;i<=b;i++)if(isWd(i))n++;n=Math.max(1,n);return Math.pow(n,.6)/n};
+ // demand on a person-day: grows with more work, but with diminishing returns (1\u21921, 3\u21922, 8\u21923.3)
+ const sat=x=>2*(Math.sqrt(1+x*1.5)-1)/(2*(Math.sqrt(2.5)-1));
+ const w0=monday(T),HIST=26,weeks=[];for(let i=0;i<A.hz;i++)weeks.push(new Date(w0.getTime()+i*7*DAY));
+ const hzEnd=new Date(w0.getTime()+A.hz*7*DAY-DAY),hStart=new Date(w0.getTime()-HIST*7*DAY);
+ const nDays=Math.round((hzEnd-hStart)/DAY)+1,dayOf=d=>Math.round((new Date(d.getFullYear(),d.getMonth(),d.getDate())-hStart)/DAY);
+ const isWd=i=>{const g=new Date(hStart.getTime()+i*DAY).getDay();return g>0&&g<6};
  const proj=projectRecurring(all,hzEnd);
+ const tIdx=dayOf(T);
+ const ppl=new Map(),addP=(p,i,v)=>{if(!ppl.has(p))ppl.set(p,new Float32Array(nDays));ppl.get(p)[i]+=v};
+ const contrib=new Map(); // per task: future weekly share for drill-down
+ const stale=[];
+ function lay(t,from,to,w,dl,future){if(!from||!to)return;let a=Math.max(0,dayOf(from)),b=Math.min(nDays-1,dayOf(to));if(b<a)return;
+  const dn=dens(Math.max(0,dayOf(from)),Math.min(nDays-1,dayOf(to)))*(t._dn||1);const who=(t.an&&t.an.length?t.an:t.pm||[]).concat(t.an&&t.an.length?(t.pm||[]).map(x=>"\u00a7"+x):[]);const ps=who.length?[...new Set(who.map(x=>x.toLowerCase()))]:["_unassigned"];
+  for(let i=a;i<=b;i++){if(!isWd(i))continue;let v=w*dn;if(dl!=null&&i>=dl-2&&i<=dl)v*=1.35;ps.forEach(p=>addP(p.replace("\u00a7",""),i,p[0]==="\u00a7"?v*.35:v));
+   if(future&&i>=tIdx){const wk=Math.floor((i-dayOf(w0))/7);if(wk>=0&&wk<A.hz){const k=contrib.get(t)||new Array(A.hz).fill(0);k[wk]+=v*ps.length;contrib.set(t,k)}}}}
+ // history: what actually happened (completed + still-open work, active from start to finish)
+ all.forEach(t=>{if(!t.start)return;const s=D(t.start);if(s>T)return;
+  const f=t.status==="Complete"?(t.done?new Date(t.done):D(t.end)):(t.end&&D(t.end)<T?D(t.end):new Date(T.getTime()-DAY));
+  if(!f||f<hStart)return;lay(t,s,f<T?f:new Date(T.getTime()-DAY),PW[t.pri]||1,null,false)});
+ // future: open work + projected recurring
  const live=open.filter(t=>t.status!=="On hold");
- // historical typical durations
- const histAll=DB.tasks.filter(t=>t.status==="Complete").map(t=>({t,d:planDur(t)})).filter(x=>x.d!=null&&x.d<200);
- const secMed={};DB.sections.forEach(s=>{secMed[s.name]=med(histAll.filter(x=>x.t.ws===s.name).map(x=>x.d))});
- const serMed={};buildSeries(DB.tasks).forEach(s=>{if(s.medDur!=null)s.tasks.forEach(t=>serMed[seriesKey(t)]=s.medDur)});
- const wdays=(a,b)=>{let n=0;const x=new Date(a);while(x<=b){const g=x.getDay();if(g&&g<6)n++;x.setDate(x.getDate()+1)}return n};
- const estimate=t=>{const k=t.proj?null:seriesKey(t);let el=(k&&serMed[k]!=null)?serMed[k]:secMed[t.ws];let src=k&&serMed[k]!=null?"series history":secMed[t.ws]!=null?"section history":"";
-  if(el==null&&t.start&&t.end){el=dayDiff(D(t.start),D(t.end))+1;src="its own dates"}if(el==null){el=5;src="default"}
-  const total=Math.max(.5,Math.min(40,el*WORKSHARE)),rem=total*(1-(t.prog||0));return{total,rem,src}};
- const items=[...live.map(t=>({...t,_t:t})),...proj].map(t=>{const e=estimate(t);
-  const s0=D(t.start||t.end)||T,e0=D(t.end)||new Date((D(t.start)||T).getTime()+Math.ceil(e.total/WORKSHARE)*DAY);
-  const over=!!(t.end&&D(t.end)<T),od=over?dayDiff(D(t.end),T):0,stale=over&&od>30&&t.status!=="In progress";
-  const from=s0<T?new Date(T):s0;let to=e0<from?from:e0;if(over)to=new Date(T.getTime()+11*DAY);
-  return{t,e,from,to,over,stale}});
- const stale=items.filter(x=>x.stale),itemsW=items.filter(x=>!x.stale);
- const ppl0=new Set();items.forEach(x=>(x.t.pm||[]).concat(x.t.an||[]).forEach(p=>ppl0.add(p.toLowerCase())));
- const autoCap=Math.max(1,ppl0.size);A.cap=A.cap||null;const heads=A.cap||autoCap,capacity=heads*5*FOCUS;
- const load=weeks.map(w=>({w,we:new Date(w.getTime()+6*DAY),pts:0,byP:{High:0,Medium:0,Low:0},proj:0,crunch:0,dl:0,items:[]}));
- itemsW.forEach(x=>{const wt=PW[x.t.pri]||1;
-  const span=Math.max(1,wdays(x.from,x.to));const perDay=x.e.rem/span;
-  load.forEach(L=>{const a=x.from>L.w?x.from:L.w,b=x.to<L.we?x.to:L.we;if(a>b)return;const d=wdays(a,b);if(!d)return;
-   const eff=perDay*d;const pts=eff*wt;L.pts+=pts;L.byP[x.t.pri||"Medium"]+=pts;if(x.t.proj)L.proj+=pts;L.items.push({x,eff})});
-  const dl=x.over?null:D(x.t.end);load.forEach(L=>{if(dl&&dl>=L.w&&dl<=L.we){const c=CRUNCH[x.t.pri]||.5;L.pts+=c;L.byP[x.t.pri||"Medium"]+=c;L.crunch+=c;L.dl++}})});
- // expected unplanned (ad hoc) work: typical weekly effort of non-recurring work that started in the last 26 weeks
- const pastW=[];for(let i=1;i<=26;i++)pastW.push(new Date(w0.getTime()-i*7*DAY));
- const nonRec=DB.tasks.filter(t=>anFilter(t)&&t.start&&!(window.getRec&&getRec(t)));
- const pastPts=pastW.map(w=>{const we=new Date(w.getTime()+6*DAY);return nonRec.filter(t=>{const s=D(t.start);return s>=w&&s<=we}).reduce((a,t)=>a+estimate(t).total*(PW[t.pri]||1),0)});
- const baseline=med(pastPts)||0;
+ [...live,...proj].forEach(t=>{const left=.35+.65*(1-(t.prog||0)),w=(PW[t.pri]||1)*left;
+  const over=!!(t.end&&D(t.end)<T),od=over?dayDiff(D(t.end),T):0;
+  if(over&&(od>90||od>30&&t.status!=="In progress")){stale.push(t);return}
+  let s=D(t.start||t.end)||T;if(s<T)s=new Date(T);
+  let e=t.end?D(t.end):new Date(s.getTime()+13*DAY);if(over)e=new Date(T.getTime()+27*DAY);if(e<s)e=s;
+  lay(t,s,e,w,over||!t.end?null:dayOf(D(t.end)),true)});
+ // per-day team load (person-days occupied)
+ const dayLoad=new Float32Array(nDays);ppl.forEach(arr=>{for(let i=0;i<nDays;i++)if(arr[i])dayLoad[i]+=sat(arr[i])});
+ const weekSum=st=>{let s=0;for(let i=st;i<st+7&&i<nDays;i++)s+=dayLoad[i];return s};
+ const histW=[];for(let k=HIST;k>=1;k--)histW.push(weekSum(dayOf(new Date(w0.getTime()-k*7*DAY))));
+ const histNZ=histW.filter(x=>x>.5),typical=med(histNZ)||Math.max(1,ppl.size*2.5);
+ const hiQ=histNZ.length?[...histNZ].sort((a,b)=>a-b)[Math.floor(histNZ.length*.85)]:typical*1.3;
+ const activePeople=[...ppl.keys()].filter(p=>{const a=ppl.get(p);for(let i=0;i<nDays;i++)if(a[i])return true;return false}).length;
+ // expected ad hoc: far-off weeks look empty only because the work isn't logged yet – fade toward a typical week
  if(A.adhoc===undefined)A.adhoc=true;
- load.forEach((L,i)=>{const sched=L.pts-L.proj,ramp=Math.min(1,i/6);L.exp=A.adhoc?Math.max(0,baseline-sched)*ramp:0;L.pts+=L.exp});
- const BANDS=[[.4,"quiet","Quiet","#3DDC97"],[.7,"light","Light","#8FD6B4"],[1,"normal","Normal","#6E9BFF"],[1.3,"busy","Busy","#F2B04A"],[1e9,"over","Overloaded","#FF6B6B"]];
- load.forEach(L=>{L.pct=L.pts/capacity;const b=BANDS.find(b=>L.pct<b[0]);L.band=b[1];L.bl=b[2];L.bc=b[3];L.q=L.band==="quiet";L.b=L.band==="busy"||L.band==="over";L.free=Math.max(0,capacity-L.pts)});
+ const BANDS=[[.6,"quiet","Quiet","#3DDC97"],[.85,"light","Light","#8FD6B4"],[1.15,"normal","Typical","#6E9BFF"],[1.45,"busy","Busy","#F2B04A"],[1e9,"over","Very busy","#FF6B6B"]];
+ const load=weeks.map((w,i)=>{const st=dayOf(w);const sched=weekSum(st);
+  const ramp=Math.min(1,Math.max(0,(i-1)/7));const exp=A.adhoc?Math.max(0,typical*.8-sched)*ramp:0;
+  const items=[];contrib.forEach((k,t)=>{if(k[i]>0)items.push({t,eff:k[i]})});
+  let projPts=0;items.forEach(x=>{if(x.t.proj)projPts+=x.eff});const tot=items.reduce((a,x)=>a+x.eff,0)||1;
+  const byP={High:0,Medium:0,Low:0};items.forEach(x=>byP[x.t.pri||"Medium"]+=x.eff/tot*sched);
+  const we=new Date(w.getTime()+6*DAY),dl=items.filter(x=>x.t.end&&D(x.t.end)>=w&&D(x.t.end)<=we).length;
+  const pts=sched+exp,pct=pts/typical;const b=BANDS.find(b=>pct<b[0]);
+  return{w,we,sched,exp,pts,pct,byP,items,dl,proj:projPts/tot*sched,band:b[1],bl:b[2],bc:b[3],q:b[1]==="quiet",b:b[1]==="busy"||b[1]==="over",free:Math.max(0,typical-pts),known:sched/typical}});
  const runs=[];let cur=null;load.forEach((x,i)=>{if(x.q){if(!cur)cur={s:i,e:i};else cur.e=i}else if(cur){runs.push(cur);cur=null}});if(cur)runs.push(cur);
  const wfmt=d=>d.toLocaleDateString("en-GB",{day:"numeric",month:"short"});
- const fw=(()=>{const W=1300,Hh=290,L=40,B=44,iw=W-L-6,ih=Hh-B-18,bw=iw/load.length,mx=Math.min(2,Math.max(1.5,...load.map(x=>x.pct)))*1.05;
+ const histPctMax=histNZ.length?Math.max(...histNZ.map(x=>x/typical)):1;
+ const fw=(()=>{const W=1300,Hh=290,L=40,B=44,iw=W-L-6,ih=Hh-B-18,bw=iw/load.length,mx=Math.min(2.2,Math.max(1.6,...load.map(x=>x.pct)))*1.05;
   const y=v=>18+ih-v/mx*ih;let s=`<svg viewBox="0 0 ${W} ${Hh}" width="100%" style="display:block"><defs><pattern id="anHatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="rgba(255,255,255,.05)"/><line x1="0" y1="0" x2="0" y2="6" stroke="rgba(255,255,255,.28)" stroke-width="2"/></pattern></defs>`;
   runs.forEach(r=>{s+=`<rect x="${L+r.s*bw}" y="10" width="${(r.e-r.s+1)*bw}" height="${ih+8}" rx="6" fill="#3DDC97" opacity=".07"/>`});
+  const hq=hiQ/typical;s+=`<rect x="${L}" y="${y(Math.min(mx,hq))}" width="${iw}" height="${y(.85)-y(Math.min(mx,hq))}" fill="rgba(110,155,255,.05)"/>`;
   [0,.5,1,1.5,2].filter(f=>f<=mx).forEach(f=>{s+=`<line x1="${L}" x2="${W}" y1="${y(f)}" y2="${y(f)}" stroke="${f===1?"rgba(245,196,0,.55)":"rgba(255,255,255,.07)"}" ${f===1?'stroke-dasharray="4 4"':""}/><text x="${L-6}" y="${y(f)+4}" text-anchor="end" font-size="10" fill="${f===1?"#F5C400":"#8B93A3"}">${Math.round(f*100)}%</text>`});
-  s+=`<text x="${W-4}" y="${y(1)-6}" text-anchor="end" font-size="10" fill="#F5C400">team capacity</text>`;
-  s+=`<line x1="${L}" x2="${W}" y1="${y(.4)}" y2="${y(.4)}" stroke="rgba(61,220,151,.45)" stroke-dasharray="2 4"/><text x="${W-4}" y="${y(.4)-6}" text-anchor="end" font-size="10" fill="#3DDC97">quiet below 40%</text>`;
-  load.forEach((x,i)=>{const cx=L+i*bw+bw*.15,w=bw*.7;let yy=18+ih;
+  s+=`<text x="${W-4}" y="${y(1)-6}" text-anchor="end" font-size="10" fill="#F5C400">typical week (last 6 months)</text>`;
+  s+=`<line x1="${L}" x2="${W}" y1="${y(.6)}" y2="${y(.6)}" stroke="rgba(61,220,151,.45)" stroke-dasharray="2 4"/><text x="${W-4}" y="${y(.6)-6}" text-anchor="end" font-size="10" fill="#3DDC97">quiet below 60%</text>`;
+  load.forEach((x,i)=>{const cx=L+i*bw+bw*.15,w=bw*.7;let yy=18+ih;const top=18;
    s+=`<g class="anw" data-w="${i}"><rect x="${L+i*bw}" y="10" width="${bw}" height="${ih+8}" fill="transparent"/>`;
-   const top=18;["Low","Medium","High"].forEach(p=>{const v=x.byP[p]/capacity;if(v<=0)return;let h=v/mx*ih;if(yy-h<top)h=Math.max(0,yy-top);yy-=h;s+=`<rect x="${cx}" y="${yy}" width="${w}" height="${h}" fill="${PCH[p]}" opacity="${x.proj&&x.proj>=(x.pts-x.exp)*.5?.45:.85}"/>`});
-   if(x.exp>0){let h=x.exp/capacity/mx*ih;if(yy-h<top)h=Math.max(0,yy-top);yy-=h;s+=`<rect x="${cx}" y="${yy}" width="${w}" height="${h}" fill="url(#anHatch)" stroke="rgba(255,255,255,.25)" stroke-dasharray="2 2"/>`}
+   ["Low","Medium","High"].forEach(p=>{const v=x.byP[p]/typical;if(v<=0)return;let h=v/mx*ih;if(yy-h<top)h=Math.max(0,yy-top);yy-=h;s+=`<rect x="${cx}" y="${yy}" width="${w}" height="${h}" fill="${PCH[p]}" opacity="${x.proj>=x.sched*.5?.45:.85}"/>`});
+   if(x.exp>0){let h=x.exp/typical/mx*ih;if(yy-h<top)h=Math.max(0,yy-top);yy-=h;s+=`<rect x="${cx}" y="${yy}" width="${w}" height="${h}" fill="url(#anHatch)" stroke="rgba(255,255,255,.25)" stroke-dasharray="2 2"/>`}
    if(x.pct>mx)s+=`<text x="${cx+w/2}" y="${top-5}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#FF6B6B">${Math.round(x.pct*100)}%</text>`;
-   if(x.pts<=0)s+=`<rect x="${cx}" y="${18+ih-3}" width="${w}" height="3" rx="1.5" fill="#3DDC97"/>`;
+   if(x.pts<=.01)s+=`<rect x="${cx}" y="${18+ih-3}" width="${w}" height="3" rx="1.5" fill="#3DDC97"/>`;
    s+=`<rect x="${cx}" y="${18+ih+6}" width="${w}" height="6" rx="3" fill="${x.bc}"/>`;
-   s+=`<title>w/c ${wfmt(x.w)} \u2013 ${x.bl} (${Math.round(x.pct*100)}% of capacity)\n\u2248${(x.items.reduce((a,i)=>a+i.eff,0)).toFixed(1)} person-days of work across ${x.items.length} task${x.items.length===1?"":"s"}${x.dl?`\n${x.dl} deadline${x.dl===1?"":"s"} this week`:""}${x.proj?`\nincludes projected recurring work`:""}${x.exp>.05?`\nincludes ~${(x.exp/capacity*100).toFixed(0)}% expected ad hoc work (from history)`:""}</title></g>`;
+   s+=`<title>w/c ${wfmt(x.w)} \u2013 ${x.bl} (${Math.round(x.pct*100)}% of a typical week)\n${x.items.length} task${x.items.length===1?"":"s"} active${x.dl?` \u00b7 ${x.dl} deadline${x.dl===1?"":"s"}`:""}${x.proj?`\nincludes projected recurring work`:""}${x.exp>.05?`\n~${Math.round(x.exp/typical*100)}% is expected ad hoc work not logged yet`:""}</title></g>`;
    if(load.length<=14||i%Math.ceil(load.length/13)===0)s+=`<text x="${L+i*bw+bw/2}" y="${Hh-8}" text-anchor="middle" font-size="10" fill="#8B93A3">${wfmt(x.w)}</text>`});
   return s+"</svg>"})();
  const quietList=runs.map(r=>{const wks=r.e-r.s+1,sd=load[r.s].w,ed=new Date(load[r.e].w.getTime()+4*DAY);
-  const free=load.slice(r.s,r.e+1).reduce((a,x)=>a+x.free,0)/ (heads?1:1);const avgPct=load.slice(r.s,r.e+1).reduce((a,x)=>a+x.pct,0)/wks;return{sd,ed,wks,free,avgPct}}).sort((a,b)=>b.free-a.free||a.sd-b.sd);
+  const sl=load.slice(r.s,r.e+1);return{sd,ed,wks,free:sl.reduce((a,x)=>a+x.free,0),avgPct:sl.reduce((a,x)=>a+x.pct,0)/wks}}).sort((a,b)=>b.free-a.free||a.sd-b.sd);
  const busy=load.filter(x=>x.b).sort((a,b)=>b.pct-a.pct).slice(0,5);
+ const heads=activePeople,autoCap=activePeople,capacity=typical,FOCUS=1,WORKSHARE=1;
  /* ---- cycle time by section ---- */
  const bySec=DB.sections.map(s=>{const x=doneIn.filter(d=>d.t.ws===s.name).map(d=>planDur(d.t)).filter(v=>v!=null);
   const tm=doneIn.filter(d=>d.t.ws===s.name&&d.t.end&&!d.a.est);const ok=tm.filter(d=>d.a.d<=new Date(D(d.t.end).getTime()+DAY-1)).length;
@@ -2286,38 +2307,40 @@ function vAnalytics(){
  $("view").innerHTML=pageHead("Analytics",`How the team's work flows · completions over the last ${rangeTxt}, workload over the next ${AN_HZ.find(h=>h[0]===A.hz)[1]}`)+`<div class="g fade">${fbar}
  <div class="kpis">
   ${kp("Completed",doneIn.length.toLocaleString("en-GB"),`last ${rangeTxt} · ${(doneIn.length/Math.max(1,A.range)).toFixed(1)} a month`,"var(--green)")}
-  ${kp("Typical time to complete",fd(med(cyc)),`median, start → 100% date · average ${fd(avg(cyc))}`)}
+  ${kp("Typical time to complete",fd(med(cyc)),`median, start → 100% date, minus time on hold · average ${fd(avg(cyc))}`)}
   ${kp("Open now",open.length,`${open.filter(t=>t.status==="In progress").length} in progress \u00b7 ${open.filter(t=>t.status==="Not started").length} not started`,"var(--blue)")}
   ${kp("Repeated work",series.length,`${recN} set up as recurring · ${series.length-recN} spotted by name`)}
  </div>
- <div class="card pad"><div class="ch"><div><h3>Workload ahead &amp; quiet periods</h3><div class="h">Estimated effort each week as a share of team capacity \u2013 based on how long similar work has taken before, how much is left to do, priority and deadlines. Recurring tasks not yet created are included. <a href="#" id="anHow" class="link" style="padding:0;font-size:12px">How it\u2019s calculated</a></div></div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><label class="tgl" title="Add the typical weekly volume of ad hoc work that hasn\u2019t been created yet"><input type="checkbox" id="anAdhoc" ${A.adhoc?"checked":""}><i></i>Expected ad hoc</label><label class="rcrow" style="font-size:12.5px;color:var(--ink2)">Team size <input type="number" min="1" max="50" class="sel" id="anCap" value="${heads}" style="width:64px;height:34px;padding:0 8px" title="People sharing this work (auto: ${autoCap} people on these tasks)"></label><div class="seg" id="anH">${AN_HZ.map(([v,l])=>`<button data-h="${v}" class="${A.hz===v?"on":""}">${l}</button>`).join("")}</div></div></div>
+ <div class="card pad"><div class="ch"><div><h3>Workload ahead &amp; quiet periods</h3><div class="h">How busy each week looks compared with a <b>typical week for this team</b> over the last 6 months (100%). Based on who is on each task, how much is left, priority and deadlines. <a href="#" id="anHow" class="link" style="padding:0;font-size:12px">How it\u2019s calculated</a></div></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><label class="tgl" title="Fade far-off weeks towards a typical week, because ad hoc work isn\u2019t logged that far ahead"><input type="checkbox" id="anAdhoc" ${A.adhoc?"checked":""}><i></i>Expected ad hoc</label><div class="seg" id="anH">${AN_HZ.map(([v,l])=>`<button data-h="${v}" class="${A.hz===v?"on":""}">${l}</button>`).join("")}</div></div></div>
   ${fw}
   <div class="legend" style="margin-top:8px">${BANDS.map(b=>`<span><i style="background:${b[3]}"></i>${b[2]}</span>`).join("")}<span style="margin-left:10px">Bar colours = priority:</span>${["High","Medium","Low"].map(p=>`<span><i style="background:${PCH[p]}"></i>${p}</span>`).join("")}<span>Faded = mostly projected recurring</span><span><i style="background:repeating-linear-gradient(45deg,rgba(255,255,255,.35) 0 2px,transparent 2px 4px)"></i>Expected ad hoc work</span><span>Click a week for detail</span></div>
   <div id="anHowBox" class="anhow" style="display:none"><b>How the workload estimate works</b><ul>
-   <li><b>Effort per task</b> \u2013 the typical time to complete (start date \u2192 date it reached 100%) for that repeat series, else for its section, else the task\u2019s own start\u2013end span (default 5 days). Roughly ${Math.round(WORKSHARE*100)}% of elapsed days are counted as hands-on work.</li>
-   <li><b>Work left</b> \u2013 reduced by the progress already recorded, then spread over the working days between now (or its start) and its deadline. Overdue work is spread over the next two weeks as catch-up; tasks more than 30 days overdue and not in progress are treated as stale backlog and left out.</li>
-   <li><b>Expected ad hoc work</b> \u2013 future weeks look emptier only because tasks haven\u2019t been created yet, so the typical weekly volume of non-recurring work from the last 6 months is added (phased in over the first 6 weeks).</li>
-   <li><b>Priority</b> \u2013 High work counts 1.5\u00d7, Medium 1\u00d7, Low 0.6\u00d7. A deadline in a week adds extra pressure (High +1, Medium +0.5, Low +0.25).</li>
-   <li><b>Capacity</b> \u2013 team size \u00d7 5 days \u00d7 ${Math.round(FOCUS*100)}% focus time (= ${capacity.toFixed(1)} weighted days a week). Team size defaults to the ${autoCap} people on these tasks; change it above.</li>
-   <li><b>Bands</b> \u2013 Quiet under 40% of capacity, Light 40\u201370%, Normal 70\u2013100%, Busy 100\u2013130%, Overloaded above 130%. On hold tasks are excluded.</li></ul></div>
-  ${stale.length?`<div class="h" style="margin-top:8px;color:var(--amber)">${stale.length} task${stale.length===1?" is":"s are"} more than 30 days overdue and not in progress \u2013 treated as stale backlog and not counted. <a href="#" class="link" id="anStale" style="padding:0;font-size:12px">Review them</a></div>`:""}
+   <li><b>Person-days, not task counts</b> \u2013 each open task is spread over the working days it is live (start to deadline), and every person on it carries it on those days.</li>
+   <li><b>People can\u2019t be cloned</b> \u2013 a person\u2019s day fills up with diminishing returns, so juggling 10 tasks never counts as more than one person. Analysts carry the work; project managers carry about a third as much.</li>
+   <li><b>Long tasks aren\u2019t full-time</b> \u2013 effort grows more slowly than the time span (a 1-day task \u2248 1 day of effort, a 4-week task \u2248 6, a 3-month task \u2248 12), so long-running work doesn\u2019t swamp the chart.</li>
+   <li><b>Weighting</b> \u2013 High priority counts 1.4\u00d7, Low 0.65\u00d7; tasks near the finish count less (progress), and the 3 working days before a deadline count 1.35\u00d7.</li>
+   <li><b>Calibrated to your history</b> \u2013 exactly the same calculation is run over the last 6 months of real work. 100% = a typical (median) past week, so readings are relative to what the team normally handles.</li>
+   <li><b>Expected ad hoc work</b> \u2013 weeks further out look emptier only because work hasn\u2019t been logged yet, so they fade towards 80% of a typical week (hatched). Turn it off to see only what\u2019s scheduled.</li>
+   <li><b>Excluded</b> \u2013 on-hold tasks, and tasks more than 30 days overdue that aren\u2019t in progress (stale backlog). Overdue work still in progress is spread over the next four weeks as catch-up; anything more than 90 days overdue is treated as stale.</li>
+   <li><b>Bands</b> \u2013 Quiet under 60% of a typical week \u00b7 Light 60\u201385% \u00b7 Typical 85\u2013115% \u00b7 Busy 115\u2013145% \u00b7 Very busy above 145%. Your busiest week in the last 6 months reached ${Math.round(histPctMax*100)}%.</li></ul></div>
+  ${stale.length?`<div class="h" style="margin-top:8px;color:var(--amber)">${stale.length} task${stale.length===1?" is":"s are"} long overdue (30+ days and not in progress, or 90+ days) \u2013 treated as stale backlog and not counted. <a href="#" class="link" id="anStale" style="padding:0;font-size:12px">Review them</a></div>`:""}
   <div id="anWk"></div>
   <div class="g ov2" style="grid-template-columns:1fr 1fr;margin-top:16px">
-   <div><div class="rclbl" style="margin-bottom:8px">Quiet windows <small>most spare capacity first</small></div>${quietList.length?quietList.slice(0,6).map(q=>`<div class="anq"><b>${wfmt(q.sd)} \u2013 ${wfmt(q.ed)}</b><span>${q.wks} week${q.wks===1?"":"s"} \u00b7 ${Math.round(q.avgPct*100)}% loaded \u00b7 ~${Math.round(q.free/FOCUS)} person-days free</span></div>`).join(""):`<div class="h">No quiet weeks in this window – every week is above 40% of capacity.</div>`}</div>
-   <div><div class="rclbl" style="margin-bottom:8px">Busiest weeks</div>${busy.length?busy.map(b=>`<div class="anq busy" data-wi="${load.indexOf(b)}"><b>w/c ${wfmt(b.w)}</b><span>${b.bl} \u00b7 ${Math.round(b.pct*100)}% of capacity \u00b7 ${b.items.length} task${b.items.length===1?"":"s"}${b.dl?` \u00b7 ${b.dl} deadline${b.dl===1?"":"s"}`:""}</span></div>`).join(""):`<div class="h">No weeks above capacity – nothing looks overloaded.</div>`}</div>
+   <div><div class="rclbl" style="margin-bottom:8px">Quiet windows <small>most spare capacity first</small></div>${quietList.length?quietList.slice(0,6).map(q=>`<div class="anq"><b>${wfmt(q.sd)} \u2013 ${wfmt(q.ed)}</b><span>${q.wks} week${q.wks===1?"":"s"} \u00b7 ${Math.round(q.avgPct*100)}% loaded \u00b7 ~${Math.round(q.free)} person-days spare vs a typical week</span></div>`).join(""):`<div class="h">No quiet weeks in this window – every week is at least 60% of a typical week.</div>`}</div>
+   <div><div class="rclbl" style="margin-bottom:8px">Busiest weeks</div>${busy.length?busy.map(b=>`<div class="anq busy" data-wi="${load.indexOf(b)}"><b>w/c ${wfmt(b.w)}</b><span>${b.bl} \u00b7 ${Math.round(b.pct*100)}% of a typical week \u00b7 ${b.items.length} task${b.items.length===1?"":"s"}${b.dl?` \u00b7 ${b.dl} deadline${b.dl===1?"":"s"}`:""}</span></div>`).join(""):`<div class="h">No weeks noticeably busier than usual.</div>`}</div>
   </div></div>
  <div class="g">
   <div class="card pad"><div class="ch"><div><h3>Throughput</h3><div class="h">Tasks completed each month (bars) vs tasks started (dashed line)</div></div></div>${thru}
    <div class="legend" style="margin-top:6px"><span><i style="background:#3DDC97"></i>Completed</span><span><i style="background:#F5C400"></i>Started</span></div></div>
  </div>
- <div class="card pad"><div class="ch"><div><h3>Repeated &amp; recurring tasks</h3><div class="h">Recurring series plus tasks with matching names (e.g. “Market Share Report Q1” and “Q2”). Time to complete = start date → date it reached 100%. Click a row for its history.</div></div>
+ <div class="card pad"><div class="ch"><div><h3>Repeated &amp; recurring tasks</h3><div class="h">Recurring series plus tasks with matching names (e.g. “Market Share Report Q1” and “Q2”). Time to complete = start date → date it reached 100%, minus any time on hold. Click a row for its history.</div></div>
   <select class="sel" id="anSort">${[["n","Sort: Most occurrences"],["dur","Sort: Longest to complete"],["next","Sort: Next due"],["name","Sort: A–Z"]].map(([k,l])=>`<option value="${k}" ${A.sort===k?"selected":""}>${l}</option>`).join("")}</select></div>
   ${srows.length?`<div class="antab"><div class="anh"><span>Task</span><span>Cadence</span><span>Times</span><span>Time to complete</span><span>Trend</span><span>Gap between</span><span>Next due</span></div>
   ${srows.slice(0,A.all?999:15).map(s=>`<div class="anr ${A.exp===s.k?"on":""}" data-sk="${H(s.k)}"><span><b>${s.rec?'<span class="rcbadge">\u21bb</span>':""}${H(s.name)}</b><small><i style="background:${secColor(s.ws)}"></i>${H(s.ws)}</small></span><span>${H(s.cadence)}</span><span>${s.n}<small>${s.done} done</small></span><span>${fd(s.medDur)}<small>${s.avgDur!=null?"avg "+fd(s.avgDur):""}</small></span><span>${spark(s)}</span><span>${s.gap==null?"–":s.gap<0?"overlap":fd(s.gap)}</span><span>${s.next?dueChip(s.next):'<span class="due m">–</span>'}</span></div>
-   ${A.exp===s.k?`<div class="anx">${s.tasks.slice().reverse().map(t=>{const a=t.status==="Complete"?doneAt(t):null,d=t.status==="Complete"?planDur(t):null;return`<div class="mrow" data-id="${t.id}"><span class="bar" style="background:${SCH[t.status]}"></span><div class="b"><div class="t">${H(t.task)}</div><div class="m">${t.start?fmt(t.start,1):"no start"} → ${t.end?fmt(t.end,1):"no end"}${a?` · done ${a.d.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}${a.est?"*":""}`:""}${d!=null?` · ${d} days`:""}</div></div>${dueChip(t)}</div>`}).join("")}<button class="link" data-q="${H(s.name)}">Show in All tasks →</button></div>`:""}`).join("")}</div>
+   ${A.exp===s.k?`<div class="anx">${s.tasks.slice().reverse().map(t=>{const a=t.status==="Complete"?doneAt(t):null,d=t.status==="Complete"?planDur(t):null;return`<div class="mrow" data-id="${t.id}"><span class="bar" style="background:${SCH[t.status]}"></span><div class="b"><div class="t">${H(t.task)}</div><div class="m">${t.start?fmt(t.start,1):"no start"} → ${t.end?fmt(t.end,1):"no end"}${a?` · done ${a.d.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}${a.est?"*":""}`:""}${d!=null?` · ${d} days`:""}${holdTotal(t)?` (excl. ${holdTotal(t)}d on hold)`:""}</div></div>${dueChip(t)}</div>`}).join("")}<button class="link" data-q="${H(s.name)}">Show in All tasks →</button></div>`:""}`).join("")}</div>
   ${srows.length>15?`<div class="showmore"><button class="btn sm" id="anAll">${A.all?"Show fewer":"Show all "+srows.length}</button></div>`:""}`:`<div class="empty"><b>No repeated work found</b>Set tasks to repeat, or give repeated tasks matching names.</div>`}</div>
- <div class="card pad"><div class="ch"><div><h3>By section</h3><div class="h">Completed tasks in the last ${rangeTxt}, typical time to complete (start → 100% date) and open work</div></div></div>
+ <div class="card pad"><div class="ch"><div><h3>By section</h3><div class="h">Completed tasks in the last ${rangeTxt}, typical time to complete (start → 100% date, excluding time on hold) and open work</div></div></div>
   <div class="antab sec"><div class="anh"><span>Section</span><span>Completed</span><span>Typical time to complete</span><span>Open now</span></div>
   ${bySec.map(x=>`<div class="anr" data-sec="${H(x.s.name)}"><span><b><i class="sd" style="background:${x.s.color}"></i>${H(x.s.name)}</b></span><span>${x.n}</span><span class="cbar"><div class="track"><div style="width:${(x.med||0)/cmx*100}%;background:${x.s.color}"></div></div><b>${fd(x.med)}</b></span><span>${x.open}</span></div>`).join("")}</div></div>
  </div>`;
@@ -2327,7 +2350,6 @@ function vAnalytics(){
  v.querySelectorAll("[data-h]").forEach(b=>b.onclick=()=>{A.hz=+b.dataset.h;render()});
  const ah=$("anAdhoc");if(ah)ah.onchange=()=>{A.adhoc=ah.checked;render()};
  const stl=$("anStale");if(stl)stl.onclick=e=>{e.preventDefault();setOne("over");UI.view="all";render();window.scrollTo({top:0})};
- const cp=$("anCap");if(cp)cp.onchange=()=>{const n=Math.round(+cp.value);A.cap=n>0&&n!==autoCap?Math.min(50,n):null;render()};
  const hw=$("anHow");if(hw)hw.onclick=e=>{e.preventDefault();const b=$("anHowBox");b.style.display=b.style.display==="none"?"block":"none"};
  $("anSort").onchange=e=>{A.sort=e.target.value;render()};
  const al=$("anAll");if(al)al.onclick=()=>{A.all=!A.all;render()};
@@ -2342,8 +2364,9 @@ function vAnalytics(){
  v.querySelectorAll(".anx .mrow").forEach(e=>e.onclick=ev=>{ev.stopPropagation();openTask(+e.dataset.id)});
  v.querySelectorAll(".anx [data-q]").forEach(b=>b.onclick=ev=>{ev.stopPropagation();UI.q=b.dataset.q;$("q").value=UI.q;UI.view="all";setOne("all");render();window.scrollTo({top:0})});
  const showWk=i=>{const x=load[i];if(!x)return;v.querySelectorAll(".anw").forEach(g=>g.classList.toggle("sel",+g.dataset.w===i));
-  $("anWk").innerHTML=`<div class="anwk"><div class="ch" style="margin-bottom:6px"><b>w/c ${wfmt(x.w)} \u00b7 <span style="color:${x.bc}">${x.bl}</span> \u00b7 ${Math.round(x.pct*100)}% of capacity \u00b7 \u2248${x.items.reduce((a,i)=>a+i.eff,0).toFixed(1)} person-days</b><button class="link" id="anWkX">Close</button></div>${x.exp>.05?`<div class="h" style="margin:0 0 6px 10px">Plus ~${Math.round(x.exp/capacity*100)}% of capacity held for expected ad hoc work, based on recent weeks.</div>`:""}${x.items.length?x.items.sort((a,b)=>PRANK[a.x.t.pri]-PRANK[b.x.t.pri]||b.eff-a.eff).map(({x:it,eff})=>{const t=it.t;return`<div class="mrow" ${t.proj?"":`data-id="${t.id}"`}><span class="bar" style="background:${PCH[t.pri]}"></span><div class="b"><div class="t">${t.proj?'<span class="rcbadge">\u21bb</span>':""}${H(t.task)}${t.proj?' <small style="color:var(--muted)">(projected \u2013 not created yet)</small>':""}</div><div class="m">${H(t.ws)} \u00b7 ${t.pri} \u00b7 ~${eff.toFixed(1)}d this week of ~${it.e.rem.toFixed(1)}d left (from ${it.e.src})${it.over?' \u00b7 <span style="color:var(--red)">overdue</span>':""}</div></div>${t.proj?"":dueChip(t)}</div>`}).join(""):`<div class="h">Nothing scheduled \u2013 a quiet week.</div>`}</div>`;
-  $("anWkX").onclick=()=>{$("anWk").innerHTML="";v.querySelectorAll(".anw").forEach(g=>g.classList.remove("sel"))};
+  const tot=x.items.reduce((a,i)=>a+i.eff,0)||1;
+  $("anWk").innerHTML=`<div class="anwk"><div class="ch" style="margin-bottom:6px"><b>w/c ${wfmt(x.w)} \u00b7 <span style="color:${x.bc}">${x.bl}</span> \u00b7 ${Math.round(x.pct*100)}% of a typical week</b><button class="link" id="anWkX">Close</button></div>${x.exp>.05?`<div class="h" style="margin:0 0 6px 10px">Includes ~${Math.round(x.exp/typical*100)}% expected ad hoc work that isn\u2019t logged yet.</div>`:""}${x.items.length?x.items.sort((a,b)=>b.eff-a.eff).map(({t,eff})=>`<div class="mrow" ${t.proj?"":`data-id="${t.id}"`}><span class="bar" style="background:${PCH[t.pri]}"></span><div class="b"><div class="t">${t.proj?'<span class="rcbadge">\u21bb</span>':""}${H(t.task)}${t.proj?' <small style="color:var(--muted)">(projected \u2013 not created yet)</small>':""}</div><div class="m">${H(t.ws)} \u00b7 ${t.pri} \u00b7 ${Math.round(eff/tot*100)}% of this week\u2019s load${t.end&&D(t.end)<T?' \u00b7 <span style="color:var(--red)">overdue</span>':""}</div></div>${t.proj?"":dueChip(t)}</div>`).join(""):`<div class="h">Nothing scheduled \u2013 a quiet week.</div>`}</div>`;
+    $("anWkX").onclick=()=>{$("anWk").innerHTML="";v.querySelectorAll(".anw").forEach(g=>g.classList.remove("sel"))};
   $("anWk").querySelectorAll(".mrow[data-id]").forEach(e=>e.onclick=()=>openTask(+e.dataset.id))};
  v.querySelectorAll(".anw").forEach(g=>g.onclick=()=>showWk(+g.dataset.w));
  v.querySelectorAll("[data-wi]").forEach(e=>e.onclick=()=>showWk(+e.dataset.wi));
