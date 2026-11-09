@@ -685,7 +685,7 @@ function save(msg,undo){if(msg)toast(msg,undo);Live.schedule()}
 const secColor=n=>(DB.sections.find(s=>s.name===n)||{}).color||"#94A3B8";
 const isOpen=t=>t.status!=="Complete";
 const daysLeft=t=>t.end?Math.round((D(t.end)-T)/DAY):null;
-const isOver=t=>isOpen(t)&&t.status!=="On hold"&&t.end&&D(t.end)<T;
+const isOver=t=>isOpen(t)&&t.status!=="On hold"&&t.prog<1&&t.end&&D(t.end)<T;
 const isSoon=t=>isOpen(t)&&t.status!=="On hold"&&t.end&&daysLeft(t)>=0&&daysLeft(t)<=14;
 const URGENT_DAYS=14;
 const quadOf=t=>{if(!isOpen(t)||t.status==="On hold"||!t.end)return null;const u=daysLeft(t)<=URGENT_DAYS,i=t.pri==="High";return i&&u?"do":i?"plan":u?"fit":"later"};
@@ -695,6 +695,7 @@ function dueChip(t){
  if(t.status==="Complete")return'<span class="due g">Done</span>';
  if(t.status==="On hold")return'<span class="due m">On hold</span>';
  const d=daysLeft(t);if(d===null)return'<span class="due m">No end date</span>';
+ if(d<0&&t.prog>=1)return'<span class="due g" title="At 100% \u2013 tick Done to complete">100% \u00b7 tick Done</span>';
  if(d<0)return`<span class="due r">${-d}d overdue</span>`;
  if(d===0)return'<span class="due a">Due today</span>';
  if(d<=14)return`<span class="due a">${d}d left</span>`;
@@ -2226,7 +2227,7 @@ function vAnalytics(){
  const contrib=new Map(); // per task: future weekly share for drill-down
  const stale=[];
  function lay(t,from,to,w,dl,future){if(!from||!to)return;let a=Math.max(0,dayOf(from)),b=Math.min(nDays-1,dayOf(to));if(b<a)return;
-  const dn=dens(Math.max(0,dayOf(from)),Math.min(nDays-1,dayOf(to)))*(t._dn||1);const who=(t.an&&t.an.length?t.an:t.pm||[]).concat(t.an&&t.an.length?(t.pm||[]).map(x=>"\u00a7"+x):[]);const ps=who.length?[...new Set(who.map(x=>x.toLowerCase()))]:["_unassigned"];
+  const dn=dens(Math.max(0,dayOf(from)),Math.min(nDays-1,dayOf(to)))*(t._dn||1);const L=x=>x.toLowerCase(),anS=new Set((t.an||[]).map(L)),pmS=new Set((t.pm||[]).map(L));const who=anS.size?[...anS,...[...pmS].filter(p=>!anS.has(p)).map(p=>"\u00a7"+p)]:[...pmS];const ps=who.length?who:["_unassigned"];
   for(let i=a;i<=b;i++){if(!isWd(i))continue;let v=w*dn;if(dl!=null&&i>=dl-2&&i<=dl)v*=1.35;ps.forEach(p=>addP(p.replace("\u00a7",""),i,p[0]==="\u00a7"?v*.35:v));
    if(future&&i>=tIdx){const wk=Math.floor((i-dayOf(w0))/7);if(wk>=0&&wk<A.hz){const k=contrib.get(t)||new Array(A.hz).fill(0);k[wk]+=v*ps.length;contrib.set(t,k)}}}}
  // history: what actually happened (completed + still-open work, active from start to finish)
@@ -2236,7 +2237,7 @@ function vAnalytics(){
  // future: open work + projected recurring
  const live=open.filter(t=>t.status!=="On hold");
  [...live,...proj].forEach(t=>{const left=.35+.65*(1-(t.prog||0)),w=(PW[t.pri]||1)*left;
-  const over=!!(t.end&&D(t.end)<T),od=over?dayDiff(D(t.end),T):0;
+  const over=!!(t.end&&D(t.end)<T&&(t.prog||0)<1),od=over?dayDiff(D(t.end),T):0;
   if(over&&(od>90||od>30&&t.status!=="In progress")){stale.push(t);return}
   let s=D(t.start||t.end)||T;if(s<T)s=new Date(T);
   let e=t.end?D(t.end):new Date(s.getTime()+13*DAY);if(over)e=new Date(T.getTime()+27*DAY);if(e<s)e=s;
