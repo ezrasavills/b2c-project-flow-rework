@@ -30,7 +30,8 @@ window.msalReady=new Promise(function(res){
 @font-face{font-family:"GothamUI";font-weight:700;src:local("Gotham Bold"),local("Gotham-Bold"),local("GothamBold"),local("Gotham SSm Bold"),local("GothamSSm-Bold")}
 @font-face{font-family:"GothamUI";font-weight:800;src:local("Gotham Black"),local("Gotham-Black"),local("Gotham Bold"),local("Gotham-Bold")}
 :root{
- --tlw:470px;
+ --zf:1;
+ --tlw:540px;
  color-scheme:dark;
  --font:"GothamUI","Gotham","Gotham SSm","Gotham Book",Montserrat,"Segoe UI",system-ui,sans-serif;
  --ink:#F2F4F8;--ink2:#C9CFDA;--muted:#8B93A3;--line:rgba(255,255,255,.10);--line2:rgba(255,255,255,.06);
@@ -367,10 +368,10 @@ textarea.fld.title{font-size:15.5px;font-weight:600;min-height:56px}
 .dur{font-size:12px;color:var(--muted);margin-top:-8px}
 .df{padding:16px 26px 20px;border-top:1px solid var(--line);display:flex;gap:10px}
 .df .sp{flex:1}
-.modal{position:fixed;left:50%;top:20%;transform:translate(-50%,-10px) scale(.98);width:470px;max-width:94vw;border-radius:20px;z-index:110;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+.modal{position:fixed;left:50%;top:50%;transform:translate(-50%,calc(-50% - 10px)) scale(.98);width:470px;max-width:calc(94vw / var(--zf,1));max-height:calc(100vh / var(--zf,1) - 32px);display:flex;flex-direction:column;border-radius:20px;z-index:110;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
  background:linear-gradient(155deg,rgba(44,47,56,.95),rgba(22,24,29,.96));-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px);border:1px solid rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 30px 80px rgba(0,0,0,.7)}
-.modal.on{opacity:1;pointer-events:auto;transform:translate(-50%,0) scale(1)}
-.modal .mb{padding:26px 28px}
+.modal.on{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.modal .mb{padding:26px 28px;overflow-y:auto;min-height:0;overscroll-behavior:contain}
 .modal h3{margin:0 0 6px;font-size:19px;letter-spacing:-.025em}
 .modal p{margin:0 0 16px;color:var(--muted);font-size:13px;line-height:1.55}
 .swatches{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
@@ -424,8 +425,8 @@ textarea.fld.title{font-size:15.5px;font-weight:600;min-height:56px}
 @media(max-width:1500px){.kpis{grid-template-columns:repeat(3,1fr)}}
 .mecard{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;border-radius:14px;border:1px solid rgba(245,196,0,.35);background:rgba(245,196,0,.07);margin-bottom:14px}
 .mecard small{display:block;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}.mecard b{display:block;font-size:14px}.mecard span{font-size:12px;color:var(--ink2)}
-.ptab{max-height:46vh;overflow:auto;border:1px solid var(--line);border-radius:14px}
-.ptab .ph,.ptab .pr{display:grid;grid-template-columns:38px 70px minmax(0,1fr) minmax(0,1.3fr) 40px 34px;gap:8px;align-items:center;padding:6px 12px}
+.ptab{max-height:none;overflow-x:auto;overflow-y:visible;border:1px solid var(--line);border-radius:14px}
+.ptab .ph,.ptab .pr{min-width:520px;display:grid;grid-template-columns:38px 70px minmax(0,1fr) minmax(0,1.3fr) 40px 34px;gap:8px;align-items:center;padding:6px 12px}
 .ptab .ph{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:600;position:sticky;top:0;background:rgba(30,32,38,.98);padding:9px 12px;grid-template-columns:116px minmax(0,1fr) minmax(0,1.3fr) 40px 34px}
 .ptab .pr+.pr{border-top:1px solid var(--line2)}.ptab .pr .fld{padding:7px 10px;font-size:12.5px}.ptab small{color:var(--muted);text-align:right}
 .pini em{font-style:normal;font-size:10px;background:var(--gold);color:#15161A;border-radius:6px;padding:1px 6px;margin-left:4px}
@@ -580,10 +581,11 @@ textarea.fld.title{font-size:15.5px;font-weight:600;min-height:56px}
 .antab .cbar{display:grid;grid-template-columns:1fr 46px;gap:10px;align-items:center}.antab .cbar b{text-align:right}
 .anx{margin:4px 0 10px 12px;padding:8px 10px;border-left:2px solid rgba(245,196,0,.4);min-width:880px}
 html{overflow-x:clip}.drawer:not(.on){visibility:hidden;transition:transform .32s cubic-bezier(.2,.8,.2,1),visibility 0s .32s}
-.tprog{display:flex;align-items:center;gap:6px;flex:none;width:112px}.tprog input{min-width:0}.tprog b{font-size:11px;width:30px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink2);font-weight:600}
+.mfoot{position:sticky;bottom:-26px;display:flex;justify-content:flex-end;gap:10px;margin:18px -28px -26px;padding:14px 28px 20px;background:linear-gradient(180deg,rgba(26,28,34,0),rgba(26,28,34,.96) 30%);z-index:2}
+.tprog{display:flex;align-items:center;gap:8px;flex:none;width:150px}.tprog input{min-width:0}.tprog b{font-size:13px;width:42px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink2);font-weight:600}
 .addp{display:grid;grid-template-columns:auto 90px minmax(0,1fr) minmax(0,1.3fr) auto;gap:8px;align-items:center;padding:10px 12px;margin-bottom:12px;border:1px dashed rgba(245,196,0,.45);border-radius:14px;background:rgba(245,196,0,.05)}
 .addp b{font-size:12.5px}.addp .fld{padding:8px 10px;font-size:12.5px}
-@media(max-width:700px){.addp{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.addp{grid-template-columns:1fr 1fr}.addp b{grid-column:1/-1}.mecard{flex-wrap:wrap}.modal .mb{padding:20px 18px}}
 </style>
 </head>
 <body>
@@ -947,7 +949,7 @@ function peopleModal(){
   <div class="ptab"><div class="ph"><span>Initials</span><span>Name</span><span>Microsoft email</span><span>Tasks</span><span></span></div>
   ${rows.map(p=>{const i=pInfo(p)||{};return`<div class="pr" data-ini="${H(p)}"><span class="av"><span style="background:${pColor(p)};width:30px;height:30px;font-size:9.5px">${H(p.slice(0,3))}</span></span><b class="pini">${H(p)}${mine&&p.toLowerCase()===mine.toLowerCase()?' <em>you</em>':""}</b>
    <input class="fld pn" value="${H(i.name||"")}" placeholder="Full name"><input class="fld pe" value="${H(i.email||"")}" placeholder="name@savills.com"><small>${cnt[p]||0}</small><button class="pdel" data-del="${H(p)}" title="Remove ${H(p)}">${ico.bin}</button></div>`}).join("")}</div>
-  <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px"><button class="btn" id="mCancel">Close</button><button class="btn gold" id="mOk">Save changes</button></div></div>`;
+  <div class="mfoot"><button class="btn" id="mCancel">Close</button><button class="btn gold" id="mOk">Save changes</button></div></div>`;
  const close=()=>{$("modal").classList.remove("on");$("modal").style.width="";if(!$("drawer").classList.contains("on"))$("scrim").classList.remove("on")};
  $("mCancel").onclick=close;
  $("myIniSave").onclick=async()=>{const v=$("myIniIn").value.trim();if(!v){toast("Type your initials");return}await claimInitials(v);peopleModal()};
