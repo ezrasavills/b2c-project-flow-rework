@@ -582,6 +582,10 @@ textarea.fld.title{font-size:15.5px;font-weight:600;min-height:56px}
 .anx{margin:4px 0 10px 12px;padding:8px 10px;border-left:2px solid rgba(245,196,0,.4);min-width:880px}
 html{overflow-x:clip}.drawer:not(.on){visibility:hidden;transition:transform .32s cubic-bezier(.2,.8,.2,1),visibility 0s .32s}
 .mfoot{position:sticky;bottom:-26px;display:flex;justify-content:flex-end;gap:10px;margin:18px -28px -26px;padding:14px 28px 20px;background:linear-gradient(180deg,rgba(26,28,34,0),rgba(26,28,34,.96) 30%);z-index:2}
+.tdue{border:1px solid transparent;background:none;padding:4px 8px;border-radius:9px;cursor:pointer;flex:none}.tdue:hover{border-color:var(--line);background:rgba(255,255,255,.07)}
+.dmq{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:12px;font-size:12px;color:var(--muted)}.dmq span{width:84px}
+.dmq button{border:1px solid var(--line);background:rgba(255,255,255,.05);border-radius:9px;padding:6px 10px;font-size:12px;font-weight:600;color:var(--ink2)}.dmq button:hover{border-color:var(--gold);color:var(--gold2)}
+.ptab .fld.auto{border-color:rgba(61,220,151,.35)}
 .tprog{display:flex;align-items:center;gap:8px;flex:none;width:150px}.tprog input{min-width:0}.tprog b{font-size:13px;width:42px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink2);font-weight:600}
 .addp{display:grid;grid-template-columns:auto 90px minmax(0,1fr) minmax(0,1.3fr) auto;gap:8px;align-items:center;padding:10px 12px;margin-bottom:12px;border:1px dashed rgba(245,196,0,.45);border-radius:14px;background:rgba(245,196,0,.05)}
 .addp b{font-size:12.5px}.addp .fld{padding:8px 10px;font-size:12.5px}
@@ -594,10 +598,9 @@ html{overflow-x:clip}.drawer:not(.on){visibility:hidden;transition:transform .32
   <div class="brand"><div class="mark">B2C</div><div><b>Project Flow</b><span>UK Residential Research</span></div></div>
   <div class="tabs">
    <button class="tab" data-v="overview" title="Overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="2.5"/><rect x="14" y="3" width="7" height="5" rx="2.5"/><rect x="14" y="12" width="7" height="9" rx="2.5"/><rect x="3" y="16" width="7" height="5" rx="2.5"/></svg><span class="tl">Overview</span></button>
-   <button class="tab" data-v="timeline" title="Timeline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M8 12h12M4 18h8"/></svg><span class="tl">Timeline</span></button>
+   <button class="tab" data-v="timeline" title="Timeline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M8 12h12M4 18h8"/></svg><span class="tl">Timeline</span><span class="ct" id="allct"></span></button>
    <button class="tab" data-v="analytics" title="Analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="tl">Analytics</span></button>
    <button class="tab" data-v="mine" title="My tasks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.4 4.2-6.5 8-6.5s7 2.1 8 6.5"/></svg><span class="tl">My tasks</span><span class="ct" id="minect"></span></button>
-   <button class="tab" data-v="all" title="All tasks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg><span class="tl">All tasks</span><span class="ct" id="allct"></span></button>
    <span style="position:relative"><button class="tab" id="secBtn" data-v="section"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span id="secLbl" class="tl">Sections</span><svg class="car" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.6" fill="none"/></svg></button>
     <div class="pop" id="secPop" style="width:330px"></div></span>
   </div>
@@ -940,7 +943,7 @@ function peopleModal(){
  const rows=[...new Set([...allPeople().map(x=>x[0]),...peopleMap().map(p=>p.ini)])].sort((a,b)=>a.localeCompare(b));
  const mine=myIni(),cnt=Object.fromEntries(allPeople());
  $("modal").style.width="640px";
- $("modal").innerHTML=`<div class="mb"><h3>Team &amp; initials</h3><p>Link each set of initials to a Microsoft account so <b>My tasks</b> works for everyone. ${Live.hasPeople?"Saved in SharePoint – shared with the whole team.":"<span style='color:var(--amber)'>Saved only in this browser.</span>"}</p>
+ $("modal").innerHTML=`<div class="mb"><h3>Team &amp; initials</h3><p>Link each set of initials to a Microsoft account so <b>My tasks</b> works for everyone. Full names are filled in automatically from the account. ${Live.hasPeople?"Saved in SharePoint – shared with the whole team.":"<span style='color:var(--amber)'>Saved only in this browser.</span>"}</p>
   ${Live.hasPeople?"":`<div class="prwarn card pad" style="margin-bottom:14px;padding:12px 14px"><div><b>Share these links with everyone</b><span>Create a small SharePoint list so everyone's initials are set once for the whole team.</span></div><button class="btn gold sm" id="mkPeople">${ico.plus} Create list</button></div>`}
   <div class="mecard"><div><small>Signed in as</small><b>${H(Live.me||"Unknown")}</b><span>${H(Live.email||"")}</span></div>
    <div style="display:flex;gap:8px;align-items:center"><span style="font-size:12px;color:var(--muted)">My initials</span><input class="fld" id="myIniIn" list="plistM" value="${H(mine||"")}" placeholder="e.g. EzA" style="width:110px;padding:8px 10px"><button class="btn gold sm" id="myIniSave">Save</button></div></div>
@@ -950,17 +953,22 @@ function peopleModal(){
   ${rows.map(p=>{const i=pInfo(p)||{};return`<div class="pr" data-ini="${H(p)}"><span class="av"><span style="background:${pColor(p)};width:30px;height:30px;font-size:9.5px">${H(p.slice(0,3))}</span></span><b class="pini">${H(p)}${mine&&p.toLowerCase()===mine.toLowerCase()?' <em>you</em>':""}</b>
    <input class="fld pn" value="${H(i.name||"")}" placeholder="Full name"><input class="fld pe" value="${H(i.email||"")}" placeholder="name@savills.com"><small>${cnt[p]||0}</small><button class="pdel" data-del="${H(p)}" title="Remove ${H(p)}">${ico.bin}</button></div>`}).join("")}</div>
   <div class="mfoot"><button class="btn" id="mCancel">Close</button><button class="btn gold" id="mOk">Save changes</button></div></div>`;
- const close=()=>{$("modal").classList.remove("on");$("modal").style.width="";if(!$("drawer").classList.contains("on"))$("scrim").classList.remove("on")};
- $("mCancel").onclick=close;
+   const close=()=>{$("modal").classList.remove("on");$("modal").style.width="";if(!$("drawer").classList.contains("on"))$("scrim").classList.remove("on")};
+   $("mCancel").onclick=close;
+   const autoName=async(emEl,nmEl)=>{const em=emEl.value.trim();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))return;
+    nmEl.placeholder="Looking up\u2026";try{const m=await Live.lookupNames([em]);const n=m[em.toLowerCase()];if(n){nmEl.value=n;nmEl.classList.add("auto");nmEl.title="Name from the Microsoft account"}else nmEl.placeholder="Full name (not found \u2013 type it)"}catch(e){nmEl.placeholder="Full name"}};
+   $("modal").querySelectorAll(".pr").forEach(r=>{const em=r.querySelector(".pe"),nm=r.querySelector(".pn");em.addEventListener("change",()=>autoName(em,nm))});
+   $("npEmail").addEventListener("change",()=>autoName($("npEmail"),$("npName")));
  $("myIniSave").onclick=async()=>{const v=$("myIniIn").value.trim();if(!v){toast("Type your initials");return}await claimInitials(v);peopleModal()};
  $("npAdd").onclick=async()=>{const ini=$("npIni").value.trim(),nm=$("npName").value.trim(),em=$("npEmail").value.trim();
    if(!ini){toast("Type their initials");$("npIni").focus();return}
    if(/[\/,&;+\s]/.test(ini)){toast("Initials can't contain spaces or / , & ; +");return}
    if(!em&&!nm){toast("Add a name or Microsoft email");return}
+     if(em&&!nm){try{const m=await Live.lookupNames([em]);if(m[em.toLowerCase()])$("npName").value=m[em.toLowerCase()]}catch(e){}}
    if(em&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){toast("Check the email address");return}
    const ex=pInfo(ini)||allPeople().find(([p])=>p.toLowerCase()===ini.toLowerCase());
    if(ex&&!confirm(`${canon(ini)} already exists. Update their name/email?`))return;
-   try{$("npAdd").disabled=true;await savePeopleRows([{ini:canon(ini),name:nm,email:em}]);toast(`Added ${canon(ini)}${em?" \u2013 linked to "+em:""}`);render();peopleModal()}catch(e){$("npAdd").disabled=false;toast("Couldn't save: "+e.message)}};
+     try{$("npAdd").disabled=true;await savePeopleRows([{ini:canon(ini),name:$("npName").value.trim()||nm,email:em}]);toast(`Added ${canon(ini)}${em?" \u2013 linked to "+em:""}`);render();peopleModal()}catch(e){$("npAdd").disabled=false;toast("Couldn't save: "+e.message)}};
  $("mOk").onclick=async()=>{const ch=[];$("modal").querySelectorAll(".pr").forEach(r=>{const ini=r.dataset.ini,i=pInfo(ini)||{},n=r.querySelector(".pn").value.trim(),e=r.querySelector(".pe").value.trim();
    if(e&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){toast(`Check the email for ${ini}`);throw 0}
    if(n!==(i.name||"")||e!==(i.email||""))ch.push({ini,name:n,email:e})});
@@ -1132,7 +1140,7 @@ function vActivity(){
 }
 
 /* ---------- Views ---------- */
-function render(){const k=UI.view+"|"+UI.mineTab+"|"+UI.section,same=UI._lv===k;document.body.classList.toggle("nofade",same);UI._lv=k;
+function render(){if(UI.view==="all"){UI.view="timeline";UI.tlTab="list"}const k=UI.view+"|"+UI.mineTab+"|"+UI.section+"|"+(UI.view==="timeline"?UI.tlTab:""),same=UI._lv===k;document.body.classList.toggle("nofade",same);UI._lv=k;
  const keep=same?{y:window.scrollY,els:[...$("view").querySelectorAll(".gw,.scroll,.tl,.antab,.anwk")].map((e,i)=>[e.className.split(" ").join("."),i,e.scrollTop,e.scrollLeft])}:null;
  _render0();
  if(keep){const v=$("view");keep.els.forEach(([c,i,st,sl])=>{const e=v.querySelectorAll(".gw,.scroll,.tl,.antab,.anwk")[i];if(e&&e.className.split(" ").join(".")===c){e.scrollTop=st;e.scrollLeft=sl}});window.scrollTo(0,keep.y);requestAnimationFrame(()=>window.scrollTo(0,keep.y))}}
@@ -1345,16 +1353,19 @@ function vSection(){
  $("renSec").onclick=()=>sectionModal(s);
  $("delSec").onclick=()=>{if(all.length){toast(`Move or delete the ${all.length} task(s) in this section first`);return}DB.sections=DB.sections.filter(x=>x!==s);save("Section deleted");go("overview")};
 }
+function tlTabs(){const tb=UI.tlTab||"timeline";return`<div class="subtabs"><button data-tt="timeline" class="${tb==="timeline"?"on":""}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M8 12h12M4 18h8"/></svg>Timeline view</button><button data-tt="list" class="${tb==="list"?"on":""}">${ico.list.replace('<svg','<svg width="15" height="15"')}List view<em>${DB.tasks.filter(isOpen).length}</em></button></div>`}
+function bindTlTabs(){$("view").querySelectorAll("[data-tt]").forEach(b=>b.onclick=()=>{UI.tlTab=b.dataset.tt;UI.limit=80;render();window.scrollTo({top:0})})}
 function vAll(){
  const base=DB.tasks.filter(matches);
  const fn=listPred();
  const rows=sortRows(base.filter(fn));
- $("view").innerHTML=pageHead("All tasks",`${rows.length.toLocaleString("en-GB")} task${rows.length===1?"":"s"} shown${UI.showDone?" (including completed)":" · open tasks only"} · tick the circle to complete · use “Select multiple” to complete several at once`)+`<div class="fade"><div class="tb" style="margin-top:0">${ddBar(()=>true)}${toolbarRight()}</div>${taskTable(rows,true)}</div>`;
- bindRows();bindDD();
+ $("view").innerHTML=pageHead("Timeline",`${rows.length.toLocaleString("en-GB")} task${rows.length===1?"":"s"} shown${UI.showDone?" (including completed)":" · open tasks only"} · tick the circle to complete · use “Select multiple” to complete several at once`)+tlTabs()+`<div class="fade"><div class="tb" style="margin-top:0">${ddBar(()=>true)}${toolbarRight()}</div>${taskTable(rows,true)}</div>`;
+ bindRows();bindDD();bindTlTabs();
 }
 
 /* ---------- Timeline ---------- */
 function vTimeline(){
+ if(UI.tlTab==="list"){vAll();return}
  const PX=16,start=new Date(T.getTime()-35*DAY);start.setDate(start.getDate()-((start.getDay()+6)%7));
  const days=7*18,end=new Date(start.getTime()+days*DAY),W=days*PX;
  const x=d=>Math.round((d-start)/DAY)*PX;
@@ -1373,13 +1384,14 @@ function vTimeline(){
    if(!t.start&&!t.end)bar=`<span class="gset" data-id="${t.id}" style="left:${x(T)+20}px">+ Set dates</span>`;
    else{const s0=D(t.start||t.end),e0=D(t.end||t.start),l=x(s0),w=x(e0)-l+PX,col=t.status==="On hold"?SCH["On hold"]:secColor(t.ws);
     bar=`<div class="gbar ${isOver(t)?"over":""}" data-id="${t.id}" style="left:${l}px;width:${w}px;background:${col}40;border:1px solid ${col}88"><div class="f" style="width:${t.prog*100}%;background:linear-gradient(180deg,${col},${col}cc)"></div><span class="lb">${Math.round(t.prog*100)}%</span><span class="h l"></span><span class="h r"></span></div>`}
-   rowsH+=`<div class="grow2"><div class="nm">${doneBtn(t,true)}${avatars(t,3)}<span class="tn" data-id="${t.id}" title="${H(t.task)}">${H(t.task)}</span><span class="tprog" title="Progress"><input type="range" min="0" max="100" step="5" value="${Math.round(t.prog*100)}" data-tp="${t.id}" style="--p:${Math.round(t.prog*100)}%;--c:${SCH[t.status]}"><b>${Math.round(t.prog*100)}%</b></span>${dueChip(t)}</div><div class="garea" style="width:${W}px">${bg}${tdy}${bar}</div></div>`})});
- $("view").innerHTML=pageHead("Timeline","Tick to complete · drag a bar to move it · drag either end to change the start or end date")+`<div class="fade"><div class="tb" style="margin-top:0">${ddBar(()=>true,{openOnly:true})}<select class="sel" id="tlSort" title="Sort tasks">${[["start","Sort: Start date"],["end","Sort: End date (soonest)"],["end-desc","Sort: End date (latest)"],["pri","Sort: Priority (high first)"],["prog","Sort: Progress"],["task","Sort: A–Z"]].map(([k,l])=>`<option value="${k}" ${(UI.tlSort||"start")===k?"selected":""}>${l}</option>`).join("")}</select><select class="sel" id="tlGroup" title="Grouping"><option value="sec" ${UI.tlGroup!=="none"?"selected":""}>Group by section</option><option value="none" ${UI.tlGroup==="none"?"selected":""}>No grouping</option></select>
+   rowsH+=`<div class="grow2"><div class="nm">${doneBtn(t,true)}${avatars(t,3)}<span class="tn" data-id="${t.id}" title="${H(t.task)}">${H(t.task)}</span><span class="tprog" title="Progress"><input type="range" min="0" max="100" step="5" value="${Math.round(t.prog*100)}" data-tp="${t.id}" style="--p:${Math.round(t.prog*100)}%;--c:${SCH[t.status]}"><b>${Math.round(t.prog*100)}%</b></span><button type="button" class="tdue" data-dt="${t.id}" title="Change dates">${dueChip(t)}</button></div><div class="garea" style="width:${W}px">${bg}${tdy}${bar}</div></div>`})});
+ $("view").innerHTML=pageHead("Timeline","Tick to complete · drag a bar to move it · click the due date to change dates")+tlTabs()+`<div class="fade"><div class="tb" style="margin-top:0">${ddBar(()=>true,{openOnly:true})}<select class="sel" id="tlSort" title="Sort tasks">${[["start","Sort: Start date"],["end","Sort: End date (soonest)"],["end-desc","Sort: End date (latest)"],["pri","Sort: Priority (high first)"],["prog","Sort: Progress"],["task","Sort: A–Z"]].map(([k,l])=>`<option value="${k}" ${(UI.tlSort||"start")===k?"selected":""}>${l}</option>`).join("")}</select><select class="sel" id="tlGroup" title="Grouping"><option value="sec" ${UI.tlGroup!=="none"?"selected":""}>Group by section</option><option value="none" ${UI.tlGroup==="none"?"selected":""}>No grouping</option></select>
   <label style="display:flex;gap:7px;align-items:center;font-size:13px;color:var(--ink2)"><input type="checkbox" id="tlHold" ${UI.tlHold?"checked":""}> Include on-hold</label><span class="sp"></span>
   <span class="legend"><span><i style="background:var(--red)"></i>Today / overdue outline</span><span><i style="background:var(--gold)"></i>Yellow ring = project manager</span><span>Brighter fill = progress</span></span></div>
   <div class="card gw"><div style="width:calc(${W}px + var(--tlw))"><div class="gh"><div class="corner">Open task</div><div class="gscale" style="width:${W}px">${scale}<div class="gtoday" style="left:${x(T)+PX/2}px"><b>Today</b></div></div></div>
   ${rowsH||'<div class="empty"><b>No open tasks in this window</b></div>'}</div></div></div>`;
- bindDD();
+ bindDD();bindTlTabs();
+ $("view").querySelectorAll("[data-dt]").forEach(b=>b.onclick=e=>{e.stopPropagation();dateModal(+b.dataset.dt)});
  $("tlHold").onchange=e=>{UI.tlHold=e.target.checked;render()};
  $("tlSort").onchange=e=>{UI.tlSort=e.target.value;render()};$("tlGroup").onchange=e=>{UI.tlGroup=e.target.value;render()};
  $("view").querySelectorAll(".grow2 .tn,.gset").forEach(e=>e.onclick=()=>openTask(+e.dataset.id));
@@ -1388,6 +1400,27 @@ function vTimeline(){
  $("view").querySelectorAll("[data-tp]").forEach(el=>{const t=DB.tasks.find(x=>x.id===+el.dataset.tp);if(!t)return;
   el.oninput=()=>{el.style.setProperty("--p",el.value+"%");el.nextElementSibling.textContent=el.value+"%";const bar=$("view").querySelector(`.gbar[data-id="${t.id}"]`);if(bar){bar.querySelector(".f").style.width=el.value+"%";bar.querySelector(".lb").textContent=el.value+"%"}};
   el.onchange=()=>{const was=t.status;setProg(t,el.value/100);touch(t);save(was==="Complete"&&t.status!=="Complete"?"Reopened \u201c"+short(t.task)+"\u201d at "+el.value+"%":el.value==100&&t.status!=="Complete"?"Progress 100% \u2013 tick Done when it\u2019s finished":"Progress updated to "+el.value+"%");render()}});
+}
+function dateModal(id){
+ const t=DB.tasks.find(x=>x.id===id);if(!t)return;
+ let s=t.start||"",e=t.end||"";
+ const draw=()=>{const ok=!(s&&e&&e<s);const dur=s&&e&&ok?Math.round((D(e)-D(s))/DAY)+1:null;
+  $("modal").innerHTML=`<div class="mb"><h3>Change dates</h3><p><b>${H(short(t.task))}</b>${t.ws?` \u00b7 ${H(t.ws)}`:""}</p>
+   <div class="two"><div class="f"><label>Start date</label><input type="date" class="fld" id="dmS" value="${s}"></div><div class="f"><label>End date</label><input type="date" class="fld" id="dmE" value="${e}"></div></div>
+   <div class="dmq"><span>End date:</span>${[["Today",0],["+1 day","+1"],["+1 week","+7"],["+2 weeks","+14"],["+1 month","+m"]].map(([l,v])=>`<button type="button" data-q="${v}">${l}</button>`).join("")}<button type="button" data-q="clr">Clear</button></div>
+   <div class="dmq"><span>Move both:</span>${[["\u2212 1 week",-7],["\u2212 1 day",-1],["+1 day",1],["+1 week",7]].map(([l,v])=>`<button type="button" data-sh="${v}">${l}</button>`).join("")}</div>
+   <div class="dur" style="margin:12px 0 0">${!ok?'<span style="color:var(--red)">End date is before the start date</span>':dur?`Duration: ${dur} day${dur===1?"":"s"} \u00b7 ${fmt(s,1)} \u2192 ${fmt(e,1)}`:"Add both dates so the task shows on the timeline"}</div>
+   <div class="mfoot"><button class="btn" id="dmX">Cancel</button><button class="btn gold" id="dmOk" ${ok?"":"disabled style='opacity:.5'"}>Save dates</button></div></div>`;
+  const rd=()=>{s=$("dmS").value;e=$("dmE").value};
+  $("dmS").onchange=()=>{rd();draw()};$("dmE").onchange=()=>{rd();draw()};
+  $("modal").querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{rd();const q=b.dataset.q,base=e?D(e):new Date(T);
+   if(q==="clr")e="";else if(q==="0")e=iso(T);else if(q==="+m"){const x=new Date(base);x.setMonth(x.getMonth()+1);e=iso(x)}else e=iso(new Date(base.getTime()+(+q)*DAY));draw()});
+  $("modal").querySelectorAll("[data-sh]").forEach(b=>b.onclick=()=>{rd();const n=+b.dataset.sh;if(s)s=iso(new Date(D(s).getTime()+n*DAY));if(e)e=iso(new Date(D(e).getTime()+n*DAY));draw()});
+  const close=()=>{$("modal").classList.remove("on");if(!$("drawer").classList.contains("on"))$("scrim").classList.remove("on")};
+  $("dmX").onclick=close;
+  $("dmOk").onclick=()=>{rd();if(s&&e&&e<s)return;const bak={start:t.start,end:t.end};t.start=s||null;t.end=e||null;touch(t);close();
+   save(`Dates updated: ${t.start?fmt(t.start):"no start"} \u2192 ${t.end?fmt(t.end,1):"no end"}`,()=>{Object.assign(t,bak);save("Undone");render()});render()}};
+ $("modal").style.width="440px";draw();$("modal").classList.add("on");$("scrim").classList.add("on");
 }
 function tlCmp(a,b){const k=UI.tlSort||"start",z="9999";
  if(k==="task")return a.task.localeCompare(b.task);
@@ -1775,6 +1808,7 @@ const Live=(()=>{
   snapT.clear();snapS.clear();tasks.forEach(t=>snapT.set(t.sp,ser(t)));secs.forEach(s=>snapS.set(s.sp,sser(s)));
   DB.tasks=tasks;DB.sections=secs;lastPull=Date.now();
   set(tasks.length||secs.length?"ready":"empty");render();
+  setTimeout(()=>syncNames().catch(()=>{}),1500);
   clearInterval(pollT);pollT=setInterval(()=>{if(document.visibilityState==="visible")pull()},CONFIG.pollSeconds*1000)}
  async function checkPri(){
   try{const j=await api(`/sites/${siteId}/lists/${taskListId}/columns?$select=name`);const cn=(j.value||[]).map(c=>c.name);hasPri=cn.includes("Priority");hasDesc=cn.includes("Description");hasDone=cn.includes("CompletedOn")&&cn.includes("CompletedBy");hasHold=cn.includes("HoldDays")&&cn.includes("HoldSince")}catch(e){hasPri=false;hasDesc=false;hasDone=false;hasHold=false}
@@ -1799,6 +1833,17 @@ const Live=(()=>{
   if(!actListId)return null;
   const it=await getAll(actListId,"Title,Action,TaskRef,Details,UserName");
   return it.map(x=>({id:x.id,when:x.createdDateTime,who:(x.fields.UserName||(x.createdBy&&x.createdBy.user&&x.createdBy.user.displayName)||"Someone"),act:x.fields.Action||"Edited",title:x.fields.Title||"",ref:x.fields.TaskRef||"",det:x.fields.Details||""})).sort((a,b)=>a.when<b.when?1:-1)}
+ // Names for accounts: the site's User Information List (no extra permission), then the directory if allowed silently
+ async function lookupNames(emails){const out={},want=new Set(emails.filter(Boolean).map(x=>x.toLowerCase()));if(!want.size)return out;
+  try{let url=`/sites/${siteId}/lists/${encodeURIComponent("User Information List")}/items?$expand=fields($select=Title,EMail,UserName)&$top=999`;
+   while(url){const j=await api(url);(j.value||[]).forEach(it=>{const f=it.fields||{},em=String(f.EMail||f.UserName||"").toLowerCase();if(em&&want.has(em)&&f.Title)out[em]=f.Title});url=j["@odata.nextLink"]}}catch(e){}
+  if(!MOCK&&pca){const miss=[...want].filter(x=>!out[x]);if(miss.length){try{const tk=(await pca.acquireTokenSilent({scopes:["User.ReadBasic.All"],account})).accessToken;
+   for(const em of miss){try{const r=await fetch(G+"/users/"+encodeURIComponent(em)+"?$select=displayName,mail",{headers:{Authorization:"Bearer "+tk}});if(r.ok){const j=await r.json();if(j.displayName)out[em]=j.displayName}}catch(e){}}}catch(e){}}}
+  if(account&&account.username&&want.has(account.username.toLowerCase())&&account.name)out[account.username.toLowerCase()]=account.name;
+  return out}
+ async function syncNames(){if(!peopleListId||!DB.people)return 0;
+  const map=await lookupNames(DB.people.map(p=>p.email));const ch=DB.people.filter(p=>p.email&&map[p.email.toLowerCase()]&&map[p.email.toLowerCase()]!==p.name).map(p=>({ini:p.ini,email:p.email,name:map[p.email.toLowerCase()]}));
+  if(ch.length){await savePeople(ch);safeRender()}return ch.length}
  async function deletePerson(sp){await api(`/sites/${siteId}/lists/${peopleListId}/items/${sp}`,{method:"DELETE"});DB.people=(DB.people||[]).filter(p=>p.sp!==sp)}
  function logChanges(meta,out){
   if(!actListId)return;const logs=[];
@@ -1847,7 +1892,7 @@ const Live=(()=>{
   const base=-Date.now();d.tasks.forEach((t,i)=>{delete t.sp;t.id=base-i;DB.tasks.push(t)});
   set("ready");go("overview");toast("Uploading to SharePoint – keep this tab open until it finishes");await push();
   if(state==="ready")toast(`Imported ${d.tasks.length.toLocaleString("en-GB")} tasks – everyone can see them now`)}
- return{get hasHold(){return hasHold},get hasDone(){return hasDone},get hasDesc(){return hasDesc},get hasAct(){return!!actListId},createActivityList,getActivity,deletePerson,get hasPeople(){return!!peopleListId},get email(){return MOCK?"test.user@savills.com":(account&&account.username)||""},createPeopleList,savePeople,get hasPri(){return hasPri},addPriColumn,init,pull,push,signIn,signOut,createLists,startFresh,importWorkbook,configured,
+ return{lookupNames,syncNames,get hasHold(){return hasHold},get hasDone(){return hasDone},get hasDesc(){return hasDesc},get hasAct(){return!!actListId},createActivityList,getActivity,deletePerson,get hasPeople(){return!!peopleListId},get email(){return MOCK?"test.user@savills.com":(account&&account.username)||""},createPeopleList,savePeople,get hasPri(){return hasPri},addPriColumn,init,pull,push,signIn,signOut,createLists,startFresh,importWorkbook,configured,
   schedule(){clearTimeout(timer);timer=setTimeout(push,400)},
    pending:()=>pushing||DB.tasks.some(t=>!t.sp||!snapT.has(t.sp)||ser(t)!==snapT.get(t.sp)),
   get state(){return state},get msg(){return msg},get me(){return me},get lastPull(){return lastPull},get listUrl(){return listUrl},get account(){return account}}
